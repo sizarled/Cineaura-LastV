@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title data-i18n-title="cw.title">Creator workspace — CineAura</title>
+  <script src="js/prefs.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/creator-dashboard.css" />
+</head>
+<body class="page-inner" data-auth-gate="silent">
+  <div class="bg-orbs" aria-hidden="true"><div class="orb orb-cyan"></div><div class="orb orb-green"></div></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="site-wrap">
+    <header class="header scrolled"><div class="header-inner">
+      <a class="logo" href="./"><span class="logo-mark" aria-hidden="true">▶</span><span class="logo-word">Cine<span>Aura</span></span></a>
+      <nav class="nav" aria-label="Primary"><a href="./dashboard.html" data-i18n="nav.dashboard">Dashboard</a><a href="./profile.html" data-i18n="cw.profile">Profile</a></nav>
+      <div class="auth auth-user"><a class="btn btn-sm btn-primary" href="./dashboard.html" data-i18n="nav.dashboard">Dashboard</a></div>
+    </div></header>
+    <main class="page-main cw-root" id="creator-root"><p class="muted">Loading creator workspace…</p></main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="js/i18n.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/documents.js"></script>
+  <script src="js/creator-dashboard.js"></script>
+</body>
+</html>

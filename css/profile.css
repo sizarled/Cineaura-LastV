@@ -941,3 +941,13 @@ input[data-parent] { border-color: var(--cyan); outline: 1px solid var(--cyan); 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Profile post items and opinion/comment filters */
+.post-linked-item{display:grid;gap:6px;padding:10px 12px;margin:8px 0;border:1px solid var(--line);border-radius:12px;background:var(--sub)}
+.post-linked-item>a{font-weight:700}
+.post-linked-item>p{margin:0;color:var(--muted);white-space:pre-line}
+.comment-tools{display:flex;gap:8px;flex-wrap:wrap}
+.comment-tools select,.form-row select[data-cmt-sentiment]{min-width:120px}
+.cmt[hidden]{display:none!important}
+.linked-item-add{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px}
+.linked-item-add summary{cursor:pointer;font-weight:700}

@@ -9,7 +9,7 @@
 
 alter table public.posts drop constraint if exists posts_kind_check;
 alter table public.posts
-  add constraint posts_kind_check check (kind in ('playlist', 'recommendation', 'reclist', 'account', 'review', 'post'));
+  add constraint posts_kind_check check (kind in ('playlist', 'recommendation', 'reclist', 'readlist', 'account', 'review', 'post'));
 
 comment on column public.posts.kind is 'playlist / recommendation / reclist / account / review / post (post = free text post, titles optional)';
 

@@ -941,6 +941,8 @@
       } catch { /* the video itself is published; the file stays linked by url */ }
     }
     state.published = { id: res.data.id, publish_at: res.data.publish_at };
+    const workspaceId = Number(new URLSearchParams(location.search).get("workspace"));
+    if (workspaceId) C.supabaseRequest("/rest/v1/creator_hub_items", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ hub_id: workspaceId, content_type: "video", content_id: String(res.data.id), title: body.title, thumb_url: thumb, href: `./video.html?id=${encodeURIComponent(res.data.id)}`, visibility: body.visibility }) }).catch(() => {});
     if (body.playlist_name) state.playlists = null;
     toast(t(res.data.scheduled ? "vid.scheduledToast" : "vid.publishedToast"));
     drawSubmit(pane);

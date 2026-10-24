@@ -144,6 +144,16 @@
     }
   }
 
+  async function removeDocument(id, memberId) {
+    const chk = await req(`/rest/v1/community_documents?id=eq.${encodeURIComponent(id)}&select=member_id,storage_path,bucket`);
+    const row = chk.ok && Array.isArray(chk.data) ? chk.data[0] : null;
+    if (!row || row.member_id !== memberId) return { ok: false, reason: "forbidden" };
+    const del = await req(`/rest/v1/community_documents?id=eq.${encodeURIComponent(id)}&member_id=eq.${encodeURIComponent(memberId)}`, { method: "DELETE" });
+    if (!del.ok) return { ok: false, reason: "delete" };
+    await removeFile(row.storage_path, BUCKET(row));
+    return { ok: true };
+  }
+
   /* ---------- VirusTotal gate ----------------------------------------------
      The key never reaches the browser: it lives as a Supabase secret and the
      `vt-scan` function calls the API (see supabase/functions/vt-scan/DEPLOY.md).
@@ -359,6 +369,8 @@
       fill.style.width = "100%";
       num.textContent = "100%";
       const created = Array.isArray(row.data) ? row.data[0] : null;
+      const workspaceId = Number(new URLSearchParams(location.search).get("workspace"));
+      if (workspaceId && created?.id) req("/rest/v1/creator_hub_items", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ hub_id: workspaceId, content_type: "document", content_id: String(created.id), title, thumb_url: "", href: `./documents.html?id=${encodeURIComponent(created.id)}`, visibility: vis }) }).catch(() => {});
       C().toast(t("doc.uploaded"));
       ctx.onDone?.(created);
       host.innerHTML = `<p class="com-note">${esc(t("doc.uploaded"))}
@@ -666,5 +678,5 @@
       .join("");
   }
 
-  window.CineAuraDocs = { list, documentView, renderUpload, renderManage, memberDocuments, homeRows, FORMATS, MAX_BYTES, MAX_PER_MEMBER };
+  window.CineAuraDocs = { list, documentView, renderUpload, renderManage, removeDocument, memberDocuments, homeRows, FORMATS, MAX_BYTES, MAX_PER_MEMBER };
 })();
