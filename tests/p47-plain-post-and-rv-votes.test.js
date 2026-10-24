@@ -5,12 +5,12 @@ const { ok, has, count, done } = make();
 
 // ---------------- A. plain post kind
 const sqlPl = read("sql/plain_posts.sql");
-has("A1: constraint widened", sqlPl, "check (kind in ('playlist', 'recommendation', 'reclist', 'account', 'review', 'post'))");
+has("A1: constraint allows readlists", sqlPl, "check (kind in ('playlist', 'recommendation', 'reclist', 'readlist', 'account', 'review', 'post'))");
 has("A1: drops the old constraint first", sqlPl, "drop constraint if exists posts_kind_check");
 has("A1: pgrst reload", sqlPl, "notify pgrst, 'reload schema';");
 
 const js = read("js/profile.js");
-has("A2: Post is the default Studio kind", js, ': "post";\n    box.innerHTML = `');
+has("A2: Post is the default Create kind", js, 'STUDIO_KINDS.includes(state.studioKind) ? state.studioKind : "post";');
 has("A3: every kind is one chip (no hidden default)", js, 'data-sk="${k}">${studioKindLabel(k)}</button>');
 has("A4: plain posts open the rich composer", js, "drawRichComposer(host, kind);");
 has("A5: picker optional for posts", js, 'kind === "post" ? t("cr.attachOpt")');

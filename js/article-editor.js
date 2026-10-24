@@ -284,6 +284,7 @@
             <span class="ae-state" id="ae-state">${esc(t("ae.draft"))}</span>
             <button class="btn btn-sm btn-ghost ae-theme" type="button" id="ae-theme" aria-label="${esc(t("set.theme"))}">${themeIcon}</button>
             <button class="btn btn-sm btn-ghost" type="button" id="ae-preview">${esc(t("ae.preview"))}</button>
+            <button class="btn btn-sm btn-ghost" type="button" id="ae-save-draft">${esc(t("ae.saveDraft"))}</button>
             <button class="btn btn-sm btn-primary" type="button" id="ae-publish">${esc(t("ae.publish"))}</button>
           </div>
         </header>
@@ -891,7 +892,8 @@
     }
     $("ae-pv-close").onclick = () => closeDialog(root.querySelector("#ae-pv"));
 
-    $("ae-publish").onclick = () => save();
+    $("ae-publish").onclick = () => save(false);
+    $("ae-save-draft").onclick = () => save(true);
 
     // image size / alignment on click
     body.addEventListener("click", (e) => {
@@ -1155,7 +1157,7 @@
   }
 
   /* ---------- save --------------------------------------------------------- */
-  async function save() {
+  async function save(asDraft = false) {
     const $ = state.$;
     const root = state.root;
     const title = $("ae-title").value.trim();
@@ -1169,16 +1171,16 @@
     }
     if (!plain && !body.querySelector("img,video,iframe")) return C().toast(t("ae.emptyBody"));
     const d = state.data;
-    if (!d.inContent && !d.inHelp) return C().toast(t("ae.needPlace"));
-    if (d.inHelp && !root.querySelectorAll("#ae-help-tree input:checked").length) return C().toast(t("ae.needSection"));
-    if (d.vis === "private" && !d.users.length && !d.passes.length) return C().toast(t("ae.needPrivate"));
-    if (d.when === "later") {
+    if (!asDraft && !d.inContent && !d.inHelp) return C().toast(t("ae.needPlace"));
+    if (!asDraft && d.inHelp && !root.querySelectorAll("#ae-help-tree input:checked").length) return C().toast(t("ae.needSection"));
+    if (!asDraft && d.vis === "private" && !d.users.length && !d.passes.length) return C().toast(t("ae.needPrivate"));
+    if (!asDraft && d.when === "later") {
       if (!$("ae-when-at").value) return C().toast(t("ae.needDate"));
       if (new Date($("ae-when-at").value).getTime() <= Date.now()) return C().toast(t("ae.futureDate"));
     }
 
     const staff = await isStaff(state.me);
-    const places = [d.inContent ? "content" : "", d.inHelp ? "help" : ""].filter(Boolean).join("+") || "content";
+    const places = asDraft ? "content" : [d.inContent ? "content" : "", d.inHelp ? "help" : ""].filter(Boolean).join("+") || "content";
     const payload = {
       member_id: state.existing?.member_id || state.me.member_id,
       title,
@@ -1200,9 +1202,9 @@
       },
       private_users: listStr(d.users),
       private_passwords: listStr(d.passes),
-      publish_at: d.when === "later" ? new Date($("ae-when-at").value).toISOString() : new Date().toISOString(),
-      // Help from a member waits for a moderator; staff publish directly
-      status: d.inHelp && !staff ? "pending" : "published",
+      publish_at: !asDraft && d.when === "later" ? new Date($("ae-when-at").value).toISOString() : new Date().toISOString(),
+      // Explicit draft saves stay unpublished; member Help submissions wait for review.
+      status: asDraft ? "draft" : d.inHelp && !staff ? "pending" : "published",
       places,
       help_sections: listStr([...root.querySelectorAll("#ae-help-tree input:checked")].map((i) => i.value)),
       content_field: $("ae-field").value,
@@ -1244,18 +1246,25 @@
       return C().toast(t("ae.saveFail"));
     }
     const row = Array.isArray(res.data) ? res.data[0] : null;
-    const successText = payload.status === "pending"
-      ? t("ae.sentReview")
-      : d.when === "later"
-        ? t("ae.scheduled")
-        : t("ae.published");
+    const workspaceId = Number(new URLSearchParams(location.search).get("workspace"));
+    const articleId = row?.id || state.editId;
+    if (workspaceId && articleId) req("/rest/v1/creator_hub_items", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ hub_id: workspaceId, content_type: "article", content_id: String(articleId), title, thumb_url: state.thumb || "", href: `./article.html?id=${encodeURIComponent(articleId)}`, visibility: payload.visibility }) }).catch(() => {});
+    const successText = payload.status === "draft"
+      ? t("ae.draftSaved")
+      : payload.status === "pending"
+        ? t("ae.sentReview")
+        : d.when === "later"
+          ? t("ae.scheduled")
+          : t("ae.published");
     C().toast(successText);
-    $("ae-state").textContent = payload.status === "pending"
-      ? t("ae.pending")
-      : d.when === "later"
-        ? t("ae.scheduled")
-        : t("ae.published");
-    if (row?.id) setTimeout(() => (location.href = `./articles.html?id=${row.id}`), 700);
+    $("ae-state").textContent = payload.status === "draft"
+      ? t("ae.draft")
+      : payload.status === "pending"
+        ? t("ae.pending")
+        : d.when === "later"
+          ? t("ae.scheduled")
+          : t("ae.published");
+    if (row?.id && payload.status !== "draft") setTimeout(() => (location.href = `./articles.html?id=${row.id}`), 700);
   }
 
   window.CineAuraArticles = { mount, sanitize, canRead, bodyHtml, critOf };

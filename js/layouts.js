@@ -22,15 +22,16 @@
   // a flat list — «Main», «Content», «Performance», «Earnings» and «Account» are
   // headings that own the buttons under them, and the order keeps them together.
   const DASH_GROUPS = [
-    { key:"main",    ids:["overview","level","points"] },
-    { key:"content", ids:["upload","articles","documents","links","codes","playlists","iptv"] },
+    { key:"main",        ids:["overview","level","points"] },
+    { key:"userContent", ids:["videos","articles","documents","questions","answers"] },
+    { key:"content",     ids:["upload","links","codes","playlists","iptv"] },
     { key:"perf",    ids:["views","analytics","reports","history"] },
     { key:"earn",    ids:["withdraw","prizes"] },
     { key:"account", ids:["customize","settings"] },
   ];
   const DASH_BASE = DASH_GROUPS.flatMap((g)=>g.ids);
   // profile: NAV_SECTIONS in js/profile.js (Market and Community joined the column)
-  const PROFILE_BASE = ["home","market","community","create","content","posts","messages","search","following","blocked","settings"];
+  const PROFILE_BASE = ["home","market","community","create","posts","messages","search","following","blocked","settings"];
 
   const BASES = { home:HOME_BASE, watch:WATCH_BASE, content:CONTENT_BASE, market:MARKET_BASE, dashboard:DASH_BASE, profile:PROFILE_BASE };
 

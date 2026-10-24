@@ -34,13 +34,14 @@
 
   // One catalogue for the picker, the validator and the badges. `exts` is the
   // allow-list; `kind` decides the badge and whether a preview makes sense.
+  const BOOK_EXTS = ["epub", "pdf", "mobi", "azw", "azw3", "fb2", "djvu", "cbz", "cbr"];
   const FORMATS = [
     { kind: "pdf", label: "PDF", exts: ["pdf"], preview: true },
     { kind: "word", label: "Word", exts: ["doc", "docx", "odt", "rtf", "txt"], preview: false },
     { kind: "sheet", label: "Excel / CSV", exts: ["xls", "xlsx", "xlsm", "ods", "csv"], preview: false },
     { kind: "slides", label: "PowerPoint", exts: ["ppt", "pptx", "odp"], preview: false },
     { kind: "database", label: "Access Database", exts: ["mdb", "accdb"], preview: false },
-    { kind: "other", label: "Other supported formats", exts: ["epub", "json", "xml", "md", "markdown"], preview: false },
+    { kind: "other", label: "Other supported formats", exts: ["json", "xml", "md", "markdown"], preview: false },
   ];
   const ALL_EXTS = FORMATS.flatMap((f) => f.exts);
   const KIND_OF_EXT = (ext) => (FORMATS.find((f) => f.exts.includes(ext)) || {}).kind || "";
@@ -74,11 +75,23 @@
     const texty = !zip && !ole && !pdf && !hasNul;
     const looksJson = texty && /^[\s\uFEFF]*[[{]/.test(ascii(head, 0, 64));
     const looksXml = texty && /^[\s\uFEFF]*</.test(ascii(head, 0, 64));
-    return { zip, ole, pdf, rtf, texty, hasNul, looksJson, looksXml };
+    const mobi = ascii(head, 60, 68) === "BOOKMOBI";
+    const djvu = ascii(head, 0, 8) === "AT&TFORM" && ascii(head, 12, 16) === "DJVU";
+    const rar = ascii(head, 0, 4) === "Rar!";
+    return { zip, ole, pdf, rtf, texty, hasNul, looksJson, looksXml, mobi, djvu, rar };
   }
 
   // true when the bytes agree with the extension's family
-  function agrees(ext, s) {
+  function agrees(ext, s, bookMode = false) {
+    if (bookMode) {
+      if (["epub", "cbz"].includes(ext)) return s.zip;
+      if (ext === "pdf") return s.pdf;
+      if (["mobi", "azw", "azw3"].includes(ext)) return s.mobi;
+      if (ext === "fb2") return s.looksXml;
+      if (ext === "djvu") return s.djvu;
+      if (ext === "cbr") return s.rar;
+      return false;
+    }
     if (ext === "pdf") return s.pdf;
     if (["docx", "xlsx", "xlsm", "pptx", "odt", "odp", "ods", "epub"].includes(ext)) return s.zip;
     if (["doc", "xls", "ppt", "mdb", "accdb"].includes(ext)) return s.ole;
@@ -142,6 +155,16 @@
     } catch {
       /* the row is gone either way */
     }
+  }
+
+  async function removeDocument(id, memberId) {
+    const chk = await req(`/rest/v1/community_documents?id=eq.${encodeURIComponent(id)}&select=member_id,storage_path,bucket`);
+    const row = chk.ok && Array.isArray(chk.data) ? chk.data[0] : null;
+    if (!row || row.member_id !== memberId) return { ok: false, reason: "forbidden" };
+    const del = await req(`/rest/v1/community_documents?id=eq.${encodeURIComponent(id)}&member_id=eq.${encodeURIComponent(memberId)}`, { method: "DELETE" });
+    if (!del.ok) return { ok: false, reason: "delete" };
+    await removeFile(row.storage_path, BUCKET(row));
+    return { ok: true };
   }
 
   /* ---------- VirusTotal gate ----------------------------------------------
@@ -230,6 +253,9 @@
   function renderUpload(host, ctx = {}) {
     const me = ctx.member || C().getSession();
     if (!me) return (host.innerHTML = `<p class="com-note">${esc(t("com.login"))}</p>`);
+    const bookMode = ctx.mode === "book";
+    const formats = bookMode ? [{ kind: "book", label: t("cw.books"), exts: BOOK_EXTS, preview: false }] : FORMATS;
+    const extList = bookMode ? BOOK_EXTS : ALL_EXTS;
     host.innerHTML = `
       <form class="stack" id="doc-form" novalidate>
         <label class="field-label" for="doc-title">${esc(t("doc.titleLabel"))}</label>
@@ -237,8 +263,9 @@
 
         <label class="field-label" for="doc-kind">${esc(t("doc.formatLabel"))}</label>
         <select id="doc-kind">
-          ${FORMATS.map((f) => `<option value="${f.kind}">${esc(f.label)} (${f.exts.map((e) => "." + e).join(", ")})</option>`).join("")}
+          ${formats.map((f) => `<option value="${f.kind}">${esc(f.label)} (${f.exts.map((e) => "." + e).join(", ")})</option>`).join("")}
         </select>
+        ${bookMode ? `<label class="field-label" for="doc-cover">${esc(t("cw.thumbnail"))}</label><input id="doc-cover" type="url" maxlength="1000" placeholder="https://…" />` : ""}
 
         <label class="field-label" for="doc-desc">${esc(t("doc.descLabel"))}</label>
         <textarea id="doc-desc" rows="3" maxlength="2000" placeholder="${esc(t("doc.descPh"))}"></textarea>
@@ -254,7 +281,7 @@
         </select>
 
         <label class="field-label" for="doc-file">${esc(t("doc.fileLabel"))}</label>
-        <input id="doc-file" type="file" accept="${ALL_EXTS.map((e) => "." + e).join(",")}" required />
+        <input id="doc-file" type="file" accept="${extList.map((e) => "." + e).join(",")}" required />
         <p class="muted">${esc(t("doc.fileHint", { max: sizeText(MAX_BYTES) }))}</p>
         <p class="muted">${esc(t("doc.scanNote"))}</p>
 
@@ -266,7 +293,8 @@
     f.onsubmit = async (e) => {
       e.preventDefault();
       const title = host.querySelector("#doc-title").value.trim();
-      const kind = host.querySelector("#doc-kind").value;
+      const kind = bookMode ? "book" : host.querySelector("#doc-kind").value;
+      const thumb = bookMode ? (host.querySelector("#doc-cover")?.value.trim() || "") : "";
       const desc = host.querySelector("#doc-desc").value.trim();
       const tags = host.querySelector("#doc-tags").value.trim();
       const vis = host.querySelector("#doc-vis").value;
@@ -275,8 +303,8 @@
       if (!file) return C().toast(t("doc.needFile"));
 
       const ext = extOf(file.name);
-      if (!ALL_EXTS.includes(ext)) return C().toast(t("doc.badExt", { ext: ext || "?" }));
-      if (KIND_OF_EXT(ext) !== kind) return C().toast(t("doc.extMismatch", { ext, kind: KIND_LABEL(kind) }));
+      if (!extList.includes(ext)) return C().toast(t("doc.badExt", { ext: ext || "?" }));
+      if (!bookMode && KIND_OF_EXT(ext) !== kind) return C().toast(t("doc.extMismatch", { ext, kind: KIND_LABEL(kind) }));
       if (file.size > MAX_BYTES) return C().toast(t("doc.tooBig", { max: sizeText(MAX_BYTES) }));
 
       // one row per member-cap check, so the limit cannot be bypassed in the tab
@@ -291,7 +319,7 @@
       } catch {
         return C().toast(t("doc.readFail"));
       }
-      if (!agrees(ext, sig)) return C().toast(t("doc.fakeFile", { ext }));
+      if (!agrees(ext, sig, bookMode)) return C().toast(t("doc.fakeFile", { ext }));
 
       const btn = host.querySelector("#doc-save");
       btn.disabled = true;
@@ -337,6 +365,7 @@
           description: desc,
           tags,
           kind,
+          thumb_url: thumb,
           ext,
           mime: file.type || "",
           size_bytes: file.size,
@@ -359,6 +388,8 @@
       fill.style.width = "100%";
       num.textContent = "100%";
       const created = Array.isArray(row.data) ? row.data[0] : null;
+      const workspaceId = Number(ctx.workspace || new URLSearchParams(location.search).get("workspace"));
+      if (workspaceId && created?.id) req("/rest/v1/creator_hub_items", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ hub_id: workspaceId, content_type: bookMode ? "book" : "document", content_id: String(created.id), title, thumb_url: thumb, href: `./documents.html?id=${encodeURIComponent(created.id)}`, visibility: vis }) }).catch(() => {});
       C().toast(t("doc.uploaded"));
       ctx.onDone?.(created);
       host.innerHTML = `<p class="com-note">${esc(t("doc.uploaded"))}
@@ -666,5 +697,5 @@
       .join("");
   }
 
-  window.CineAuraDocs = { list, documentView, renderUpload, renderManage, memberDocuments, homeRows, FORMATS, MAX_BYTES, MAX_PER_MEMBER };
+  window.CineAuraDocs = { list, documentView, renderUpload, renderManage, removeDocument, memberDocuments, homeRows, FORMATS, MAX_BYTES, MAX_PER_MEMBER };
 })();

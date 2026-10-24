@@ -308,6 +308,7 @@
             <span>${escapeHtml(tr(p.membership_type || m.membership_type || "Free"))}</span>
             <span>${escapeHtml(m.member_id)}</span>
           </a>
+          <a class="btn btn-sm btn-primary" style="display:flex;justify-content:center;margin:0 0 12px" href="./creator-dashboard.html">${({ar:"إدارة القناة والمدونة والمساحة والمكتبة",fr:"Espace créateur",de:"Creator-Bereich",es:"Espacio del creador",it:"Spazio creator",nl:"Creatorruimte"}[C.getLang?.()] || "Creator workspace")}</a>
           <nav class="side-nav">
             ${dashNavHtml()}
           </nav>
@@ -370,6 +371,9 @@
       playlists: viewPlaylists,
       links: viewLinks,
       upload: viewUpload,
+      videos: viewOwnVideos,
+      questions: (main) => viewCommunityContributions(main, "questions"),
+      answers: (main) => viewCommunityContributions(main, "answers"),
       articles: viewArticles,
       documents: viewDocuments,
       reports: viewReports,
@@ -1597,6 +1601,31 @@
      member with its delete: the Streamtape file goes, its registry row, and
      — for a film or an episode — the watch link it became. Only the member's
      own folder is ever touched; folders themselves are never deleted. */
+  async function viewOwnVideos(main) {
+    const id = state.member?.member_id || "";
+    // The content tables are intentionally not readable through PostgREST;
+    // sql/content.sql exposes this owner's list through the content_mine RPC.
+    const res = id ? await C.rpc("content_mine", { p_member: id }).catch(() => null) : null;
+    const ok = !!res?.ok && Array.isArray(res.data);
+    const rows = ok ? res.data.filter((r) => !r.scheduled) : [];
+    main.innerHTML = `<p class="eyebrow">${t("dash.nav.videos")}</p><h1>${t("dash.nav.videos")}</h1>
+      <p class="muted">${t("dash.content.typeLead")}</p>
+      <p><a class="btn btn-sm btn-primary" href="./video%20editor.html">${t("prof.cr.video")}</a></p>
+      ${!ok ? `<p class="empty">${t("vid.loadFail")}</p>` : rows.length ? rows.map((r) => `<a class="glass" style="display:flex;gap:12px;align-items:center;padding:10px 12px;margin:8px 0;text-decoration:none" href="./video.html?id=${encodeURIComponent(r.id || "")}">
+        ${r.thumb ? `<img src="${escapeHtml(r.thumb)}" alt="" loading="lazy" style="width:84px;height:52px;object-fit:cover;border-radius:8px" />` : "🎬"}
+        <span><strong>${escapeHtml(r.title || r.id || "")}</strong><br><span class="muted">${escapeHtml(r.visibility || "public")} · ${escapeHtml(String(r.created_at || "").slice(0, 10))} · 👁 ${Number(r.views || 0)}</span></span>
+      </a>`).join("") : `<p class="empty">${t("prof.ct.none")}</p>`}`;
+  }
+
+  async function viewCommunityContributions(main, kind) {
+    main.innerHTML = `<p class="eyebrow">${t("dash.grp.userContent")}</p><h1>${t("dash.nav." + kind)}</h1>
+      <p><a class="btn btn-sm btn-primary" href="./answers.html${kind === "questions" ? "#ask" : ""}">${kind === "questions" ? t("com.ask") : t("com.answersN")}</a></p>
+      <div id="dash-community-content">${t("common.loading")}</div>`;
+    const box = main.querySelector("#dash-community-content");
+    if (!window.CineAuraCommunity?.memberBlocks) return (box.innerHTML = `<p class="empty">${t("com.loadFail")}</p>`);
+    await window.CineAuraCommunity.memberBlocks(box, state.member.member_id, kind);
+  }
+
   async function viewUpload(main) {
     const ST = window.Streamtape;
     const productsRes = await supabaseRequest(
@@ -4375,7 +4404,8 @@
   // feeds the router (dashboard.html#codes, #iptv-lists …).
   const NAV_GROUPS = [
     ["dash.grp.main", ["overview", "level", "points"]],
-    ["dash.grp.content", ["upload", "articles", "documents", "links", "codes", "playlists", "iptv"]],
+    ["dash.grp.userContent", ["videos", "articles", "documents", "questions", "answers"]],
+    ["dash.grp.content", ["upload", "links", "codes", "playlists", "iptv"]],
     ["dash.grp.perf", ["views", "analytics", "reports", "history"]],
     ["dash.grp.earn", ["withdraw", "prizes"]],
     ["dash.grp.account", ["customize", "settings"]],
