@@ -5169,3 +5169,7 @@ Could not upload attachments. Check the connection, storage setup, and file size
 Each file must be 50 MB or less. = يجب ألا يتجاوز حجم كل ملف 50 ميغابايت.
 Attach up to {max} files. = يمكن إرفاق ما يصل إلى {max} ملفات.
 Attachments must total {max} or less. = يجب ألا يتجاوز الحجم الإجمالي للمرفقات {max}.
+You have not created any playlists yet. = لم تنشئ أي قائمة تشغيل بعد.
+Create a document = إنشاء مستند
+Load older messages = تحميل الرسائل الأقدم
+Could not load messages. Please try again. = تعذّر تحميل الرسائل. حاول مرة أخرى.

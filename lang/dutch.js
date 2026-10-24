@@ -5847,4 +5847,8 @@
  "Wrong password.": "Onjuist wachtwoord.",
  "ae.sendReview": "Ter beoordeling sturen",
  "Send for review": "Ter beoordeling sturen"
+ "You have not created any playlists yet.": "Je hebt nog geen afspeellijsten gemaakt.",
+ "Create a document": "Document maken",
+ "Load older messages": "Oudere berichten laden",
+ "Could not load messages. Please try again.": "Berichten laden is mislukt. Probeer het opnieuw.",
 };

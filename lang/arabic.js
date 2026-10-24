@@ -5883,4 +5883,8 @@
  "Wrong password.": "كلمة السر غير صحيحة.",
  "ae.sendReview": "إرسال للمراجعة",
  "Send for review": "إرسال للمراجعة"
+ "You have not created any playlists yet.": "لم تنشئ أي قائمة تشغيل بعد.",
+ "Create a document": "إنشاء مستند",
+ "Load older messages": "تحميل الرسائل الأقدم",
+ "Could not load messages. Please try again.": "تعذّر تحميل الرسائل. حاول مرة أخرى.",
 };

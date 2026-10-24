@@ -5847,4 +5847,8 @@
  "Wrong password.": "Falsches Passwort.",
  "ae.sendReview": "Zur Prüfung senden",
  "Send for review": "Zur Prüfung senden"
+ "You have not created any playlists yet.": "Du hast noch keine Playlist erstellt.",
+ "Create a document": "Dokument erstellen",
+ "Load older messages": "Ältere Nachrichten laden",
+ "Could not load messages. Please try again.": "Nachrichten konnten nicht geladen werden. Bitte erneut versuchen.",
 };

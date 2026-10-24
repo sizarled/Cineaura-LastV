@@ -5847,4 +5847,8 @@
  "Wrong password.": "Mot de passe incorrect.",
  "ae.sendReview": "Envoyer pour validation",
  "Send for review": "Envoyer pour validation"
+ "You have not created any playlists yet.": "Vous n’avez pas encore créé de playlist.",
+ "Create a document": "Créer un document",
+ "Load older messages": "Charger les anciens messages",
+ "Could not load messages. Please try again.": "Impossible de charger les messages. Réessayez.",
 };

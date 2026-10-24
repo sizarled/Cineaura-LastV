@@ -737,6 +737,8 @@
     "prof.sqlHint": "Could not update. Run sql/messages_update.sql in Supabase first.",
     "prof.retry": "Retry",
     "prof.sendFailed": "Message failed to send.",
+    "prof.olderMessages": "Load older messages",
+    "prof.loadMessagesFail": "Could not load messages. Please try again.",
     "prof.noMsg": "No messages yet.",
     "prof.startConv": "Start the conversation.",
     "prof.people": "People",
@@ -6058,6 +6060,8 @@
     "ae.joinPass": "Join password",
     "ae.join": "Join",
     "ae.wrongPass": "Wrong password.",
+    "dash.noLists": "You have not created any playlists yet.",
+    "prof.cr.document": "Create a document",
     "ae.sendReview": "Send for review",
 
   };

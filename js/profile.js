@@ -844,10 +844,11 @@
     const host = state.hostMember;
     const policy = state.host?.follow_policy || "instant";
     if (state.followRow?.status === "accepted") {
-      await supabaseRequest(
+      const removed = await supabaseRequest(
         `/rest/v1/follows?follower_id=eq.${restValue(me.member_id)}&following_id=eq.${restValue(host.member_id)}`,
         { method: "DELETE" }
       );
+      if (!removed.ok) return toast(t("prof.followFail"));
       state.followRow = null;
       await recount(me.member_id);
       await recount(host.member_id);
@@ -903,22 +904,23 @@
     renderShell();
   }
 
-  function onBlock() {
+  async function onBlock() {
     if (state.blockRow) {
-      unblock(state.hostMember.member_id).then(() => {
-        state.blockRow = null;
-        toast(t("prof.unblocked"));
-        renderShell();
-      });
+      const ok = await unblock(state.hostMember.member_id);
+      if (!ok) return toast(t("prof.blockFail"));
+      state.blockRow = null;
+      toast(t("prof.unblocked"));
+      renderShell();
       return;
     }
     openBlockModal(state.hostMember);
   }
 
   async function unblock(id) {
-    await supabaseRequest(`/rest/v1/blocks?blocker_id=eq.${restValue(state.me.member.member_id)}&blocked_id=eq.${restValue(id)}`, {
+    const res = await supabaseRequest(`/rest/v1/blocks?blocker_id=eq.${restValue(state.me.member.member_id)}&blocked_id=eq.${restValue(id)}`, {
       method: "DELETE",
     });
+    return Boolean(res?.ok);
   }
 
   function openBlockModal(person) {
@@ -989,41 +991,62 @@
 
   async function openPeople(kind) {
     const hostId = state.hostMember.member_id;
-    const q =
-      kind === "followers"
-        ? `/rest/v1/follows?following_id=eq.${restValue(hostId)}&status=eq.accepted&select=*`
-        : `/rest/v1/follows?follower_id=eq.${restValue(hostId)}&status=eq.accepted&select=*`;
-    const res = await supabaseRequest(q);
-    const rows = res.data || [];
+    const PAGE_SIZE = 100;
+    const base = kind === "followers"
+      ? `/rest/v1/follows?following_id=eq.${restValue(hostId)}&status=eq.accepted&select=*&order=created_at.desc`
+      : `/rest/v1/follows?follower_id=eq.${restValue(hostId)}&status=eq.accepted&select=*&order=created_at.desc`;
+    let offset = 0;
+    const first = await supabaseRequest(`${base}&limit=${PAGE_SIZE}&offset=0`);
+    if (!first.ok) return toast(t("com.loadFail"));
+    const rows = Array.isArray(first.data) ? first.data : [];
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
-    overlay.innerHTML = `<section class="glass modal-card"><h2>${kind === "followers" ? t("prof.followersTitle") : t("prof.following")}</h2><div id="ppl"></div><button class="btn btn-sm btn-ghost" id="ppl-x" type="button">${t("common.close")}</button></section>`;
+    overlay.innerHTML = `<section class="glass modal-card"><h2>${kind === "followers" ? t("prof.followersTitle") : t("prof.following")}</h2><div id="ppl"></div><button class="btn btn-sm btn-ghost" id="ppl-more" type="button"${rows.length < PAGE_SIZE ? " hidden" : ""}>${t("vid.loadMore")}</button><button class="btn btn-sm btn-ghost" id="ppl-x" type="button">${t("common.close")}</button></section>`;
     document.body.appendChild(overlay);
     overlay.querySelector("#ppl-x").onclick = () => overlay.remove();
     const box = overlay.querySelector("#ppl");
-    if (!rows.length) {
-      box.innerHTML = `<p class="empty">None yet.</p>`;
-      return;
-    }
-    const pair = (r) =>
-      kind === "followers"
-        ? { u: r.follower_username, id: r.follower_id }
-        : { u: r.following_username, id: r.following_id };
-    await primeAvatars(rows.map((r) => pair(r).id), rows.map((r) => pair(r).u));
-    box.innerHTML = rows
-      .map((r) => {
+    const more = overlay.querySelector("#ppl-more");
+    const pair = (r) => kind === "followers"
+      ? { u: r.follower_username, id: r.follower_id }
+      : { u: r.following_username, id: r.following_id };
+    const appendRows = async (page, replace = false) => {
+      if (!page.length && replace) {
+        box.innerHTML = `<p class="empty">${t("prof.none")}</p>`;
+        return;
+      }
+      const people = page.map(pair);
+      await primeAvatars(people.map((r) => r.id), people.map((r) => r.u));
+      const html = page.map((r) => {
         const { u, id } = pair(r);
         return `<div class="person-row">
           ${avatarImg(id, u)}
           <div><strong>@${escapeHtml(u)}</strong><div class="muted">${escapeHtml(id)}</div></div>
           <div class="prof-actions">
             <a class="btn btn-sm btn-primary" href="${profileHref(u)}">${t("common.visit")}</a>
-            ${state.me ? `<button class="btn btn-sm btn-ghost" data-msg="${escapeHtml(id)}" data-user="${escapeHtml(u)}" type="button">Message</button>
+            ${state.me ? `<button class="btn btn-sm btn-ghost" data-msg="${escapeHtml(id)}" data-user="${escapeHtml(u)}" type="button">${t("prof.message")}</button>
             <button class="btn btn-sm btn-danger" data-blk="${escapeHtml(id)}" data-user="${escapeHtml(u)}" type="button">${t("prof.block")}</button>` : ""}
           </div>
         </div>`;
-      })
-      .join("");
+      }).join("");
+      if (replace) box.innerHTML = html;
+      else box.insertAdjacentHTML("beforeend", html);
+      hydrateAvatars(box);
+    };
+    await appendRows(rows, true);
+    offset = rows.length;
+    more.onclick = async () => {
+      more.disabled = true;
+      const result = await supabaseRequest(`${base}&limit=${PAGE_SIZE}&offset=${offset}`);
+      if (!result.ok) {
+        more.disabled = false;
+        return toast(t("com.loadFail"));
+      }
+      const page = Array.isArray(result.data) ? result.data : [];
+      await appendRows(page);
+      offset += page.length;
+      more.hidden = page.length < PAGE_SIZE;
+      more.disabled = false;
+    };
     box.onclick = (e) => {
       const msg = e.target.closest("[data-msg]");
       const blk = e.target.closest("[data-blk]");
@@ -4144,6 +4167,7 @@
           <button class="btn btn-sm btn-ghost" id="chat-x" type="button">${t("common.close")}</button>
         </div>
         <div class="chat-log" id="chat-log"></div>
+        <button class="btn btn-sm btn-ghost" id="chat-older" type="button" hidden>${t("prof.olderMessages")}</button>
         ${blocked
           ? `<p class="muted" style="margin:8px 0 0">${t("prof.msgBlocked")}</p>`
           : `<div class="form-row">
@@ -4154,19 +4178,41 @@
     document.body.appendChild(overlay);
     hydrateAvatars(overlay);
     let timer = null;
+    let loading = false;
+    const messageRows = new Map();
+    const failedKey = (row) => row._failed ? String(row.id) : `msg:${row.id}`;
     const close = () => { clearInterval(timer); overlay.remove(); if (onClose) onClose(); };
     overlay.querySelector("#chat-x").onclick = close;
 
-    const load = async () => {
-      const [a, b] = await Promise.all([
-        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(me.member_id)}&receiver_id=eq.${restValue(person.member_id)}&select=*&order=created_at.asc`),
-        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(person.member_id)}&receiver_id=eq.${restValue(me.member_id)}&select=*&order=created_at.asc`),
-      ]);
-      const mineRows = (Array.isArray(a.data) ? a.data : []).filter((m) => !m.sender_deleted);
-      const theirRows = (Array.isArray(b.data) ? b.data : []).filter((m) => !m.receiver_deleted);
-      const failed = getFailed().filter((f) => f.from_id === me.member_id && f.to_id === person.member_id).map((f) => ({ ...f, created_at: f.at, sender_id: me.member_id, _failed: true }));
-      const rows = [...mineRows, ...theirRows, ...failed].sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
+    const load = async ({ older = false } = {}) => {
+      if (loading || !overlay.isConnected) return;
+      loading = true;
+      try {
       const log = overlay.querySelector("#chat-log");
+      const olderBtn = overlay.querySelector("#chat-older");
+      const oldest = [...messageRows.values()]
+        .filter((m) => !m._failed && m.created_at)
+        .map((m) => String(m.created_at))
+        .sort()[0];
+      const before = older && oldest ? `&created_at=lt.${encodeURIComponent(oldest)}` : "";
+      const pageQuery = `&order=created_at.desc&limit=100${before}`;
+      const [a, b] = await Promise.all([
+        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(me.member_id)}&receiver_id=eq.${restValue(person.member_id)}&select=*${pageQuery}`),
+        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(person.member_id)}&receiver_id=eq.${restValue(me.member_id)}&select=*${pageQuery}`),
+      ]);
+      if (!a.ok || !b.ok) throw new Error("Message history request failed");
+      const incoming = [
+        ...(Array.isArray(a.data) ? a.data.filter((m) => !m.sender_deleted) : []),
+        ...(Array.isArray(b.data) ? b.data.filter((m) => !m.receiver_deleted) : []),
+      ];
+      incoming.forEach((m) => messageRows.set(failedKey(m), m));
+      if (!older) {
+        getFailed().filter((f) => f.from_id === me.member_id && f.to_id === person.member_id)
+          .forEach((f) => messageRows.set(failedKey({ ...f, _failed: true }), { ...f, created_at: f.at, sender_id: me.member_id, _failed: true }));
+      }
+      const rows = [...messageRows.values()].sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
+      const oldHeight = log.scrollHeight;
+      const oldTop = log.scrollTop;
       log.innerHTML = rows.map((m) => {
         const mine = m.sender_id === me.member_id;
         const st = mine ? msgStatus(m) : "";
@@ -4174,11 +4220,21 @@
           <div class="muted">${fmtWhen(m.created_at)}${st ? ` · ${statusLabel(st)}` : ""}${m._failed ? ` <button class="btn btn-sm btn-danger" data-retry="${escapeHtml(m.id)}" type="button">${t("prof.retry")}</button>` : ""}</div>
         </div>`;
       }).join("") || `<p class="muted">${t("prof.startConv")}</p>`;
-      log.scrollTop = log.scrollHeight;
-      if (theirRows.some((m) => !m.read)) {
+      const hasMore = (Array.isArray(a.data) && a.data.length >= 100) || (Array.isArray(b.data) && b.data.length >= 100);
+      olderBtn.hidden = !hasMore;
+      if (older) log.scrollTop = log.scrollHeight - oldHeight + oldTop;
+      else log.scrollTop = log.scrollHeight;
+      if (incoming.some((m) => m.receiver_id === me.member_id && !m.read)) {
         supabaseRequest(`/rest/v1/messages?receiver_id=eq.${restValue(me.member_id)}&sender_id=eq.${restValue(person.member_id)}&read=eq.false`, { method: "PATCH", body: JSON.stringify({ read: true }) });
       }
+      } catch (error) {
+        console.error("Unable to load profile messages", error);
+        toast(t("prof.loadMessagesFail"));
+      } finally {
+        loading = false;
+      }
     };
+    overlay.querySelector("#chat-older").onclick = () => load({ older: true });
 
     const send = async (text, retryId) => {
       if (!(await window.CineAura.guardFeature("messages"))) return false;
@@ -4660,25 +4716,28 @@
       const acc = e.target.closest("[data-acc]");
       const rej = e.target.closest("[data-rej]");
       if (cancel) {
-        await supabaseRequest(`/rest/v1/follows?id=eq.${cancel.dataset.cancel}`, { method: "DELETE" });
+        const result = await supabaseRequest(`/rest/v1/follows?id=eq.${cancel.dataset.cancel}`, { method: "DELETE" });
+        if (!result.ok) return toast(t("prof.followFail"));
         toast(t("prof.cancelled"));
         viewFollowing(main);
       }
       if (acc) {
-        await supabaseRequest(`/rest/v1/follows?id=eq.${acc.dataset.acc}`, {
+        const result = await supabaseRequest(`/rest/v1/follows?id=eq.${acc.dataset.acc}`, {
           method: "PATCH",
           body: JSON.stringify({ status: "accepted", accepted_at: new Date().toISOString() }),
         });
+        if (!result.ok) return toast(t("prof.followFail"));
         await recount(me);
         if (acc.dataset.fid) await recount(acc.dataset.fid);
         toast(t("prof.accepted"));
         viewFollowing(main);
       }
       if (rej) {
-        await supabaseRequest(`/rest/v1/follows?id=eq.${rej.dataset.rej}`, {
+        const result = await supabaseRequest(`/rest/v1/follows?id=eq.${rej.dataset.rej}`, {
           method: "PATCH",
           body: JSON.stringify({ status: "rejected" }),
         });
+        if (!result.ok) return toast(t("prof.followFail"));
         toast(t("prof.declined"));
         viewFollowing(main);
       }
@@ -4904,7 +4963,8 @@
     main.onclick = async (e) => {
       const b = e.target.closest("[data-un]");
       if (!b) return;
-      await unblock(b.dataset.un);
+      const ok = await unblock(b.dataset.un);
+      if (!ok) return toast(t("prof.blockFail"));
       toast(t("prof.unblocked"));
       viewBlocked(main);
     };
