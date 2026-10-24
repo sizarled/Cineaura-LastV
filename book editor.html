@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title data-i18n-title="cw.bookEditor">Book editor — CineAura</title>
+  <script src="js/prefs.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/documents.css" />
+  <link rel="stylesheet" href="css/creator-dashboard.css" />
+</head>
+<body class="page-inner" data-auth-gate="silent">
+  <div class="site-wrap">
+    <header class="header scrolled"><div class="header-inner">
+      <a class="logo" href="./"><span class="logo-mark" aria-hidden="true">▶</span><span class="logo-word">Cine<span>Aura</span></span></a>
+      <nav class="nav"><a href="./creator-dashboard.html?kind=library" data-i18n="cw.library">Library</a><a href="./dashboard.html" data-i18n="nav.dashboard">Dashboard</a></nav>
+    </div></header>
+    <main class="page-main cw-root">
+      <section class="glass cw-main">
+        <div class="cw-head"><div><p class="eyebrow" data-i18n="cw.library">Library</p><h1 data-i18n="cw.bookEditor">Book editor</h1><p class="cw-muted" data-i18n="cw.bookFormats">Publish digital books: PDF, EPUB, MOBI, AZW/AZW3, FB2, DjVu, CBZ, or CBR.</p></div></div>
+        <div id="book-editor-form"><p class="muted" data-i18n="common.loading">Loading…</p></div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="js/i18n.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/documents.js"></script>
+  <script>
+    (() => {
+      const C = window.CineAura;
+      const params = new URLSearchParams(location.search);
+      const workspace = Number(params.get("workspace")) || 0;
+      document.title = `${C.t("cw.bookEditor")} — CineAura`;
+      if (window.CineAuraDocs) window.CineAuraDocs.renderUpload(document.querySelector("#book-editor-form"), { member: C.getSession(), mode: "book", workspace });
+    })();
+  </script>
+</body>
+</html>

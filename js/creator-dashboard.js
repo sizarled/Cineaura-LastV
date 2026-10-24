@@ -1,7 +1,6 @@
 /* Creator workspace: management UI for channels, blogs, spaces and libraries.
-   Existing video/article/question/document tools stay the sources of truth for
-   content; creator_hub_items supplies workspace membership and metadata for
-   podcasts and ebooks until their dedicated editors ship. */
+   Existing content modules remain the source of truth where available; dedicated
+   audio and digital-book editors integrate uploads with the creator workspace. */
 (() => {
   "use strict";
   const C = window.CineAura;
@@ -24,10 +23,10 @@
   const state = { member: null, profile: {}, kind: new URLSearchParams(location.search).get("kind") || "channel", tab: "", hubs: [], hub: null, categories: [], articleRows: [], busy: false, schemaMissing: false };
   const AR = {
     "cw.title":"مساحة إدارة المحتوى — CineAura", "cw.profile":"الملف الشخصي", "cw.channel":"القناة", "cw.blog":"المدونة", "cw.space":"المساحة المجتمعية", "cw.library":"المكتبة",
-    "cw.videos":"الفيديوهات", "cw.podcasts":"البودكاست", "cw.playlists":"قوائم التشغيل", "cw.manage":"الإدارة", "cw.articles":"المقالات", "cw.drafts":"المسودات", "cw.categories":"الأقسام", "cw.questions":"الأسئلة", "cw.answers":"الأجوبة", "cw.books":"الكتب الإلكترونية", "cw.documents":"المستندات", "cw.subscribers":"المشتركون", "cw.general":"عام", "cw.discover":"اكتشاف المساحات", "cw.subscribe":"اشتراك", "cw.unsubscribe":"إلغاء الاشتراك", "cw.subscribeFailed":"تعذّر الاشتراك، حاول مرة أخرى.", "cw.noDiscover":"لا توجد مساحات عامة أو حصرية بعد.", "cw.memberId":"معرّف العضو",
+    "cw.videos":"الفيديوهات", "cw.podcasts":"البودكاست", "cw.playlists":"قوائم التشغيل", "cw.manage":"الإدارة", "cw.articles":"المقالات", "cw.drafts":"المسودات", "cw.categories":"الأقسام", "cw.questions":"الأسئلة", "cw.answers":"الأجوبة", "cw.books":"الكتب الإلكترونية", "cw.bookEditor":"محرر الكتب الإلكترونية", "cw.bookFormats":"انشر الكتب الرقمية بصيغ PDF وEPUB وMOBI وAZW/AZW3 وFB2 وDjVu وCBZ وCBR.", "cw.documents":"المستندات", "cw.subscribers":"المشتركون", "cw.general":"عام", "cw.discover":"اكتشاف المساحات", "cw.subscribe":"اشتراك", "cw.unsubscribe":"إلغاء الاشتراك", "cw.subscribeFailed":"تعذّر الاشتراك، حاول مرة أخرى.", "cw.noDiscover":"لا توجد مساحات عامة أو حصرية بعد.", "cw.memberId":"معرّف العضو",
     "cw.loginTitle":"سجّل الدخول لإدارة مساحاتك", "cw.loginLead":"تُدار القنوات والمدونات والمساحات والمكتبات من هنا.", "cw.error":"تعذّر تحميل الصفحة", "cw.memberMissing":"تعذّر العثور على ملف عضويتك.", "cw.loadFail":"تعذّر تحميل مساحاتك. تحقق من تطبيق sql/creator_workspace.sql.", "cw.noWorkspace":"لم يتم اختيار مساحة", "cw.chooseWorkspace":"اختر مساحة", "cw.addWorkspace":"إضافة مساحة", "cw.createWorkspaceLead":"أنشئ مساحة {kind} لإدارة محتواها وأقسامها وفريقها ومشتركيها.", "cw.createContent":"إنشاء محتوى", "cw.addVideo":"إضافة فيديو", "cw.addPodcast":"إضافة بودكاست", "cw.addPlaylist":"إضافة قائمة تشغيل", "cw.addArticle":"إضافة مقال", "cw.addDraft":"إضافة مسودة", "cw.addQuestion":"طرح سؤال", "cw.addBook":"إضافة كتاب إلكتروني", "cw.addDocument":"إضافة مستند", "cw.addCategory":"إضافة قسم", "cw.editWorkspace":"تعديل المساحة", "cw.deleteWorkspace":"حذف المساحة", "cw.confirmDeleteWorkspace":"هل تريد حذف هذه المساحة وروابط محتواها؟", "cw.workspaceSettingsHint":"يمكنك ضبط الاسم والشعار والغلاف والمجال والنيش والظهور وأعضاء VIP والروابط من تعديل المساحة.", "cw.contentCount":"المحتوى المرتبط", "cw.assign":"إضافة إلى هذه المساحة", "cw.unlink":"إزالة من هذه المساحة", "cw.allWorkspaces":"كل المساحات التي تديرها", "cw.lines":"الأسطر", "cw.words":"الكلمات", "cw.characters":"الأحرف", "cw.publish":"نشر", "cw.preview":"معاينة",
     "cw.name":"الاسم / العنوان", "cw.description":"الوصف", "cw.logo":"رابط الشعار", "cw.cover":"رابط صورة الغلاف", "cw.visibility":"الظهور", "cw.public":"عام", "cw.exclusive":"حصري", "cw.private":"خاص", "cw.domain":"المجال", "cw.niche":"النيشات (حتى 5)", "cw.nichesHint":"نيش واحد في كل سطر، حتى خمسة.", "cw.relatedLinks":"روابط ذات صلة (سطر لكل رابط: الاسم | الرابط)", "cw.linksHint":"الموقع | https://example.com", "cw.vipIds":"معرّفات أعضاء VIP (واحد في كل سطر)", "cw.idsHint":"افصل المعرّفات بمسافات أو فواصل أو أسطر جديدة.", "cw.save":"حفظ", "cw.cancel":"إلغاء", "cw.saved":"تم الحفظ", "cw.saveFailed":"تعذّر الحفظ. تحقق من إعداد قاعدة البيانات ثم أعد المحاولة.", "cw.blogLimit":"يمكنك إنشاء ثلاث مدونات كحد أقصى.", "cw.open":"فتح", "cw.edit":"تعديل", "cw.delete":"حذف", "cw.remove":"إزالة", "cw.confirmDelete":"حذف هذا العنصر؟ لا يمكن التراجع عن ذلك.", "cw.deleteFailed":"تعذّر حذف المساحة.", "cw.id":"المعرّف", "cw.question":"السؤال", "cw.views":"المشاهدات", "cw.minutes":"دقائق المشاهدة", "cw.likes":"الإعجابات", "cw.dislikes":"عدم الإعجاب", "cw.comments":"التعليقات", "cw.shares":"المشاركات", "cw.reports":"البلاغات", "cw.reads":"القراءات", "cw.downloads":"التنزيلات", "cw.followers":"المتابعون", "cw.reasks":"إعادة السؤال", "cw.items":"العناصر",
-    "cw.noItems":"لا يوجد محتوى بعد.", "cw.noVideos":"لا توجد فيديوهات منشورة بعد.", "cw.noPlaylists":"لا توجد قوائم تشغيل بعد.", "cw.noPodcasts":"لا توجد حلقات بودكاست بعد.", "cw.noArticles":"لا توجد مقالات منشورة بعد.", "cw.noDrafts":"لا توجد مسودات بعد.", "cw.noQuestions":"لا توجد أسئلة بعد.", "cw.noAnswers":"لا توجد أجوبة بعد.", "cw.noDocuments":"لا توجد مستندات بعد.", "cw.noBooks":"لا توجد كتب إلكترونية بعد.", "cw.noCategories":"لا توجد أقسام بعد.", "cw.categoryAdd":"إضافة قسم", "cw.categoryName":"اسم القسم", "cw.category":"القسم", "cw.rootCategory":"قسم رئيسي", "cw.categoryDepthHint":"يمكن تنظيم الأقسام في ثلاثة مستويات: رئيسي وثانوي وفرعي.", "cw.categoryDepthError":"يمكن تداخل الأقسام حتى ثلاثة مستويات فقط.", "cw.level":"المستوى", "cw.add":"إضافة", "cw.noSubscribers":"لا يوجد مشتركون بعد.", "cw.makeVip":"تعيين VIP", "cw.removeVip":"إزالة VIP", "cw.addPass":"إنشاء كلمة مرور مؤقتة", "cw.manageStaff":"إدارة الطاقم", "cw.staffHint":"أدخل معرّف العضو لمنحه صلاحية إدارة هذه المساحة.", "cw.password":"كلمة المرور", "cw.passDuration":"مدة الصلاحية", "cw.hour":"ساعة", "cw.hours":"ساعة", "cw.days":"يوم", "cw.allowedIds":"معرّفات الأعضاء المسموح لهم (اختياري)", "cw.link":"الرابط", "cw.thumbnail":"رابط الصورة المصغرة", "cw.bookHint":"للكتب الإلكترونية فقط؛ يمكن إضافة محرر كتب مخصص لاحقاً.", "cw.podcastHint":"يمكن إضافة محرر بودكاست لاحقاً؛ أضف هنا رابط الصفحة أو موجز البودكاست العام."
+    "cw.noItems":"لا يوجد محتوى بعد.", "cw.noVideos":"لا توجد فيديوهات منشورة بعد.", "cw.noPlaylists":"لا توجد قوائم تشغيل بعد.", "cw.noPodcasts":"لا توجد حلقات بودكاست بعد.", "cw.noArticles":"لا توجد مقالات منشورة بعد.", "cw.noDrafts":"لا توجد مسودات بعد.", "cw.noQuestions":"لا توجد أسئلة بعد.", "cw.noAnswers":"لا توجد أجوبة بعد.", "cw.noDocuments":"لا توجد مستندات بعد.", "cw.noBooks":"لا توجد كتب إلكترونية بعد.", "cw.noCategories":"لا توجد أقسام بعد.", "cw.categoryAdd":"إضافة قسم", "cw.categoryName":"اسم القسم", "cw.category":"القسم", "cw.rootCategory":"قسم رئيسي", "cw.categoryDepthHint":"يمكن تنظيم الأقسام في ثلاثة مستويات: رئيسي وثانوي وفرعي.", "cw.categoryDepthError":"يمكن تداخل الأقسام حتى ثلاثة مستويات فقط.", "cw.level":"المستوى", "cw.add":"إضافة", "cw.noSubscribers":"لا يوجد مشتركون بعد.", "cw.makeVip":"تعيين VIP", "cw.removeVip":"إزالة VIP", "cw.addPass":"إنشاء كلمة مرور مؤقتة", "cw.manageStaff":"إدارة الطاقم", "cw.staffHint":"أدخل معرّف العضو لمنحه صلاحية إدارة هذه المساحة.", "cw.password":"كلمة المرور", "cw.passDuration":"مدة الصلاحية", "cw.hour":"ساعة", "cw.hours":"ساعة", "cw.days":"يوم", "cw.allowedIds":"معرّفات الأعضاء المسموح لهم (اختياري)", "cw.link":"الرابط", "cw.thumbnail":"رابط الصورة المصغرة", "cw.bookHint":"ارفع ملفات الكتب الرقمية وأدرها في مكتبتك.", "cw.podcastHint":"ارفع الحلقات الصوتية وأدرها لهذه القناة.", "cw.podcastEditorLead":"ارفع ملفًا صوتيًا وأضف تفاصيل الحلقة ثم انشرها على هذه القناة.", "cw.audioUnavailable":"معاينة الصوت غير متاحة.", "cw.duration":"المدة"
   };
   const t = (k, vars) => {
     const lang = C.getLang?.() || "en";
@@ -224,8 +223,32 @@
     }
   }
   async function drawLooseItems(box, type) {
-    const rows = await loadArray("creator_hub_items", `hub_id=eq.${selectedHubId()}&content_type=eq.${type}`);
-    box.innerHTML = `<div class="cw-inline" style="margin-bottom:12px"><button class="btn btn-sm btn-primary" type="button" data-add-loose="${type}">${esc(t(type === "book" ? "cw.addBook" : "cw.addPodcast"))}</button><span class="cw-muted">${esc(t(type === "book" ? "cw.bookHint" : "cw.podcastHint"))}</span></div>${renderRows(rows, { idKey: "content_id", thumb: "thumb_url", open: (r) => r.href || "#", metrics: [["minutes_viewed","cw.minutes"],["shares","cw.shares"],["reports","cw.reports"]], deleteTable: "creator_hub_items", emptyKey: type === "book" ? "cw.noBooks" : "cw.noPodcasts" })}`;
+    if (type === "book") {
+      const all = await loadArray("community_documents", `member_id=eq.${qv(state.member.member_id)}&kind=eq.book`);
+      const rows = await mappedRows(all, "book");
+      box.innerHTML = `<div class="cw-inline" style="margin-bottom:12px"><a class="btn btn-sm btn-primary" href="./book%20editor.html?workspace=${selectedHubId()}">${esc(t("cw.addBook"))}</a><span class="cw-muted">${esc(t("cw.bookHint"))}</span></div>${renderRows(rows, { idKey: "id", associateType: "book", deleteAction: "document", thumb: "thumb_url", visibility: "visibility", open: (r) => `./documents.html?id=${encodeURIComponent(r.id)}`, edit: () => `./book%20editor.html?workspace=${selectedHubId()}`, metrics: [["views","cw.reads"],["downloads","cw.downloads"],["likes","cw.likes"],["dislikes","cw.dislikes"],["comments","cw.comments"],["shares","cw.shares"],["reports","cw.reports"]], emptyKey: "cw.noBooks" })}`;
+      return;
+    }
+    const rows = await loadArray("creator_hub_items", `hub_id=eq.${selectedHubId()}&content_type=eq.podcast`, "created_at.desc");
+    const cards = await Promise.all(rows.map(async (r) => {
+      const audio = r.file_path ? await signedCreatorAudio(r.file_path) : "";
+      return `<article class="cw-item">${r.thumb_url ? `<img class="cw-thumb" src="${esc(r.thumb_url)}" alt="" />` : `<span class="cw-thumb">♫</span>`}<div><h3>${esc(r.title || r.file_name || r.content_id)}</h3><p>${esc(t("cw.id"))}: ${esc(r.content_id)} · ${esc(visText(r.visibility))} · ${esc(t("cw.duration"))}: ${formatDuration(r.duration_seconds)}</p>${audio ? `<audio controls preload="none" src="${esc(audio)}" style="width:min(100%,440px);margin-top:8px"></audio>` : `<p class="cw-muted">${esc(t("cw.audioUnavailable"))}</p>`}</div><div class="cw-actions"><a class="btn btn-sm btn-ghost" href="./podcast%20editor.html?hub=${selectedHubId()}&edit=${encodeURIComponent(r.content_id)}">${esc(t("cw.edit"))}</a><button class="btn btn-sm btn-danger" type="button" data-delete-podcast="${esc(r.content_id)}" data-file-path="${esc(r.file_path || "")}">${esc(t("cw.delete"))}</button></div></article>`;
+    }));
+    box.innerHTML = `<div class="cw-inline" style="margin-bottom:12px"><a class="btn btn-sm btn-primary" href="./podcast%20editor.html?hub=${selectedHubId()}">${esc(t("cw.addPodcast"))}</a><span class="cw-muted">${esc(t("cw.podcastEditorLead"))}</span></div>${cards.length ? `<div class="cw-list">${cards.join("")}</div>` : `<div class="cw-empty">${esc(t("cw.noPodcasts"))}</div>`}`;
+  }
+  async function signedCreatorAudio(path) {
+    try {
+      const encoded = String(path).split("/").map(encodeURIComponent).join("/");
+      const res = await fetch(`${C.SUPABASE_URL}/storage/v1/object/sign/creator-media/${encoded}`, { method: "POST", headers: { apikey: C.SUPABASE_KEY, Authorization: `Bearer ${C.SUPABASE_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn: 60 }) });
+      if (!res.ok) return "";
+      const data = await res.json(); const signed = data.signedURL || data.signedUrl || "";
+      return signed ? (signed.startsWith("http") ? signed : `${C.SUPABASE_URL}/storage/v1${signed}`) : "";
+    } catch { return ""; }
+  }
+  function formatDuration(seconds) {
+    const n = Number(seconds || 0);
+    if (!n) return "—";
+    return `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, "0")}`;
   }
 
   async function drawHubManage(box) {
@@ -329,9 +352,8 @@
   }
   function openSimpleForm(type) {
     if (type === "category") { state.tab = "categories"; drawShell(); return drawPage(); }
-    const data = { video: ["cw.addVideo","./video%20editor.html"], podcast: ["cw.addPodcast",""], playlist: ["cw.addPlaylist","./dashboard.html#playlists"], article: ["cw.addArticle","./article-Editor.html"], draft: ["cw.addDraft","./article-Editor.html"], question: ["cw.addQuestion","./answers%20editor.html"], document: ["cw.addDocument","./document%20editor.html"], book: ["cw.addBook",""] }[type];
+    const data = { video: ["cw.addVideo","./video%20editor.html"], podcast: ["cw.addPodcast","./podcast%20editor.html"], playlist: ["cw.addPlaylist","./dashboard.html#playlists"], article: ["cw.addArticle","./article-Editor.html"], draft: ["cw.addDraft","./article-Editor.html"], question: ["cw.addQuestion","./answers%20editor.html"], document: ["cw.addDocument","./document%20editor.html"], book: ["cw.addBook","./book%20editor.html"] }[type];
     if (!data) return;
-    if (["podcast","book"].includes(type)) return openLooseForm(type);
     if (type === "playlist") return (location.href = data[1]);
     if (type === "document") return (location.href = `./dashboard.html?workspace=${selectedHubId()}#documents`);
     const draftParam = type === "draft" ? "&draft=1" : "";
@@ -404,6 +426,16 @@
       if (!confirm(t("cw.confirmDelete"))) return;
       const result = await window.CineAuraDocs?.removeDocument(btn.dataset.deleteDocument, state.member.member_id);
       if (!result?.ok) return C.toast(t("cw.deleteFailed"));
+      return drawPage();
+    }
+    if (btn.dataset.deletePodcast) {
+      if (!confirm(t("cw.confirmDelete"))) return;
+      const path = String(btn.dataset.filePath || "");
+      if (path) {
+        const encoded = path.split("/").map(encodeURIComponent).join("/");
+        await fetch(`${C.SUPABASE_URL}/storage/v1/object/creator-media/${encoded}`, { method: "DELETE", headers: { apikey: C.SUPABASE_KEY, Authorization: `Bearer ${C.SUPABASE_KEY}` } }).catch(() => {});
+      }
+      await req(rootPath("creator_hub_items", `hub_id=eq.${selectedHubId()}&content_type=eq.podcast&content_id=eq.${qv(btn.dataset.deletePodcast)}`), { method: "DELETE" });
       return drawPage();
     }
     if (btn.dataset.deleteVideo) {
