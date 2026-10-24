@@ -61,7 +61,7 @@
     host: null,
     hostMember: null,
     isOwner: false,
-    section: (() => { const s = new URLSearchParams(location.search).get("section"); return ["home","market","community","create","content","posts","messages","search","following","blocked","settings"].includes(s || "") ? s : "home"; })(),
+    section: (() => { const s = new URLSearchParams(location.search).get("section"); return ["home","market","community","create","posts","messages","search","following","blocked","settings"].includes(s || "") ? s : "home"; })(),
     homeTab: "activity",
     followRow: null,
     followTab: "sent",
@@ -518,7 +518,7 @@
   // "market" opens the own store (viewMarket, sql/market.sql).
   // Order: Profile → Market → Create → Your content → Manage posts → Messages →
   // Search → Following → Blocked → Settings.
-  const NAV_SECTIONS = ["home", "market", "community", "create", "content", "posts", "messages", "search", "following", "blocked", "settings"];
+  const NAV_SECTIONS = ["home", "market", "community", "create", "posts", "messages", "search", "following", "blocked", "settings"];
 
   function signedIn() {
     return Boolean(state.me?.member?.member_id);
@@ -778,7 +778,6 @@
       </div>
       <div class="tabs">
         <button class="btn btn-sm auth-allow ${state.homeTab==="activity"?"btn-primary":"btn-ghost"}" data-htab="activity" type="button">${t("prof.activity")}</button>
-        <button class="btn btn-sm auth-allow ${state.homeTab==="content"?"btn-primary":"btn-ghost"}" data-htab="content" type="button">${t("prof.contentTab")}</button>
         <button class="btn btn-sm auth-allow ${state.homeTab==="market"?"btn-primary":"btn-ghost"}" data-htab="market" type="button">${t("prof.marketTab")}</button>
         ${state.isOwner ? `<button class="btn btn-sm ${state.homeTab==="updates"?"btn-primary":"btn-ghost"}" data-htab="updates" type="button">${t("prof.updates")}</button>` : ""}
       </div>
@@ -790,8 +789,8 @@
     main.querySelectorAll("[data-htab]").forEach((b) => {
       b.onclick = () => {
         state.homeTab = b.dataset.htab;
-        // #videos / #playlists / #playlist/… belong to the Content tab only, #market… to Market
-        if (state.homeTab !== "content" && pcFromHash()) replaceHash("");
+        // #market… belongs to the Market tab.
+        if (pcFromHash()) replaceHash("");
         if (state.homeTab === "market") replaceHash(mkHash());
         else if (mkFromHash()) replaceHash("");
         viewHome(main);
@@ -800,7 +799,6 @@
     main.querySelector("[data-people='followers']").onclick = () => openPeople("followers");
     main.querySelector("[data-people='following']").onclick = () => openPeople("following");
     if (state.homeTab === "updates") await drawUpdates();
-    else if (state.homeTab === "content") await drawContent();
     else if (state.homeTab === "market") await drawMarket();
     else await drawActivity();
     hydrateAvatars(main);
@@ -844,10 +842,11 @@
     const host = state.hostMember;
     const policy = state.host?.follow_policy || "instant";
     if (state.followRow?.status === "accepted") {
-      await supabaseRequest(
+      const removed = await supabaseRequest(
         `/rest/v1/follows?follower_id=eq.${restValue(me.member_id)}&following_id=eq.${restValue(host.member_id)}`,
         { method: "DELETE" }
       );
+      if (!removed.ok) return toast(t("prof.followFail"));
       state.followRow = null;
       await recount(me.member_id);
       await recount(host.member_id);
@@ -903,22 +902,23 @@
     renderShell();
   }
 
-  function onBlock() {
+  async function onBlock() {
     if (state.blockRow) {
-      unblock(state.hostMember.member_id).then(() => {
-        state.blockRow = null;
-        toast(t("prof.unblocked"));
-        renderShell();
-      });
+      const ok = await unblock(state.hostMember.member_id);
+      if (!ok) return toast(t("prof.blockFail"));
+      state.blockRow = null;
+      toast(t("prof.unblocked"));
+      renderShell();
       return;
     }
     openBlockModal(state.hostMember);
   }
 
   async function unblock(id) {
-    await supabaseRequest(`/rest/v1/blocks?blocker_id=eq.${restValue(state.me.member.member_id)}&blocked_id=eq.${restValue(id)}`, {
+    const res = await supabaseRequest(`/rest/v1/blocks?blocker_id=eq.${restValue(state.me.member.member_id)}&blocked_id=eq.${restValue(id)}`, {
       method: "DELETE",
     });
+    return Boolean(res?.ok);
   }
 
   function openBlockModal(person) {
@@ -989,41 +989,62 @@
 
   async function openPeople(kind) {
     const hostId = state.hostMember.member_id;
-    const q =
-      kind === "followers"
-        ? `/rest/v1/follows?following_id=eq.${restValue(hostId)}&status=eq.accepted&select=*`
-        : `/rest/v1/follows?follower_id=eq.${restValue(hostId)}&status=eq.accepted&select=*`;
-    const res = await supabaseRequest(q);
-    const rows = res.data || [];
+    const PAGE_SIZE = 100;
+    const base = kind === "followers"
+      ? `/rest/v1/follows?following_id=eq.${restValue(hostId)}&status=eq.accepted&select=*&order=created_at.desc`
+      : `/rest/v1/follows?follower_id=eq.${restValue(hostId)}&status=eq.accepted&select=*&order=created_at.desc`;
+    let offset = 0;
+    const first = await supabaseRequest(`${base}&limit=${PAGE_SIZE}&offset=0`);
+    if (!first.ok) return toast(t("com.loadFail"));
+    const rows = Array.isArray(first.data) ? first.data : [];
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
-    overlay.innerHTML = `<section class="glass modal-card"><h2>${kind === "followers" ? t("prof.followersTitle") : t("prof.following")}</h2><div id="ppl"></div><button class="btn btn-sm btn-ghost" id="ppl-x" type="button">${t("common.close")}</button></section>`;
+    overlay.innerHTML = `<section class="glass modal-card"><h2>${kind === "followers" ? t("prof.followersTitle") : t("prof.following")}</h2><div id="ppl"></div><button class="btn btn-sm btn-ghost" id="ppl-more" type="button"${rows.length < PAGE_SIZE ? " hidden" : ""}>${t("vid.loadMore")}</button><button class="btn btn-sm btn-ghost" id="ppl-x" type="button">${t("common.close")}</button></section>`;
     document.body.appendChild(overlay);
     overlay.querySelector("#ppl-x").onclick = () => overlay.remove();
     const box = overlay.querySelector("#ppl");
-    if (!rows.length) {
-      box.innerHTML = `<p class="empty">None yet.</p>`;
-      return;
-    }
-    const pair = (r) =>
-      kind === "followers"
-        ? { u: r.follower_username, id: r.follower_id }
-        : { u: r.following_username, id: r.following_id };
-    await primeAvatars(rows.map((r) => pair(r).id), rows.map((r) => pair(r).u));
-    box.innerHTML = rows
-      .map((r) => {
+    const more = overlay.querySelector("#ppl-more");
+    const pair = (r) => kind === "followers"
+      ? { u: r.follower_username, id: r.follower_id }
+      : { u: r.following_username, id: r.following_id };
+    const appendRows = async (page, replace = false) => {
+      if (!page.length && replace) {
+        box.innerHTML = `<p class="empty">${t("prof.none")}</p>`;
+        return;
+      }
+      const people = page.map(pair);
+      await primeAvatars(people.map((r) => r.id), people.map((r) => r.u));
+      const html = page.map((r) => {
         const { u, id } = pair(r);
         return `<div class="person-row">
           ${avatarImg(id, u)}
           <div><strong>@${escapeHtml(u)}</strong><div class="muted">${escapeHtml(id)}</div></div>
           <div class="prof-actions">
             <a class="btn btn-sm btn-primary" href="${profileHref(u)}">${t("common.visit")}</a>
-            ${state.me ? `<button class="btn btn-sm btn-ghost" data-msg="${escapeHtml(id)}" data-user="${escapeHtml(u)}" type="button">Message</button>
+            ${state.me ? `<button class="btn btn-sm btn-ghost" data-msg="${escapeHtml(id)}" data-user="${escapeHtml(u)}" type="button">${t("prof.message")}</button>
             <button class="btn btn-sm btn-danger" data-blk="${escapeHtml(id)}" data-user="${escapeHtml(u)}" type="button">${t("prof.block")}</button>` : ""}
           </div>
         </div>`;
-      })
-      .join("");
+      }).join("");
+      if (replace) box.innerHTML = html;
+      else box.insertAdjacentHTML("beforeend", html);
+      hydrateAvatars(box);
+    };
+    await appendRows(rows, true);
+    offset = rows.length;
+    more.onclick = async () => {
+      more.disabled = true;
+      const result = await supabaseRequest(`${base}&limit=${PAGE_SIZE}&offset=${offset}`);
+      if (!result.ok) {
+        more.disabled = false;
+        return toast(t("com.loadFail"));
+      }
+      const page = Array.isArray(result.data) ? result.data : [];
+      await appendRows(page);
+      offset += page.length;
+      more.hidden = page.length < PAGE_SIZE;
+      more.disabled = false;
+    };
     box.onclick = (e) => {
       const msg = e.target.closest("[data-msg]");
       const blk = e.target.closest("[data-blk]");
@@ -1448,9 +1469,27 @@
   const Rich = window.CineAuraRich;
   const RICH_KINDS = ["recommendation", "reclist", "review"];
 
+  function postItemHref(item) {
+    const raw = String(item?.href || "").trim();
+    if (!raw) return "#";
+    try {
+      const url = new URL(raw, location.href);
+      if (!["http:", "https:"].includes(url.protocol)) return "#";
+      return url.href;
+    } catch { return "#"; }
+  }
+
+  function postItemHtml(item) {
+    const href = postItemHref(item);
+    const label = item.source_type === "product" ? t("prof.typeProduct") : item.source_type === "book" ? t("prof.typeBook") : item.source_type === "article" ? t("com.tab.articles") : item.source_type === "document" ? t("doc.tab") : item.source_type === "answer" ? t("com.answersN") : item.source_type === "series" || item.media_type === "tv" ? t("common.series") : item.source_type === "movie" || item.media_type === "movie" ? t("common.movie") : t("prof.typeContent");
+    return `<div class="post-linked-item"><a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || label)}</a><span class="chip">${escapeHtml(label)}</span>${item.note ? `<p>${escapeHtml(item.note)}</p>` : ""}</div>`;
+  }
+
   function kindLabel(kind) {
     if (kind === "post") return t("prof.plainPost");
+    if (kind === "readlist") return t("prof.readlist");
     if (kind === "playlist") return t("dash.nav.playlists");
+    if (kind === "readlist") return t("prof.readlist");
     if (kind === "reclist") return t("prof.recList");
     if (kind === "review") return t("rev.review");
     if (kind === "account") return t("prof.recAcc");
@@ -1464,9 +1503,11 @@
   async function enrichItemMap(posts, itemMap) {
     await Promise.all(
       posts
-        .filter((p) => RICH_KINDS.includes(p.kind) && itemMap[p.post_id]?.length)
+        .filter((p) => RICH_KINDS.includes(p.kind) && itemMap[p.post_id]?.some((it) => !it.source_type || it.source_type === "tmdb"))
         .map(async (p) => {
-          itemMap[p.post_id] = await Rich.enrich(itemMap[p.post_id]);
+          const rich = itemMap[p.post_id].filter((it) => !it.source_type || it.source_type === "tmdb");
+          const linked = itemMap[p.post_id].filter((it) => it.source_type && it.source_type !== "tmdb");
+          itemMap[p.post_id] = [...await Rich.enrich(rich), ...linked];
         })
     );
   }
@@ -1486,8 +1527,13 @@
   // lists / reviews get poster + title + year + genre + story + cast + trailer.
   function postContentHtml(p, items) {
     const video = postVideoHtml(p);
+    if (p.kind === "readlist") {
+      const links = items.map(postItemHtml).join("");
+      return `${video}<p style="white-space:pre-line">${escapeHtml(p.body || "")}</p><div class="rich-list readlist-items">${links}</div>`;
+    }
     if (!RICH_KINDS.includes(p.kind)) {
       const media = items
+        .filter((it) => !it.source_type || it.source_type === "tmdb")
         .map((it) => {
           const href = it.media_type === "person" ? personHref(it.tmdb_id) : watchHref(it.media_type, it.tmdb_id, null, null, p.post_id);
           const img = it.poster_path ? imgUrl(it.poster_path, "w185") : initialsAvatar(it.title);
@@ -1495,19 +1541,19 @@
           return `<a href="${href}">${score ? `<span class="score">★ ${score}</span>` : ""}<img src="${img}" alt=""/><div class="muted">${escapeHtml(it.title)}</div></a>`;
         })
         .join("");
-      return `${video}<p>${escapeHtml(p.body || "")}</p>
+      return `${video}<p style="white-space:pre-line">${escapeHtml(p.body || "")}</p>
         ${p.playlist_id ? `<p><a class="btn btn-sm btn-ghost" href="./playlist.html?ID=${encodeURIComponent(p.playlist_id)}">${t("prof.openPl")}</a></p>` : ""}
         ${media ? `<div class="post-media">${media}</div>` : ""}`;
     }
     const display = Rich.parseDisplay(p.display);
     const compact = p.kind === "reclist" && items.length > 1;
-    const blocks = items.map((it) => Rich.itemHtml(it, display, p.post_id, { compact })).join("");
+    const blocks = items.map((it) => it.source_type && it.source_type !== "tmdb" ? postItemHtml(it) : `${Rich.itemHtml(it, display, p.post_id, { compact })}${it.note ? `<p class="muted post-item-note">${escapeHtml(it.note)}</p>` : ""}`).join("");
     if (p.kind === "review") {
       return `${video}<div class="rich-list">${blocks}</div>
         <div class="review-text">${escapeHtml(p.body || "")}</div>
         ${Rich.reviewListsHtml(p.pros, p.cons)}`;
     }
-    return `${video}<p>${escapeHtml(p.body || "")}</p><div class="rich-list">${blocks}</div>`;
+    return `${video}<p style="white-space:pre-line">${escapeHtml(p.body || "")}</p><div class="rich-list">${blocks}</div>`;
   }
 
   function ownerToolsHtml(p) {
@@ -1542,7 +1588,7 @@
     });
     const canReply = state.me && !blockedFeature("updates");
     const item = (c, depth) => `
-      <div class="cmt${depth ? " cmt-reply" : ""}">
+      <div class="cmt${depth ? " cmt-reply" : ""}" data-sentiment="${escapeHtml(c.sentiment || "neutral")}" data-created="${escapeHtml(c.created_at || "")}">
         <p><a href="${profileHref(c.username)}"><strong>@${escapeHtml(c.username)}</strong></a> ${escapeHtml(c.comment)}
           ${canReply ? ` <button class="cmt-reply-btn" type="button" data-reply-to="${c.parent_id ? rootOf(c) : c.id}" data-reply-post="${escapeHtml(postId)}" data-reply-user="${escapeHtml(c.username)}">↩ ${t("prof.reply")}</button>` : ""}
         </p>
@@ -1555,6 +1601,11 @@
     const me = state.me?.member?.member_id;
     if (!me) return "";
     return (votes || []).find((v) => v.member_id === me)?.vote || "";
+  }
+
+  function myAgreement(votes) {
+    const me = state.me?.member?.member_id;
+    return me ? (votes || []).find((v) => v.member_id === me)?.agreement || "" : "";
   }
 
   function renderPostCard(p, items, votes, comments) {
@@ -1581,6 +1632,8 @@
       ${p.title ? `<h3>${escapeHtml(p.title)}</h3>` : ""}
       ${postContentHtml(p, items)}
       ${hideVote ? "" : `<div class="prof-actions">
+        <button class="btn btn-sm ${myAgreement(votes) === "agree" ? "btn-vote-on" : "btn-ghost"}" data-agree="agree" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.agree", { n: votes.filter((v) => v.agreement === "agree").length })}</button>
+        <button class="btn btn-sm ${myAgreement(votes) === "disagree" ? "btn-vote-on" : "btn-ghost"}" data-agree="disagree" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.disagree", { n: votes.filter((v) => v.agreement === "disagree").length })}</button>
         <button class="btn btn-sm ${mine === "up" ? "btn-vote-on" : "btn-ghost"}" data-vote="up" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.recommendBtn", { n: up })}</button>
         <button class="btn btn-sm ${mine === "down" ? "btn-vote-on" : "btn-ghost"}" data-vote="down" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.dont", { n: down })}</button>
         ${state.me ? commentBtn() : ""}
@@ -1588,8 +1641,9 @@
       </div>`}
       ${hideVote && state.me && !minePost ? `<div class="prof-actions">${reportBtn()}</div>` : ""}
       <div class="stack" style="margin-top:10px">
-        ${commentListHtml(comments, p.post_id)}
-        ${state.me && !blockedFeature("updates") ? `<div class="form-row"><input data-cmt="${escapeHtml(p.post_id)}" placeholder="${t("prof.writeCmt")}" /><button class="btn btn-sm btn-primary" data-send-cmt="${escapeHtml(p.post_id)}" type="button">${t("prof.comment")}</button></div>` : ""}
+        <div class="comment-tools"><select data-comment-filter="${escapeHtml(p.post_id)}"><option value="all">${t("prof.allComments")}</option><option value="positive">${t("prof.positiveComments")}</option><option value="negative">${t("prof.negativeComments")}</option></select><select data-comment-sort="${escapeHtml(p.post_id)}"><option value="oldest">${t("prof.oldestFirst")}</option><option value="newest">${t("prof.newestFirst")}</option></select></div>
+        <div class="post-comments" data-comment-list="${escapeHtml(p.post_id)}">${commentListHtml(comments, p.post_id)}</div>
+        ${state.me && !blockedFeature("updates") ? `<div class="form-row"><input data-cmt="${escapeHtml(p.post_id)}" placeholder="${t("prof.writeCmt")}" /><select data-cmt-sentiment="${escapeHtml(p.post_id)}"><option value="positive">${t("prof.positive")}</option><option value="negative">${t("prof.negative")}</option></select><button class="btn btn-sm btn-primary" data-send-cmt="${escapeHtml(p.post_id)}" type="button">${t("prof.comment")}</button></div>` : ""}
       </div>
       <div class="post-share">${shareRowHtml(postHref(p), postShareText(p), { compact: true, track: p.post_id })}</div>`;
   }
@@ -1606,6 +1660,7 @@
       return;
     }
     const vote = e.target.closest("[data-vote]");
+    const agreement = e.target.closest("[data-agree]");
     const send = e.target.closest("[data-send-cmt]");
     // Comment icon: scroll straight to the comment box of this post.
     const focusCmt = e.target.closest("[data-focus-cmt]");
@@ -1652,28 +1707,36 @@
       return;
     }
     if (!state.me) {
-      if (vote || send) toast(t("prof.signFirst"));
+      if (vote || agreement || send) toast(t("prof.signFirst"));
       return;
     }
-    if (vote && !(await window.CineAura.guardFeature("posts"))) return;
+    if ((vote || agreement) && !(await window.CineAura.guardFeature("posts"))) return;
     if (send && !(await window.CineAura.guardFeature("comments"))) return;
     const redraw = typeof refresh === "function" ? refresh : () => drawActivity();
+    if (agreement) {
+      const postId = agreement.dataset.pid;
+      const value = agreement.dataset.agree;
+      const mineId = restValue(state.me.member.member_id);
+      const existing = await supabaseRequest(`/rest/v1/post_votes?post_id=eq.${restValue(postId)}&member_id=eq.${mineId}&select=id`);
+      let saved;
+      if (existing.ok && Array.isArray(existing.data) && existing.data[0]) {
+        saved = await supabaseRequest(`/rest/v1/post_votes?post_id=eq.${restValue(postId)}&member_id=eq.${mineId}`, { method: "PATCH", body: JSON.stringify({ agreement: value }) });
+      } else {
+        saved = await supabaseRequest("/rest/v1/post_votes", { method: "POST", body: JSON.stringify({ post_id: postId, member_id: state.me.member.member_id, username: state.me.member.username, vote: null, agreement: value }) });
+      }
+      if (!saved.ok) return toast(t("prof.voteFail"));
+      toast(t(value === "agree" ? "prof.agreed" : "prof.disagreed"));
+      redraw();
+    }
     if (vote) {
       const postId = vote.dataset.pid;
       const choice = vote.dataset.vote;
-      await supabaseRequest(
-        `/rest/v1/post_votes?post_id=eq.${restValue(postId)}&member_id=eq.${restValue(state.me.member.member_id)}`,
-        { method: "DELETE" }
-      );
-      await supabaseRequest("/rest/v1/post_votes", {
-        method: "POST",
-        body: JSON.stringify({
-          post_id: postId,
-          member_id: state.me.member.member_id,
-          username: state.me.member.username,
-          vote: choice,
-        }),
-      });
+      const mineId = restValue(state.me.member.member_id);
+      const existingVote = await supabaseRequest(`/rest/v1/post_votes?post_id=eq.${restValue(postId)}&member_id=eq.${mineId}&select=id`);
+      const savedVote = existingVote.ok && Array.isArray(existingVote.data) && existingVote.data[0]
+        ? await supabaseRequest(`/rest/v1/post_votes?post_id=eq.${restValue(postId)}&member_id=eq.${mineId}`, { method: "PATCH", body: JSON.stringify({ vote: choice }) })
+        : await supabaseRequest("/rest/v1/post_votes", { method: "POST", body: JSON.stringify({ post_id: postId, member_id: state.me.member.member_id, username: state.me.member.username, vote: choice, agreement: null }) });
+      if (!savedVote.ok) return toast(t("prof.voteFail"));
       // The vote row belongs to the post author, which is not always the member
       // whose wall we are standing on (updates feed shows other people's posts).
       const voted = state.postCache.get(postId) || null;
@@ -1726,16 +1789,18 @@
       const text = input?.value.trim();
       if (!text) return;
       const parent = Number(input?.dataset.parent || 0) || null;
-      await supabaseRequest("/rest/v1/post_comments", {
+      const commentSaved = await supabaseRequest("/rest/v1/post_comments", {
         method: "POST",
         body: JSON.stringify({
           post_id: postId,
           member_id: state.me.member.member_id,
           username: state.me.member.username,
           comment: text,
+          sentiment: document.querySelector(`[data-cmt-sentiment="${postId}"]`)?.value || "positive",
           ...(parent ? { parent_id: parent } : {}),
         }),
       });
+      if (!commentSaved.ok) return toast(t("prof.commentFail"));
       // Note: comments already count toward reach via the post_comments table
       // itself (post_reach), so no extra post_event row is needed here.
       if (input) {
@@ -2566,8 +2631,7 @@
   //   playlist, recommendation, reclist (recommendation list), review, post.
   // The heavy editors (video, document, article, question) live in their own
   // pages, reachable from "Your content" — not from this tab.
-  const STUDIO_TABS = ["create", "manage", "stats"];
-  const STUDIO_KINDS = ["playlist", "recommendation", "reclist", "review", "post"];
+  const STUDIO_KINDS = ["post", "playlist", "readlist", "buylist", "recommendation", "reclist", "review"];
   const MANAGE_TABS = ["videos", "documents", "articles", "qa", "posts", "recs"];
 
   function studioKindLabel(k) {
@@ -2577,26 +2641,20 @@
     if (k === "article") return t("com.newArticle");
     if (k === "question") return t("com.ask");
     if (k === "playlist") return t("dash.nav.playlists");
+    if (k === "readlist") return t("prof.readlist");
+    if (k === "buylist") return t("prof.buylist");
     if (k === "recommendation") return t("prof.recs");
     if (k === "reclist") return t("prof.recList");
     return t("rev.review");
   }
 
   async function viewCreate(main) {
-    const tab = STUDIO_TABS.includes(state.studioTab) ? state.studioTab : "create";
     main.innerHTML = `
-      <p class="eyebrow">${t("prof.studio.eyebrow")}</p>
-      <h1>${t("prof.studio.title")}</h1>
+      <p class="eyebrow">${t("prof.create")}</p>
+      <h1>${t("prof.create")}</h1>
       <p class="muted">${t("prof.studio.lead")}</p>
-      <div class="tabs follow-tabs" role="tablist" style="flex-wrap:wrap">
-        ${STUDIO_TABS.map((k) => `<button type="button" role="tab" class="follow-tab${k === tab ? " active" : ""}" data-st="${k}">${t("prof.studio.tab." + k)}</button>`).join("")}
-      </div>
       <div id="studio-body" style="margin-top:14px"></div>`;
-    main.querySelectorAll("[data-st]").forEach((b) => (b.onclick = () => ((state.studioTab = b.dataset.st), viewCreate(main))));
-    const body = main.querySelector("#studio-body");
-    if (tab === "manage") return studioManage(body);
-    if (tab === "stats") return studioStats(body);
-    return studioCreate(body);
+    return studioCreate(main.querySelector("#studio-body"));
   }
 
   // ── Studio › Create content ──────────────────────────────────────────────
@@ -2604,7 +2662,7 @@
   // review, post. Video / Document / Article / Question each have a dedicated
   // editor page, reachable from "Your content" (see viewContent below).
   async function studioCreate(box) {
-    const kind = STUDIO_KINDS.includes(state.studioKind) ? state.studioKind : STUDIO_KINDS[0];
+    const kind = STUDIO_KINDS.includes(state.studioKind) ? state.studioKind : "post";
     box.innerHTML = `
       <div class="tabs" style="flex-wrap:wrap">
         ${STUDIO_KINDS.map((k) => `<button type="button" class="btn btn-sm ${k === kind ? "btn-primary" : "btn-ghost"}" data-sk="${k}">${studioKindLabel(k)}</button>`).join("")}
@@ -2613,7 +2671,52 @@
     box.querySelectorAll("[data-sk]").forEach((b) => (b.onclick = () => ((state.studioKind = b.dataset.sk), studioCreate(box))));
     const host = box.querySelector("#studio-form");
     if (kind === "playlist") return studioPlaylistForm(host);
+    if (kind === "buylist") {
+      const M = window.CineAuraMarket;
+      host.innerHTML = `<p class="muted">${escapeHtml(t("prof.buylistLead"))}</p><button class="btn btn-primary" id="create-buylist" type="button">${escapeHtml(t("mkt.ls.create"))}</button>`;
+      host.querySelector("#create-buylist").onclick = () => M?.openListForm({ onSaved: () => toast(t("mkt.ls.created")) });
+      return;
+    }
+    if (kind === "readlist") return drawReadlistComposer(host);
     drawRichComposer(host, kind);
+  }
+
+  function drawReadlistComposer(box) {
+    box.innerHTML = `<div class="stack">
+      <input id="rl-title" maxlength="160" placeholder="${escapeHtml(t("prof.readlistTitle"))}" />
+      <select id="rl-scope"><option value="mixed">${escapeHtml(t("prof.readlistMixed"))}</option><option value="articles">${escapeHtml(t("com.tab.articles"))}</option><option value="documents">${escapeHtml(t("doc.tab"))}</option><option value="answers">${escapeHtml(t("com.tab.answers"))}</option></select>
+      <textarea id="rl-desc" rows="3" maxlength="2000" placeholder="${escapeHtml(t("prof.readlistDesc"))}"></textarea>
+      <textarea id="rl-items" rows="7" placeholder="${escapeHtml(t("prof.readlistItems"))}"></textarea>
+      <label class="field-label" for="cr-vis">${t("pm.visibility")}</label>
+      <select id="cr-vis"><option value="public">${t("pm.vis.public")}</option><option value="exclusive">${t("pm.vis.exclusive")}</option><option value="private">${t("pm.vis.private")}</option></select>
+      ${exclusiveFields("cr")}
+      <button class="btn btn-primary" id="rl-save" type="button">${escapeHtml(t("prof.publishPl"))}</button>
+    </div>`;
+    bindVis("cr");
+    box.querySelector("#rl-save").onclick = async () => {
+      if (!(await window.CineAura.guardFeature("posts")) || !(await window.CineAura.guardLevel("create_content"))) return;
+      const title = box.querySelector("#rl-title").value.trim();
+      const desc = box.querySelector("#rl-desc").value.trim();
+      const lines = box.querySelector("#rl-items").value.split(/\n+/).map((x) => x.trim()).filter(Boolean);
+      if (!title || !desc || !lines.length) return toast(t("prof.readlistRequired"));
+      const scope = box.querySelector("#rl-scope").value;
+      const visibility = readVis("cr");
+      if (!visibility) return;
+      const allowed = new Set(["articles", "documents", "answers", "book"]);
+      const items = [];
+      for (const line of lines) {
+        const bits = line.split("|").map((x) => x.trim());
+        const type = scope === "mixed" ? bits.shift() : scope;
+        const itemTitle = bits.shift() || "";
+        const href = bits.join("|").trim();
+        if (!allowed.has(type) || !itemTitle || !href) return toast(t("prof.readlistFormat"));
+        let url;
+        try { url = new URL(href, location.href); } catch { return toast(t("prof.attachBadLink")); }
+        if (!["http:", "https:"].includes(url.protocol)) return toast(t("prof.attachBadLink"));
+        items.push({ post_id: "", tmdb_id: null, media_type: type, title: itemTitle, poster_path: "", rating: 0, source_type: type, source_id: "", href: url.href, note: "" });
+      }
+      await insertPost("readlist", title, `${desc}\n\n${t("prof.readlistScope")}: ${t(`prof.readlist.${scope}`)}`, visibility, "", items);
+    };
   }
 
   async function studioPlaylistForm(box) {
@@ -2936,6 +3039,13 @@
             <div class="glass tp-results" id="tp-results" hidden></div>
           </div>
           <p class="muted tp-hint">${t("rich.searchHint")}</p>
+          <details class="linked-item-add"><summary>${t("prof.attachOther")}</summary>
+            <select id="li-type"><option value="article">${t("com.tab.articles")}</option><option value="document">${t("doc.tab")}</option><option value="answer">${t("com.answersN")}</option><option value="product">${t("prof.typeProduct")}</option><option value="movie">${t("common.movie")}</option><option value="series">${t("common.series")}</option><option value="book">${t("prof.typeBook")}</option></select>
+            <input id="li-title" maxlength="180" placeholder="${t("prof.attachTitle")}" />
+            <input id="li-href" type="url" maxlength="1000" placeholder="https://…" />
+            <input id="li-note" maxlength="400" placeholder="${t("prof.attachNote")}" />
+            <button type="button" class="btn btn-sm btn-ghost" id="li-add">${t("prof.attachAdd")}</button>
+          </details>
           <label class="field-label" for="c-title">${isReview ? t("rev.titleLabel") : t("prof.postTitle")}</label>
           <input id="c-title" placeholder="${isReview ? t("rev.titlePh") : multi ? t("prof.listTitle") : t("prof.recTitle")}" />
           <label class="field-label" for="c-body">${isReview ? t("rev.textLabel") : t("rich.textLabel")}</label>
@@ -2983,7 +3093,7 @@
       };
       const blocks = d.items.length
         ? `<div class="rich-list">${d.items
-            .map((it) => Rich.itemHtml(it, d.display, "", { removable: true, compact: multi && d.items.length > 1 }))
+            .map((it) => it.source_type && it.source_type !== "tmdb" ? postItemHtml(it) : `${Rich.itemHtml(it, d.display, "", { removable: true, compact: multi && d.items.length > 1 })}${it.note ? `<p class="muted">${escapeHtml(it.note)}</p>` : ""}`)
             .join("")}</div>`
         : `<p class="empty">${t("rich.noneYet")}</p>`;
       out.innerHTML = `<article class="post-card kind-${kind}">
@@ -3071,6 +3181,22 @@
         : `<p class="muted">${t("rich.noResults")}</p>`;
     };
 
+    $("#li-add").onclick = () => {
+      const title = $("#li-title").value.trim();
+      const rawHref = $("#li-href").value.trim();
+      const source_type = $("#li-type").value;
+      let url;
+      try { url = new URL(rawHref, location.href); } catch { return toast(t("prof.attachBadLink")); }
+      if (!title || !rawHref || !["https:", "http:"].includes(url.protocol)) return toast(t("prof.attachBadLink"));
+      const duplicate = d.items.some((it) => it.href === url.href);
+      if (duplicate) return toast(t("rich.already"));
+      const item = { source_type, source_id: "", href: url.href, title, note: $("#li-note").value.trim(), media_type: source_type, tmdb_id: null, poster_path: "", rating: 0 };
+      if (multi) d.items.push(item); else d.items = [item];
+      if (!$("#c-title").value.trim() && !isReview && !multi) $("#c-title").value = title;
+      $("#li-title").value = ""; $("#li-href").value = ""; $("#li-note").value = "";
+      preview();
+    };
+
     $("#tp-q").addEventListener("input", () => {
       clearTimeout(timer);
       timer = setTimeout(search, 320);
@@ -3146,7 +3272,10 @@
     // An optional video file of the member: uploads to Streamtape (Posts) on save.
     const videoFile = $("#c-vid")?.files?.[0] || null;
     if (videoFile) extras.videoFile = videoFile;
-    await insertPost(kind, title, body, vis, "", d.items.map((it) => Rich.toItemRow(it)), extras);
+    await insertPost(kind, title, body, vis, "", d.items.map((it) => it.source_type && it.source_type !== "tmdb" ? ({
+      post_id: "", tmdb_id: null, media_type: it.source_type, title: it.title, poster_path: "", rating: 0,
+      source_type: it.source_type, source_id: it.source_id || "", href: it.href, note: it.note || "",
+    }) : ({ ...Rich.toItemRow(it), source_type: "tmdb", source_id: "", href: "", note: it.note || "" })), extras);
   }
 
   async function insertPost(kind, title, body, vis, playlistId, items, extras = {}) {
@@ -3228,10 +3357,15 @@
       const rows = items.map((it) => ({ ...it, post_id: postId }));
       const full = await supabaseRequest("/rest/v1/post_items", { method: "POST", body: JSON.stringify(rows) });
       if (!full.ok) {
-        await supabaseRequest("/rest/v1/post_items", {
+        if (rows.some((r) => r.source_type && r.source_type !== "tmdb")) {
+          await supabaseRequest(`/rest/v1/posts?post_id=eq.${restValue(postId)}`, { method: "DELETE" });
+          return toast(t("prof.linkedItemsNeedSql"));
+        }
+        const fallback = await supabaseRequest("/rest/v1/post_items", {
           method: "POST",
           body: JSON.stringify(rows.map((r) => Rich.baseItemRow(r))),
         });
+        if (!fallback.ok) return toast(t("prof.pubFail"));
       }
     }
     if (vis.visibility === "private") await saveAccess(postId, vis.people);
@@ -4144,6 +4278,7 @@
           <button class="btn btn-sm btn-ghost" id="chat-x" type="button">${t("common.close")}</button>
         </div>
         <div class="chat-log" id="chat-log"></div>
+        <button class="btn btn-sm btn-ghost" id="chat-older" type="button" hidden>${t("prof.olderMessages")}</button>
         ${blocked
           ? `<p class="muted" style="margin:8px 0 0">${t("prof.msgBlocked")}</p>`
           : `<div class="form-row">
@@ -4154,19 +4289,41 @@
     document.body.appendChild(overlay);
     hydrateAvatars(overlay);
     let timer = null;
+    let loading = false;
+    const messageRows = new Map();
+    const failedKey = (row) => row._failed ? String(row.id) : `msg:${row.id}`;
     const close = () => { clearInterval(timer); overlay.remove(); if (onClose) onClose(); };
     overlay.querySelector("#chat-x").onclick = close;
 
-    const load = async () => {
-      const [a, b] = await Promise.all([
-        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(me.member_id)}&receiver_id=eq.${restValue(person.member_id)}&select=*&order=created_at.asc`),
-        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(person.member_id)}&receiver_id=eq.${restValue(me.member_id)}&select=*&order=created_at.asc`),
-      ]);
-      const mineRows = (Array.isArray(a.data) ? a.data : []).filter((m) => !m.sender_deleted);
-      const theirRows = (Array.isArray(b.data) ? b.data : []).filter((m) => !m.receiver_deleted);
-      const failed = getFailed().filter((f) => f.from_id === me.member_id && f.to_id === person.member_id).map((f) => ({ ...f, created_at: f.at, sender_id: me.member_id, _failed: true }));
-      const rows = [...mineRows, ...theirRows, ...failed].sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
+    const load = async ({ older = false } = {}) => {
+      if (loading || !overlay.isConnected) return;
+      loading = true;
+      try {
       const log = overlay.querySelector("#chat-log");
+      const olderBtn = overlay.querySelector("#chat-older");
+      const oldest = [...messageRows.values()]
+        .filter((m) => !m._failed && m.created_at)
+        .map((m) => String(m.created_at))
+        .sort()[0];
+      const before = older && oldest ? `&created_at=lt.${encodeURIComponent(oldest)}` : "";
+      const pageQuery = `&order=created_at.desc&limit=100${before}`;
+      const [a, b] = await Promise.all([
+        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(me.member_id)}&receiver_id=eq.${restValue(person.member_id)}&select=*${pageQuery}`),
+        supabaseRequest(`/rest/v1/messages?sender_id=eq.${restValue(person.member_id)}&receiver_id=eq.${restValue(me.member_id)}&select=*${pageQuery}`),
+      ]);
+      if (!a.ok || !b.ok) throw new Error("Message history request failed");
+      const incoming = [
+        ...(Array.isArray(a.data) ? a.data.filter((m) => !m.sender_deleted) : []),
+        ...(Array.isArray(b.data) ? b.data.filter((m) => !m.receiver_deleted) : []),
+      ];
+      incoming.forEach((m) => messageRows.set(failedKey(m), m));
+      if (!older) {
+        getFailed().filter((f) => f.from_id === me.member_id && f.to_id === person.member_id)
+          .forEach((f) => messageRows.set(failedKey({ ...f, _failed: true }), { ...f, created_at: f.at, sender_id: me.member_id, _failed: true }));
+      }
+      const rows = [...messageRows.values()].sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
+      const oldHeight = log.scrollHeight;
+      const oldTop = log.scrollTop;
       log.innerHTML = rows.map((m) => {
         const mine = m.sender_id === me.member_id;
         const st = mine ? msgStatus(m) : "";
@@ -4174,11 +4331,21 @@
           <div class="muted">${fmtWhen(m.created_at)}${st ? ` · ${statusLabel(st)}` : ""}${m._failed ? ` <button class="btn btn-sm btn-danger" data-retry="${escapeHtml(m.id)}" type="button">${t("prof.retry")}</button>` : ""}</div>
         </div>`;
       }).join("") || `<p class="muted">${t("prof.startConv")}</p>`;
-      log.scrollTop = log.scrollHeight;
-      if (theirRows.some((m) => !m.read)) {
+      const hasMore = (Array.isArray(a.data) && a.data.length >= 100) || (Array.isArray(b.data) && b.data.length >= 100);
+      olderBtn.hidden = !hasMore;
+      if (older) log.scrollTop = log.scrollHeight - oldHeight + oldTop;
+      else log.scrollTop = log.scrollHeight;
+      if (incoming.some((m) => m.receiver_id === me.member_id && !m.read)) {
         supabaseRequest(`/rest/v1/messages?receiver_id=eq.${restValue(me.member_id)}&sender_id=eq.${restValue(person.member_id)}&read=eq.false`, { method: "PATCH", body: JSON.stringify({ read: true }) });
       }
+      } catch (error) {
+        console.error("Unable to load profile messages", error);
+        toast(t("prof.loadMessagesFail"));
+      } finally {
+        loading = false;
+      }
     };
+    overlay.querySelector("#chat-older").onclick = () => load({ older: true });
 
     const send = async (text, retryId) => {
       if (!(await window.CineAura.guardFeature("messages"))) return false;
@@ -4506,14 +4673,17 @@
       ${p.title ? `<h3>${escapeHtml(p.title)}</h3>` : ""}
       ${postContentHtml(p, items)}
       <div class="prof-actions">
+        <button class="btn btn-sm ${myAgreement(votes) === "agree" ? "btn-vote-on" : "btn-ghost"}" data-agree="agree" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.agree", { n: votes.filter((v) => v.agreement === "agree").length })}</button>
+        <button class="btn btn-sm ${myAgreement(votes) === "disagree" ? "btn-vote-on" : "btn-ghost"}" data-agree="disagree" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.disagree", { n: votes.filter((v) => v.agreement === "disagree").length })}</button>
         <button class="btn btn-sm ${mine === "up" ? "btn-vote-on" : "btn-ghost"}" data-vote="up" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.recommendBtn", { n: up })}</button>
         <button class="btn btn-sm ${mine === "down" ? "btn-vote-on" : "btn-ghost"}" data-vote="down" data-pid="${escapeHtml(p.post_id)}" type="button">${t("prof.dont", { n: down })}</button>
         ${state.me ? `<button class="btn btn-sm btn-ghost" data-focus-cmt="${escapeHtml(p.post_id)}" type="button" title="${t("prof.writeCmt")}">💬 ${t("prof.comment")}</button>` : ""}
         ${state.me && p.owner_id !== state.me.member?.member_id ? `<button class="btn btn-sm btn-ghost" data-report-post="${escapeHtml(p.post_id)}" type="button" title="${t("prof.reportPost")}">⚑ ${t("prof.reportPost")}</button>` : ""}
       </div>
       <div class="stack" style="margin-top:10px">
-        ${commentListHtml(comments, p.post_id)}
-        ${state.me ? `<div class="form-row"><input data-cmt="${escapeHtml(p.post_id)}" placeholder="${t("prof.writeCmt")}" /><button class="btn btn-sm btn-primary" data-send-cmt="${escapeHtml(p.post_id)}" type="button">${t("prof.comment")}</button></div>` : ""}
+        <div class="comment-tools"><select data-comment-filter="${escapeHtml(p.post_id)}"><option value="all">${t("prof.allComments")}</option><option value="positive">${t("prof.positiveComments")}</option><option value="negative">${t("prof.negativeComments")}</option></select><select data-comment-sort="${escapeHtml(p.post_id)}"><option value="oldest">${t("prof.oldestFirst")}</option><option value="newest">${t("prof.newestFirst")}</option></select></div>
+        <div class="post-comments" data-comment-list="${escapeHtml(p.post_id)}">${commentListHtml(comments, p.post_id)}</div>
+        ${state.me ? `<div class="form-row"><input data-cmt="${escapeHtml(p.post_id)}" placeholder="${t("prof.writeCmt")}" /><select data-cmt-sentiment="${escapeHtml(p.post_id)}"><option value="positive">${t("prof.positive")}</option><option value="negative">${t("prof.negative")}</option></select><button class="btn btn-sm btn-primary" data-send-cmt="${escapeHtml(p.post_id)}" type="button">${t("prof.comment")}</button></div>` : ""}
       </div>
       <div class="post-share">${shareRowHtml(postHref(p), postShareText(p), { compact: true, track: p.post_id })}</div>
     </article>`;
@@ -4660,25 +4830,28 @@
       const acc = e.target.closest("[data-acc]");
       const rej = e.target.closest("[data-rej]");
       if (cancel) {
-        await supabaseRequest(`/rest/v1/follows?id=eq.${cancel.dataset.cancel}`, { method: "DELETE" });
+        const result = await supabaseRequest(`/rest/v1/follows?id=eq.${cancel.dataset.cancel}`, { method: "DELETE" });
+        if (!result.ok) return toast(t("prof.followFail"));
         toast(t("prof.cancelled"));
         viewFollowing(main);
       }
       if (acc) {
-        await supabaseRequest(`/rest/v1/follows?id=eq.${acc.dataset.acc}`, {
+        const result = await supabaseRequest(`/rest/v1/follows?id=eq.${acc.dataset.acc}`, {
           method: "PATCH",
           body: JSON.stringify({ status: "accepted", accepted_at: new Date().toISOString() }),
         });
+        if (!result.ok) return toast(t("prof.followFail"));
         await recount(me);
         if (acc.dataset.fid) await recount(acc.dataset.fid);
         toast(t("prof.accepted"));
         viewFollowing(main);
       }
       if (rej) {
-        await supabaseRequest(`/rest/v1/follows?id=eq.${rej.dataset.rej}`, {
+        const result = await supabaseRequest(`/rest/v1/follows?id=eq.${rej.dataset.rej}`, {
           method: "PATCH",
           body: JSON.stringify({ status: "rejected" }),
         });
+        if (!result.ok) return toast(t("prof.followFail"));
         toast(t("prof.declined"));
         viewFollowing(main);
       }
@@ -4722,7 +4895,7 @@
   // reclist / review / post).
   const CONTENT_TYPES = ["all", "videos", "articles", "documents", "questions", "answers", "posts", "reviews", "recs"];
   // The social side of "Your content": rows of `posts` grouped by their kind.
-  const POST_TYPES = { posts: ["post"], reviews: ["review"], recs: ["recommendation", "reclist"] };
+  const POST_TYPES = { posts: ["post", "readlist"], reviews: ["review"], recs: ["recommendation", "reclist"] };
 
   // Your content > Posts / Reviews / Recommendations: the member's own rows with
   // the state the schema really carries (visibility + date; drafts/review states
@@ -4904,7 +5077,8 @@
     main.onclick = async (e) => {
       const b = e.target.closest("[data-un]");
       if (!b) return;
-      await unblock(b.dataset.un);
+      const ok = await unblock(b.dataset.un);
+      if (!ok) return toast(t("prof.blockFail"));
       toast(t("prof.unblocked"));
       viewBlocked(main);
     };
@@ -5063,13 +5237,10 @@
     await loadRelations();
     await loadHostStatus();
     // profile.html#content (and #content/manage, #content/stats) opens "Your content"
-    if (state.me && /^#content(\/|$)/.test(location.hash)) state.section = "content";
+    if (state.me && /^#content(\/|$)/.test(location.hash)) location.replace("./dashboard.html#videos");
     // profile.html?@name#videos, #playlists, #playlist/CPL… open the Content tab
     const pcWant = pcFromHash();
-    if (pcWant && !postId) {
-      state.homeTab = "content";
-      Object.assign(pcState(), pcWant);
-    }
+    if (pcWant && !postId) location.replace(`./dashboard.html#${pcWant.tab === "videos" ? "upload" : pcWant.tab}`);
     // profile.html?@name#market (#market/recs | lists | reviews) opens the Market tab
     const mkWant = mkFromHash();
     if (mkWant && !postId) {
@@ -5102,21 +5273,29 @@
     }
     const want = pcFromHash();
     if (want) {
-      Object.assign(pcState(), want);
-      if (state.section === "home" && state.homeTab === "content" && $("#pc-pane")) {
-        pcShow();
-        return;
-      }
-      state.section = "home";
-      state.homeTab = "content";
-      renderShell();
+      location.replace(`./dashboard.html#${want.tab === "videos" ? "upload" : want.tab}`);
       return;
     }
-    if (state.me && /^#content(\/|$)/.test(location.hash) && state.section !== "content") {
-      state.section = "content";
-      renderShell();
-    }
+    if (state.me && /^#content(\/|$)/.test(location.hash)) location.replace("./dashboard.html#videos");
   }
+
+  document.addEventListener("change", (event) => {
+    const control = event.target.closest("[data-comment-filter], [data-comment-sort]");
+    if (!control) return;
+    const post = control.closest(".post-card");
+    const list = post?.querySelector(".post-comments");
+    if (!list) return;
+    const sentiment = post.querySelector("[data-comment-filter]")?.value || "all";
+    const order = post.querySelector("[data-comment-sort]")?.value || "oldest";
+    list.querySelectorAll(".cmt[data-sentiment]").forEach((comment) => {
+      comment.hidden = sentiment !== "all" && comment.dataset.sentiment !== sentiment;
+    });
+    const roots = [...list.children].filter((child) => child.classList.contains("cmt"));
+    roots.sort((a, b) => {
+      const cmp = String(a.dataset.created || "").localeCompare(String(b.dataset.created || ""));
+      return order === "newest" ? -cmp : cmp;
+    }).forEach((root) => list.appendChild(root));
+  });
 
   document.addEventListener("DOMContentLoaded", boot);
 })();

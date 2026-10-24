@@ -60,7 +60,7 @@ const js = read("js/profile.js");
 
 has("commentListHtml helper", js, "function commentListHtml(comments, postId)");
 has("comment root guard", js, "while (x.parent_id && byId.has(x.parent_id) && guard++ < 10)");
-has("reply markup class", js, '<div class="cmt${depth ? " cmt-reply" : ""}">');
+has("reply markup class + sentiment metadata", js, '<div class="cmt${depth ? " cmt-reply" : ""}" data-sentiment=');
 has("reply button data attrs", js, 'data-reply-to="${c.parent_id ? rootOf(c) : c.id}"');
 has("reply button post attr", js, 'data-reply-post="${escapeHtml(postId)}"');
 has("reply button user attr", js, 'data-reply-user="${escapeHtml(c.username)}"');

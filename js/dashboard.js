@@ -370,6 +370,9 @@
       playlists: viewPlaylists,
       links: viewLinks,
       upload: viewUpload,
+      videos: viewOwnVideos,
+      questions: (main) => viewCommunityContributions(main, "questions"),
+      answers: (main) => viewCommunityContributions(main, "answers"),
       articles: viewArticles,
       documents: viewDocuments,
       reports: viewReports,
@@ -1597,6 +1600,28 @@
      member with its delete: the Streamtape file goes, its registry row, and
      — for a film or an episode — the watch link it became. Only the member's
      own folder is ever touched; folders themselves are never deleted. */
+  async function viewOwnVideos(main) {
+    const id = restValue(state.member.member_id);
+    const res = await supabaseRequest(`/rest/v1/content?owner_id=eq.${id}&select=content_id,title,thumb_url,visibility,created_at,views&order=created_at.desc&limit=100`);
+    const rows = res.ok && Array.isArray(res.data) ? res.data : [];
+    main.innerHTML = `<p class="eyebrow">${t("dash.nav.videos")}</p><h1>${t("dash.nav.videos")}</h1>
+      <p class="muted">${t("dash.content.typeLead")}</p>
+      <p><a class="btn btn-sm btn-primary" href="./video%20editor.html">${t("prof.cr.video")}</a></p>
+      ${!res.ok ? `<p class="empty">${t("com.loadFail")}</p>` : rows.length ? rows.map((r) => `<a class="glass" style="display:flex;gap:12px;align-items:center;padding:10px 12px;margin:8px 0;text-decoration:none" href="./video.html?id=${encodeURIComponent(r.content_id)}">
+        ${r.thumb_url ? `<img src="${escapeHtml(r.thumb_url)}" alt="" loading="lazy" style="width:84px;height:52px;object-fit:cover;border-radius:8px" />` : "🎬"}
+        <span><strong>${escapeHtml(r.title || r.content_id)}</strong><br><span class="muted">${escapeHtml(r.visibility || "public")} · ${escapeHtml(String(r.created_at || "").slice(0, 10))} · 👁 ${Number(r.views || 0)}</span></span>
+      </a>`).join("") : `<p class="empty">${t("prof.ct.none")}</p>`}`;
+  }
+
+  async function viewCommunityContributions(main, kind) {
+    main.innerHTML = `<p class="eyebrow">${t("dash.grp.userContent")}</p><h1>${t("dash.nav." + kind)}</h1>
+      <p><a class="btn btn-sm btn-primary" href="./answers.html${kind === "questions" ? "#ask" : ""}">${kind === "questions" ? t("com.ask") : t("com.answersN")}</a></p>
+      <div id="dash-community-content">${t("common.loading")}</div>`;
+    const box = main.querySelector("#dash-community-content");
+    if (!window.CineAuraCommunity?.memberBlocks) return (box.innerHTML = `<p class="empty">${t("com.loadFail")}</p>`);
+    await window.CineAuraCommunity.memberBlocks(box, state.member.member_id, kind);
+  }
+
   async function viewUpload(main) {
     const ST = window.Streamtape;
     const productsRes = await supabaseRequest(
@@ -4375,7 +4400,8 @@
   // feeds the router (dashboard.html#codes, #iptv-lists …).
   const NAV_GROUPS = [
     ["dash.grp.main", ["overview", "level", "points"]],
-    ["dash.grp.content", ["upload", "articles", "documents", "links", "codes", "playlists", "iptv"]],
+    ["dash.grp.userContent", ["videos", "articles", "documents", "questions", "answers"]],
+    ["dash.grp.content", ["upload", "links", "codes", "playlists", "iptv"]],
     ["dash.grp.perf", ["views", "analytics", "reports", "history"]],
     ["dash.grp.earn", ["withdraw", "prizes"]],
     ["dash.grp.account", ["customize", "settings"]],
