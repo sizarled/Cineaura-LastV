@@ -1,0 +1,81 @@
+/* Customizer overlay — layout/color/icon editors */
+.lz-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:start center;background:rgba(7,15,24,.62);backdrop-filter:blur(10px);padding:24px 16px;overflow:auto}
+.lz-overlay[hidden]{display:none!important}
+.lz-card{width:min(1180px,100%);background:var(--surface,rgba(9,22,36,.96));border:1px solid var(--line,rgba(255,255,255,.14));border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.45);overflow:hidden}
+.lz-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.lz-head h2{margin:0;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.lz-head p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.lz-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lz-body{display:grid;grid-template-columns:240px 1fr;min-height:520px}
+.lz-side{border-inline-end:1px solid var(--line);padding:14px;background:var(--sub-bg,rgba(255,255,255,.04))}
+.lz-side h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.lz-nav{display:grid;gap:6px}
+.lz-nav button{padding:9px 10px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--text);text-align:start;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px}
+.lz-nav button.active{background:var(--surface);border-color:var(--line);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.lz-nav button small{margin-inline-start:auto;opacity:.6;font-size:11px}
+.lz-main{padding:16px;display:grid;gap:14px;align-content:start}
+.lz-tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}
+.lz-tabs button{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--sub-bg);font-weight:600;font-size:13px;cursor:pointer}
+.lz-tabs button.active{background:var(--cyan);color:#032541;border-color:var(--cyan)}
+.lz-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:860px){.lz-body{grid-template-columns:1fr}.lz-side{border-inline-end:0;border-bottom:1px solid var(--line)}.lz-grid2{grid-template-columns:1fr}}
+.lz-panel{border:1px solid var(--line);border-radius:12px;background:var(--card-bg,rgba(255,255,255,.06));padding:12px;display:grid;gap:10px}
+.lz-panel h4{margin:0;font-size:13px;font-weight:700}
+.lz-hint{color:var(--muted);font-size:12.5px;line-height:1.4}
+.lz-list{display:grid;gap:8px}
+.lz-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:grab}
+.lz-item:active{cursor:grabbing}
+.lz-item.dragging{opacity:.45;border-style:dashed}
+.lz-item .lz-handle{opacity:.55;cursor:grab}
+.lz-item .lz-name{flex:1;min-width:0;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lz-item .lz-toggle{margin-inline-start:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px}
+.lz-item input[type="checkbox"]{accent-color:var(--cyan)}
+.lz-presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.lz-preset{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:10px;display:grid;gap:6px;cursor:pointer}
+.lz-preset.active{border-color:var(--cyan);box-shadow:0 0 0 2px color-mix(in srgb,var(--cyan) 22%,transparent)}
+.lz-preset b{font-size:13px}
+.lz-preset p{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
+.lz-preset .lz-mini{height:36px;border-radius:8px;display:grid;place-items:center;font-size:12px;border:1px solid var(--line);background:var(--sub-bg)}
+.lz-color-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.lz-color-row label{font-size:12px;font-weight:600}
+.lz-color-row input[type="color"]{width:40px;height:32px;border-radius:8px;border:1px solid var(--line);padding:0;background:transparent}
+.lz-icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px}
+.lz-icon-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px;display:grid;place-items:center;gap:6px;text-align:center}
+.lz-icon-card img{width:36px;height:36px;object-fit:contain;border-radius:6px;background:var(--sub-bg)}
+.lz-icon-card small{font-size:11px;word-break:break-all}
+.lz-drop{border:1.5px dashed var(--line);border-radius:12px;padding:14px;text-align:center;background:var(--sub-bg)}
+.lz-drop.drag{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 8%,transparent)}
+.lz-home-pins{display:grid;gap:8px}
+.lz-home-pins .lz-pin{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface)}
+.lz-home-pins .lz-pin img{width:40px;height:60px;object-fit:cover;border-radius:6px}
+.lz-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;background:var(--surface)}
+.toast.lz-toast{position:fixed;bottom:16px;inset-inline-start:50%;transform:translateX(-50%)}
+
+/* The dashboard sidebar is grouped: Main / Content / Performance / Earnings /
+   Account. The reorder list shows those headings and keeps them attached to the
+   buttons under them. */
+.lz-grp {
+  border: 1px dashed color-mix(in srgb, var(--cyan, #01b4e4) 28%, transparent);
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--cyan, #01b4e4) 5%, transparent);
+}
+.lz-grp + .lz-grp { margin-top: 8px; }
+.lz-grp-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 6px;
+}
+.lz-grp-name {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cyan-2, var(--cyan, #01b4e4));
+}
+.lz-grp-btns { display: inline-flex; gap: 4px; }
+.lz-grp-btns .btn { padding: 2px 8px; line-height: 1.2; }
+.lz-grp-btns .btn[disabled] { opacity: .35; cursor: default; }
+.lz-grp-list { display: grid; gap: 6px; min-height: 18px; }

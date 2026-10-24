@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-style="default" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأسئلة والأجوبة — CineAura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Outfit:wght@400;600;750&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#01b4e4;--green:#90cea1;--text:#f4fbff;--muted:#9bb0c2;--line:rgba(145,196,220,.16);--sans:"Outfit","Cairo","Segoe UI",sans-serif;--ar:"Cairo","Outfit",sans-serif;--surface:rgba(9,22,36,.62);--hdr:rgba(7,18,30,.82);--input:rgba(4,14,24,.55);--sub:rgba(255,255,255,.05);--red:#ff6b6b;--shadow:0 24px 80px rgba(0,0,0,.42);--bg:linear-gradient(180deg,#08131e,#070f18 46%,#0a1826);--radius:18px}
+html[data-theme="day"]{--text:#0d253f;--muted:#4a6578;--line:rgba(13,37,63,.12);--surface:rgba(255,255,255,.86);--hdr:rgba(255,255,255,.94);--input:rgba(255,255,255,.95);--sub:rgba(13,37,63,.05);--red:#d93025;--shadow:0 18px 48px rgba(13,37,63,.1);--bg:linear-gradient(180deg,#f4f8fb,#e8f1f6 48%,#dceaf3)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{min-height:100%;background:var(--bg);background-attachment:fixed;color:var(--text);font-family:var(--ar);font-size:15px;line-height:1.7;padding:104px 16px 60px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(520px 320px at 85% 8%,rgba(1,180,228,.16),transparent 70%),radial-gradient(480px 300px at 10% 90%,rgba(144,206,161,.12),transparent 70%)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.header{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));inset-inline:16px;z-index:20;max-width:1240px;margin:auto}
+.header-inner{display:flex;align-items:center;gap:10px;padding:10px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--hdr);backdrop-filter:blur(22px) saturate(150%);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.08)}
+.logo{display:flex;align-items:center;gap:10px;margin-inline-end:auto}
+.logo-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(160deg,rgba(1,180,228,.28),rgba(144,206,161,.12));border:1px solid rgba(1,180,228,.35)}
+.logo-mark svg{width:14px;height:14px;fill:var(--green)}
+.logo-word{font-family:var(--sans);font-weight:750;font-size:18px;letter-spacing:-.04em}
+.logo-word span{background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.page-title{color:var(--muted);font-weight:600;font-size:14px}
+.btn{border:1px solid var(--line);background:var(--sub);border-radius:12px;padding:8px 16px;font-weight:600;transition:.2s}
+.btn:hover{border-color:rgba(1,180,228,.5);background:rgba(1,180,228,.08)}
+.btn-primary{background:linear-gradient(90deg,#01b4e4,#2ec7ea 48%,#90cea1 160%);color:#032541;border:0;box-shadow:0 8px 24px rgba(1,180,228,.22)}
+.btn-primary:hover{box-shadow:0 12px 30px rgba(1,180,228,.34);background:linear-gradient(90deg,#01b4e4,#2ec7ea 48%,#90cea1 160%)}
+.btn-sm{padding:5px 12px;font-size:12.5px;border-radius:9px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);backdrop-filter:blur(22px) saturate(150%);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.08)}
+input[type=text],input[type=url],input[type=number],input[type=datetime-local],select,textarea{width:100%;background:var(--input);border:1px solid var(--line);border-radius:12px;padding:9px 12px;outline:none;color-scheme:dark}
+html[data-theme="day"] input,html[data-theme="day"] select,html[data-theme="day"] textarea{color-scheme:light}
+input:focus,select:focus,textarea:focus{border-color:rgba(1,180,228,.5);box-shadow:0 0 0 4px rgba(1,180,228,.12)}
+textarea{resize:vertical;min-height:84px}
+label.f{display:block;font-size:13px;color:var(--muted);font-weight:600;margin:12px 0 5px}
+label.f:first-of-type{margin-top:0}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.row{display:flex;gap:8px}.row>*{min-width:0}
+.check{display:flex;gap:8px;align-items:center;font-size:14px}
+.check input{accent-color:var(--cyan);width:17px;height:17px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(144,206,161,.12);color:var(--green);border:1px solid rgba(144,206,161,.18);border-radius:999px;padding:2px 10px;font-size:13px}
+.chip button{border:0;background:none;color:inherit;font-size:16px;line-height:1}
+.mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--sub);border-radius:12px}
+.seg button{border:0;background:none;border-radius:9px;padding:7px 4px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:inset 0 0 0 1px rgba(1,180,228,.5)}
+.sub{margin-top:14px;padding-top:4px;display:none}.sub.show{display:block}
+dialog{border:1px solid var(--line);border-radius:var(--radius);background:var(--hdr);color:var(--text);padding:22px;width:min(560px,94vw);max-height:90vh;overflow:auto;margin:auto;box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(3,10,18,.6);backdrop-filter:blur(4px)}
+dialog h3{margin-bottom:12px}
+.dlg-act{display:flex;gap:8px;justify-content:flex-start;margin-top:16px}
+#toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));inset-inline:0;margin:auto;width:max-content;max-width:90vw;z-index:50;background:var(--hdr);border:1px solid var(--line);border-radius:12px;padding:10px 18px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}
+#toast.on{opacity:1;transform:none}
+.hidden{display:none!important}
+
+/* ══════════ Q&A page ══════════ */
+.wrap{max-width:940px;margin:0 auto;position:relative}
+.qa-top{padding:14px 16px;display:grid;gap:12px;margin-bottom:18px}
+.search{position:relative}
+.search>svg{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+.search input{padding-inline-start:38px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{border:1px solid var(--line);background:var(--sub);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;color:var(--muted);transition:.2s}
+.fbtn:hover{color:var(--text);border-color:color-mix(in srgb,var(--cyan) 45%,transparent)}
+.fbtn.on{background:color-mix(in srgb,var(--cyan) 16%,transparent);border-color:color-mix(in srgb,var(--cyan) 52%,transparent);color:color-mix(in srgb,var(--cyan) 82%,var(--text))}
+
+.qgrid{display:grid;gap:14px}
+.qcard{padding:18px;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s}
+.qcard:hover{border-color:color-mix(in srgb,var(--cyan) 48%,transparent);transform:translateY(-2px)}
+.qcard h2{font-size:17.5px;line-height:1.5;margin:8px 0 0}
+.qcard .excerpt{color:var(--muted);font-size:13.5px;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--cyan) 30%,transparent);background:color-mix(in srgb,var(--cyan) 12%,transparent);color:color-mix(in srgb,var(--cyan) 78%,var(--text))}
+.tag.g{border-color:color-mix(in srgb,var(--green) 34%,transparent);background:color-mix(in srgb,var(--green) 14%,transparent);color:color-mix(in srgb,var(--green) 74%,var(--text))}
+.tag.m{border-color:var(--line);background:var(--sub);color:var(--muted)}
+.qmeta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.qmeta .who{display:inline-flex;align-items:center;gap:7px;color:var(--text);font-weight:600}
+.stat{display:inline-flex;align-items:center;gap:5px}
+.stat svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.lvl{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--cyan) 16%,transparent);color:color-mix(in srgb,var(--cyan) 82%,var(--text));border:1px solid color-mix(in srgb,var(--cyan) 32%,transparent)}
+.pts{font-size:11px;font-weight:700;color:color-mix(in srgb,var(--green) 72%,var(--text))}
+
+.avatar{--h:200;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;flex:none;font-size:10px;font-weight:700;color:#fff;letter-spacing:.02em;background:linear-gradient(135deg,hsl(var(--h) 72% 46%),hsl(calc(var(--h) + 45) 72% 58%));box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.avatar.lg{width:46px;height:46px;font-size:15px}
+
+.empty{text-align:center;padding:52px 24px;color:var(--muted)}
+.empty svg{width:46px;height:46px;stroke:var(--muted);fill:none;stroke-width:1.6;margin-bottom:12px}
+
+/* question detail */
+.back-btn{margin-bottom:14px}
+.qfull{padding:22px clamp(16px,3vw,28px)}
+.qfull-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.qfull-head h1{font-size:clamp(20px,2.6vw,26px);line-height:1.45;margin-top:8px}
+.qfull .qmeta{margin-top:16px}
+.qbody{margin-top:18px;font-size:16px;line-height:2}
+.qbody p{margin:0 0 12px}
+.ans-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:26px 0 14px}
+.ans-head h2{font-size:18px}
+.ans-head h2 span{color:var(--muted);font-size:15px;font-weight:600}
+.ans-list{display:grid;gap:12px}
+.answer{display:flex;gap:12px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);backdrop-filter:blur(22px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.answer .body{flex:1;min-width:0}
+.answer .who{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.answer .who b{color:var(--text);font-size:13.5px}
+.answer .txt{margin-top:8px;font-size:15px;line-height:1.95;white-space:pre-wrap;word-break:break-word}
+.answer .vis{font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--cyan) 34%,transparent);background:color-mix(in srgb,var(--cyan) 13%,transparent);color:color-mix(in srgb,var(--cyan) 80%,var(--text))}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.act{border:1px solid var(--line);background:var(--sub);border-radius:9px;padding:4px 10px;font-size:12.5px;font-weight:600;display:inline-flex;gap:5px;align-items:center;color:var(--muted);transition:.18s}
+.act svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.act:hover{color:var(--text);border-color:color-mix(in srgb,var(--cyan) 42%,transparent)}
+.act.like.on{color:var(--cyan);border-color:color-mix(in srgb,var(--cyan) 55%,transparent);background:color-mix(in srgb,var(--cyan) 14%,transparent)}
+.act.dis.on{color:var(--red);border-color:color-mix(in srgb,var(--red) 55%,transparent);background:color-mix(in srgb,var(--red) 12%,transparent)}
+.act.rep.on{color:var(--red);border-color:color-mix(in srgb,var(--red) 45%,transparent);background:color-mix(in srgb,var(--red) 10%,transparent)}
+.act:disabled{cursor:default;opacity:.75}
+.act .date{margin-inline-start:auto;color:var(--muted);font-weight:500;font-size:11.5px;border:0;background:none;padding:0}
+
+/* attachments */
+.ans-att{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.afile{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--sub);text-decoration:none;color:var(--text);font-size:12.5px;max-width:100%}
+.afile:hover{border-color:color-mix(in srgb,var(--cyan) 48%,transparent)}
+.afile .ico{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;background:var(--input);color:var(--cyan);flex:none}
+.afile .ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.afile .nm{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.afile small{color:var(--muted);font-size:10.5px}
+
+.att-drop{display:block;padding:18px;text-align:center;border:2px dashed var(--line);border-radius:12px;color:var(--muted);font-size:13px;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+.att-drop:hover,.att-drop.over{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 8%,transparent);color:var(--text)}
+.att-list{display:grid;gap:8px;margin-top:10px}
+.att-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--sub)}
+.att-item .ico{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--input);flex:none;color:var(--cyan)}
+.att-item .ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.att-item .info{flex:1;min-width:0}
+.att-item .nm{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.att-item .sz{font-size:10.5px;color:var(--muted)}
+.att-item .rm{border:0;background:transparent;color:var(--red);cursor:pointer;padding:5px;border-radius:6px;font-size:17px;line-height:1;display:grid;place-items:center}
+.att-item .rm:hover{background:color-mix(in srgb,var(--red) 15%,transparent)}
+.att-badge{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 6px;border-radius:999px;background:var(--cyan);color:#fff;font-size:10.5px;font-weight:700}
+
+@media(max-width:720px){
+  .page-title{display:none}
+  .answer{padding:14px}
+  .qfull-head{flex-direction:column}
+  .qfull-head .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="header"><div class="header-inner">
+  <div class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="logo-word">Cine<span>Aura</span></span></div>
+  <span class="page-title">الأسئلة والأجوبة</span>
+  <button class="btn" id="themeBtn" aria-label="تبديل النهار والليل">☀︎</button>
+  <button class="btn btn-primary" id="askBtn">اطرح سؤالًا</button>
+</div></header>
+
+<main class="wrap">
+
+  <!-- ═══════════ LIST VIEW ═══════════ -->
+  <section id="viewList">
+    <div class="card qa-top">
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="qSearch" placeholder="ابحث في الأسئلة…" aria-label="بحث">
+      </div>
+      <div class="filters" id="fieldFilters"></div>
+    </div>
+    <div class="qgrid" id="qList"></div>
+  </section>
+
+  <!-- ═══════════ DETAIL VIEW ═══════════ -->
+  <section id="viewDetail" class="hidden">
+    <button class="btn back-btn" id="backBtn">→ العودة إلى الأسئلة</button>
+    <article class="card qfull" id="qFull"></article>
+    <div class="ans-head">
+      <h2>الإجابات <span id="ansCount"></span></h2>
+    </div>
+    <div class="ans-list" id="answersList"></div>
+  </section>
+
+</main>
+
+<!-- ═══════════ ANSWER DIALOG ═══════════ -->
+<dialog id="ansDlg">
+  <h3>إجابتك على السؤال</h3>
+
+  <label class="f" for="ansText">نص الإجابة</label>
+  <textarea id="ansText" rows="5" placeholder="اكتب إجابتك بوضوح…"></textarea>
+
+  <label class="f">المرفقات <span class="att-badge" id="ansAttCount">0</span></label>
+  <label class="att-drop" id="ansDrop">
+    <input type="file" id="ansFile" multiple hidden accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.csv,.rtf,.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.xz">
+    <span>اسحب الملفات هنا أو اضغط للاختيار</span>
+    <small style="display:block;margin-top:4px;color:var(--muted)">صور · فيديو · مستندات · ملفات مضغوطة</small>
+  </label>
+  <div class="att-list" id="ansAttList"></div>
+
+  <label class="f">ظهور الإجابة</label>
+  <div class="seg" id="ansVisSeg">
+    <button class="on" data-v="public">عام</button>
+    <button data-v="excl">حصري</button>
+    <button data-v="priv">خاص</button>
+  </div>
+  <p class="hint" id="ansVisHint">تظهر الإجابة للجميع.</p>
+
+  <div class="sub" id="ansExclSub">
+    <label class="check"><input type="checkbox" id="aFol"> المتابعون فقط</label>
+    <label class="f" for="aCSel">الدولة</label>
+    <select id="aCSel"><option value="">إضافة دولة…</option></select>
+    <div class="chips" id="aCChips"></div>
+    <label class="f" for="aLSel">اللغة</label>
+    <select id="aLSel"><option value="">إضافة لغة…</option></select>
+    <div class="chips" id="aLChips"></div>
+    <label class="f">المستوى LV (0 – 10)</label>
+    <div class="row"><input type="number" id="aLvMin" min="0" max="10" value="0" aria-label="أدنى مستوى"><input type="number" id="aLvMax" min="0" max="10" value="10" aria-label="أعلى مستوى"></div>
+    <label class="f" for="aTier">Balance tier (هذه الفئة فما فوق)</label>
+    <select id="aTier"><option value="">بدون شرط</option></select>
+  </div>
+
+  <div class="sub" id="ansPrivSub">
+    <label class="f" for="aUIn">إضافة مستخدم</label>
+    <div class="row"><input type="text" id="aUIn" placeholder="@اسم_المستخدم"><button class="btn btn-sm" id="aUAdd">إضافة</button></div>
+    <div class="chips" id="aUChips"></div>
+    <label class="f" for="aPIn">كلمات سر الانضمام التلقائي</label>
+    <div class="row"><input type="text" id="aPIn" dir="ltr" placeholder="كلمة سر" autocomplete="off"><button class="btn btn-sm" id="aPAdd">إضافة</button></div>
+    <div class="mini"><button class="btn btn-sm" id="aPGen">توليد كلمة سر</button></div>
+    <div class="chips" id="aPChips"></div>
+    <p class="hint">من يدخل إحدى الكلمات ينضم تلقائيًا إلى القائمة.</p>
+  </div>
+
+  <div class="dlg-act">
+    <button class="btn btn-primary" id="ansSend">نشر الإجابة</button>
+    <button class="btn" id="ansCancel">إلغاء</button>
+  </div>
+</dialog>
+
+<div id="toast" role="status"></div>
+
+<script>
+/* ══════════════ helpers ══════════════ */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2400)}
+function fmtDate(d){try{return new Date(d).toLocaleDateString("ar",{day:"numeric",month:"long",year:"numeric"})}catch(e){return d}}
+function fmtSize(b){if(b<1024)return b+" بايت";if(b<1048576)return (b/1024).toFixed(1)+" ك.ب";if(b<1073741824)return (b/1048576).toFixed(1)+" م.ب";return (b/1073741824).toFixed(1)+" ج.ب"}
+function hueOf(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+function avatarHTML(u,cls){
+  const h=hueOf(u.name);
+  const ini=u.name.replace(/^@/,"").split(/[\s_\-]+/).filter(Boolean).map(x=>x[0]).join("").slice(0,2).toUpperCase();
+  return `<span class="avatar ${cls||""}" style="--h:${h}" aria-hidden="true">${esc(ini)}</span>`;
+}
+const ATT_PATHS={
+ image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+ video:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>',
+ doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+ archive:'<rect x="2" y="4" width="20" height="5" rx="2"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/>'
+};
+const attIcon=t=>`<svg viewBox="0 0 24 24">${ATT_PATHS[t]||ATT_PATHS.doc}</svg>`;
+const ICON={
+ users:'<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg>',
+ chat:'<svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>',
+ cal:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+ up:'<svg viewBox="0 0 24 24"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88z"/></svg>',
+ down:'<svg viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88z"/></svg>',
+ flag:'<svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>'
+};
+
+/* ══════════════ data ══════════════ */
+const QUESTIONS=[
+ {
+  id:'q1',
+  title:'ما أفضل طريقة لتعلّم المونتاج السينمائي من الصفر؟',
+  body:'<p>أريد أن أبدأ تعلّم المونتاج السينمائي، لكنني لا أعرف من أين أبدأ: هل أبدأ بالبرامج أم بالمبادئ النظرية أولًا؟ وما هي المصادر العربية الموثوقة التي تنصحون بها للمبتدئين؟</p>',
+  field:'الأفلام', niche:'الإثارة والتشويق', micro:'', nano:'',
+  followers:128,
+  user:{name:'@youssef',level:7,points:3240},
+  date:'2026-10-18T14:30:00',
+  answers:[
+   {id:'a11',user:{name:'@sara',level:5,points:1980},
+    text:'ابدأ بالمبادئ النظرية أولًا: تعلّم قواعد القطع، الإيقاع، والعلاقة بين المشهد والمشهد. بعدها انتقل إلى برنامج واحد فقط (DaVinci Resolve مجاني وكافٍ).',
+    likes:34,dislikes:2,reports:0,date:'2026-10-18T16:10:00',visibility:'public',
+    attachments:[{name:'دليل-المونتاج-للمبتدئين.pdf',size:1258291,type:'doc'}]},
+   {id:'a12',user:{name:'@amine',level:9,points:7410},
+    text:'أنصحك بمشاهدة أفلام كاملة ثم إعادة تقطيع مشاهدها ذهنيًا. التمرين العملي أهم من مشاهدة مئة درس. خصّص 30 دقيقة يوميًا لتقطيع مشهد قصير.',
+    likes:57,dislikes:1,reports:0,date:'2026-10-19T09:05:00',visibility:'public',attachments:[]},
+   {id:'a13',user:{name:'@lina',level:4,points:920},
+    text:'جرب قناة "مونتاج برو" على يوتيوب، فيها سلسلة عربية ممتازة تبدأ من الصفر وتصل إلى المشاريع الحقيقية.',
+    likes:12,dislikes:0,reports:1,date:'2026-10-20T11:45:00',visibility:'public',attachments:[]}
+  ]
+ },
+ {
+  id:'q2',
+  title:'هل يستحق أنمي Frieren كل هذه الضجة؟',
+  body:'<p>أسمع مديحًا كبيرًا لأنمي Frieren: Beyond Journey\'s End، وأتساءل هل يستحق المشاهدة فعلًا أم أنه مبالغ فيه؟ ما الذي يميزه عن بقية أنميات الفانتازيا؟</p>',
+  field:'الأنمي', niche:'الخيال العلمي', micro:'', nano:'',
+  followers:86,
+  user:{name:'@nour',level:6,points:2210},
+  date:'2026-10-20T18:00:00',
+  answers:[
+   {id:'a21',user:{name:'@amine',level:9,points:7410},
+    text:'يستحق بلا شك. تناوله للزمن والفقد مختلف عن أي أنمي فانتازيا آخر، والإيقاع الهادئ مقصود لخدمة الفكرة.',
+    likes:41,dislikes:3,reports:0,date:'2026-10-20T20:15:00',visibility:'public',attachments:[]},
+   {id:'a22',user:{name:'@sara',level:5,points:1980},
+    text:'إذا كنت تبحث عن أكشن سريع فقد لا يعجبك، لكنه من أفضل ما أنتجته الصناعة في السنوات الأخيرة من ناحية الكتابة.',
+    likes:23,dislikes:1,reports:0,date:'2026-10-21T08:20:00',visibility:'public',attachments:[]}
+  ]
+ },
+ {
+  id:'q3',
+  title:'كيف أحسّن أداء هاتفي القديم دون شراء جهاز جديد؟',
+  body:'<p>هاتفي عمره ثلاث سنوات وأصبح بطيئًا جدًا. هل هناك خطوات عملية لتحسين أدائه دون تغييره؟ وهل إعادة ضبط المصنع حل جذري؟</p>',
+  field:'التقنية', niche:'الأجهزة', micro:'', nano:'',
+  followers:204,
+  user:{name:'@khalid',level:3,points:640},
+  date:'2026-10-15T10:10:00',
+  answers:[
+   {id:'a31',user:{name:'@youssef',level:7,points:3240},
+    text:'ابدأ بحذف التطبيقات غير المستخدمة، ثم امسح الكاش، وأوقف التطبيقات التي تعمل في الخلفية. إعادة ضبط المصنع مفيدة لكنها آخر الحلول بعد أخذ نسخة احتياطية.',
+    likes:66,dislikes:2,reports:0,date:'2026-10-15T12:40:00',visibility:'public',
+    attachments:[{name:'قائمة-تطبيقات-ثقيلة.zip',size:3421184,type:'archive'}]},
+   {id:'a32',user:{name:'@lina',level:4,points:920},
+    text:'استبدال شاشة القفل بتطبيق أخف وتقليل الرسوم المتحركة من إعدادات المطور يفرق كثيرًا، خاصة في الهواتف القديمة.',
+    likes:18,dislikes:0,reports:0,date:'2026-10-16T09:00:00',visibility:'public',attachments:[]},
+   {id:'a33',user:{name:'@nour',level:6,points:2210},
+    text:'لا تنسَ البطارية: إذا كانت صحتها منخفضة جدًا فسيؤدي ذلك إلى تقييد أداء المعالج تلقائيًا. استبدالها قد يعيد الهاتف لسرعته.',
+    likes:29,dislikes:1,reports:0,date:'2026-10-17T15:25:00',visibility:'public',attachments:[]}
+  ]
+ },
+ {
+  id:'q4',
+  title:'ما أفضل مسلسل كوري للمبتدئين في عالم الدراما؟',
+  body:'<p>لم أشاهد أي مسلسل كوري من قبل وأريد بداية قوية. ما المسلسل الذي تنصحون به لمبتدئ، ولماذا؟</p>',
+  field:'المسلسلات', niche:'المسلسلات الكورية', micro:'', nano:'',
+  followers:57,
+  user:{name:'@lina',level:4,points:920},
+  date:'2026-10-22T13:00:00',
+  answers:[
+   {id:'a41',user:{name:'@sara',level:5,points:1980},
+    text:'ابدأ بـ Reply 1988، دافئ وقريب من القلب ولا يحتاج معرفة مسبقة بالثقافة الكورية.',
+    likes:21,dislikes:0,reports:0,date:'2026-10-22T14:30:00',visibility:'public',attachments:[]},
+   {id:'a42',user:{name:'@khalid',level:3,points:640},
+    text:'أقترح Crash Landing on You، فيه رومانسية وتشويق وإنتاج ضخم، وهو بوابة ممتازة للمبتدئين.',
+    likes:15,dislikes:2,reports:0,date:'2026-10-22T16:05:00',visibility:'public',attachments:[]}
+  ]
+ },
+ {
+  id:'q5',
+  title:'ما الفرق بين ألعاب الاستراتيجية في الوقت الحقيقي والاستراتيجية بالأدوار؟',
+  body:'<p>أسمع دائمًا مصطلحي RTS و TBS وأريد فهم الفرق بينهما وأي نوع أنسب للمبتدئ في ألعاب الاستراتيجية.</p>',
+  field:'الألعاب', niche:'ألعاب الاستراتيجية', micro:'', nano:'',
+  followers:73,
+  user:{name:'@amine',level:9,points:7410},
+  date:'2026-10-12T20:00:00',
+  answers:[
+   {id:'a51',user:{name:'@nour',level:6,points:2210},
+    text:'في RTS الوقت يجري بشكل مستمر وتتخذ قراراتك تحت ضغط (مثل StarCraft)، أما TBS فالوقت متوقف أثناء دورك (مثل Civilization)، وهو أنسب للمبتدئ لأنه يسمح بالتفكير.',
+    likes:48,dislikes:1,reports:0,date:'2026-10-13T08:00:00',visibility:'public',attachments:[]}
+  ]
+ }
+];
+
+/* ══════════════ state ══════════════ */
+let current=null, filterField="الكل", searchTerm="";
+
+/* ══════════════ list view ══════════════ */
+function excerptOf(html){const d=document.createElement("div");d.innerHTML=html;return (d.textContent||"").trim()}
+function tagsFor(q){
+  let h=`<span class="tag">${esc(q.field)}</span>`;
+  if(q.niche)h+=`<span class="tag g">${esc(q.niche)}</span>`;
+  if(q.micro)h+=`<span class="tag m">${esc(q.micro)}</span>`;
+  if(q.nano)h+=`<span class="tag m">${esc(q.nano)}</span>`;
+  return h;
+}
+function buildFilters(){
+  const fields=["الكل",...new Set(QUESTIONS.map(q=>q.field))];
+  $("fieldFilters").innerHTML=fields.map(f=>`<button class="fbtn${f===filterField?" on":""}" data-f="${esc(f)}">${esc(f)}</button>`).join("");
+}
+function renderList(){
+  const term=searchTerm.trim().toLowerCase();
+  const list=QUESTIONS.filter(q=>{
+    const okF=filterField==="الكل"||q.field===filterField;
+    const okS=!term||(q.title+" "+excerptOf(q.body)+" "+q.user.name).toLowerCase().includes(term);
+    return okF&&okS;
+  });
+  if(!list.length){
+    $("qList").innerHTML=`<div class="card empty">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <p>لا توجد أسئلة مطابقة لبحثك.</p></div>`;
+    return;
+  }
+  $("qList").innerHTML=list.map(q=>`
+    <article class="card qcard" data-id="${q.id}" tabindex="0" role="button" aria-label="${esc(q.title)}">
+      <div class="tags">${tagsFor(q)}</div>
+      <h2>${esc(q.title)}</h2>
+      <p class="excerpt">${esc(excerptOf(q.body))}</p>
+      <div class="qmeta">
+        <span class="who">${avatarHTML(q.user)} ${esc(q.user.name)} <span class="lvl">LV ${q.user.level}</span> <span class="pts">${q.user.points} نقطة</span></span>
+        <span class="stat">${ICON.users} ${q.followers} متابع</span>
+        <span class="stat">${ICON.chat} ${q.answers.length} إجابة</span>
+        <span class="stat">${ICON.cal} ${fmtDate(q.date)}</span>
+      </div>
+    </article>`).join("");
+}
+$("qList").addEventListener("click",e=>{
+  const card=e.target.closest(".qcard");
+  if(card)openQuestion(card.dataset.id);
+});
+$("qList").addEventListener("keydown",e=>{
+  const card=e.target.closest(".qcard");
+  if(card&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openQuestion(card.dataset.id)}
+});
+$("fieldFilters").addEventListener("click",e=>{
+  const b=e.target.closest(".fbtn");if(!b)return;
+  filterField=b.dataset.f;
+  $("fieldFilters").querySelectorAll(".fbtn").forEach(x=>x.classList.toggle("on",x===b));
+  renderList();
+});
+$("qSearch").addEventListener("input",e=>{searchTerm=e.target.value;renderList()});
+
+/* ══════════════ detail view ══════════════ */
+function openQuestion(id){
+  current=QUESTIONS.find(q=>q.id===id);
+  if(!current)return;
+  renderDetail();
+  $("viewList").classList.add("hidden");
+  $("viewDetail").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"instant"});
+}
+function showList(){
+  $("viewDetail").classList.add("hidden");
+  $("viewList").classList.remove("hidden");
+  current=null;
+  renderList();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+$("backBtn").onclick=showList;
+
+function renderDetail(){
+  const q=current;
+  $("qFull").innerHTML=`
+    <div class="qfull-head">
+      <div style="min-width:0;flex:1">
+        <div class="tags">${tagsFor(q)}</div>
+        <h1>${esc(q.title)}</h1>
+      </div>
+      <button class="btn btn-primary" id="ansBtn">✎ أجب على السؤال</button>
+    </div>
+    <div class="qmeta">
+      <span class="who">${avatarHTML(q.user)} ${esc(q.user.name)} <span class="lvl">LV ${q.user.level}</span> <span class="pts">${q.user.points} نقطة</span></span>
+      <span class="stat">${ICON.users} ${q.followers} متابع</span>
+      <span class="stat">${ICON.chat} ${q.answers.length} إجابة</span>
+      <span class="stat">${ICON.cal} ${fmtDate(q.date)}</span>
+    </div>
+    <div class="qbody">${q.body}</div>`;
+  renderAnswers();
+}
+$("qFull").addEventListener("click",e=>{
+  if(e.target.closest("#ansBtn"))openAnswerDlg();
+});
+
+function attachmentsHTML(list){
+  if(!list||!list.length)return "";
+  return `<div class="ans-att">${list.map(f=>`
+    <a class="afile" href="${f.url||"#"}" ${f.url?"download":'onclick="event.preventDefault()"'}>
+      <span class="ico">${attIcon(f.type)}</span>
+      <span class="nm">${esc(f.name)}</span>
+      <small>${fmtSize(f.size)}</small>
+    </a>`).join("")}</div>`;
+}
+function renderAnswers(){
+  const q=current;
+  $("ansCount").textContent=`(${q.answers.length})`;
+  if(!q.answers.length){
+    $("answersList").innerHTML=`<div class="card empty"><p>لا توجد إجابات بعد. كن أول من يجيب!</p></div>`;
+    return;
+  }
+  $("answersList").innerHTML=q.answers.map(a=>`
+    <article class="answer" data-id="${a.id}">
+      ${avatarHTML(a.user,"lg")}
+      <div class="body">
+        <div class="who">
+          <b>${esc(a.user.name)}</b>
+          <span class="lvl">LV ${a.user.level}</span>
+          <span class="pts">${a.user.points} نقطة</span>
+          ${a.visibility==="excl"?'<span class="vis">حصري</span>':a.visibility==="priv"?'<span class="vis">خاص</span>':""}
+          <span style="margin-inline-start:auto;font-size:11.5px">${fmtDate(a.date)}</span>
+        </div>
+        <div class="txt">${esc(a.text)}</div>
+        ${attachmentsHTML(a.attachments)}
+        <div class="acts">
+          <button class="act like${a.liked?" on":""}" data-act="like" aria-pressed="${!!a.liked}">${ICON.up}<span>${a.likes}</span></button>
+          <button class="act dis${a.disliked?" on":""}" data-act="dislike" aria-pressed="${!!a.disliked}">${ICON.down}<span>${a.dislikes}</span></button>
+          <button class="act rep${a.reported?" on":""}" data-act="report" aria-pressed="${!!a.reported}">${ICON.flag}<span>${a.reports}</span></button>
+        </div>
+      </div>
+    </article>`).join("");
+}
+$("answersList").addEventListener("click",e=>{
+  const btn=e.target.closest("[data-act]");
+  if(!btn||!current)return;
+  const card=btn.closest(".answer");
+  const a=current.answers.find(x=>x.id===card.dataset.id);
+  if(!a)return;
+  const act=btn.dataset.act;
+  if(act==="like"){
+    if(a.liked){a.liked=false;a.likes=Math.max(0,a.likes-1)}
+    else{a.liked=true;a.likes++;if(a.disliked){a.disliked=false;a.dislikes=Math.max(0,a.dislikes-1)}}
+  }else if(act==="dislike"){
+    if(a.disliked){a.disliked=false;a.dislikes=Math.max(0,a.dislikes-1)}
+    else{a.disliked=true;a.dislikes++;if(a.liked){a.liked=false;a.likes=Math.max(0,a.likes-1)}}
+  }else if(act==="report"){
+    if(a.reported){toast("أرسلت بلاغًا عن هذه الإجابة مسبقًا");return}
+    a.reported=true;a.reports++;
+    toast("تم إرسال البلاغ، شكرًا لمساعدتك");
+  }
+  renderAnswers();
+});
+
+/* ══════════════ answer dialog ══════════════ */
+const COUNTRIES=["المغرب","الجزائر","تونس","ليبيا","مصر","السودان","السعودية","الإمارات","قطر","الكويت","البحرين","عُمان","اليمن","العراق","سوريا","لبنان","الأردن","فلسطين","موريتانيا","تركيا","فرنسا","ألمانيا","إسبانيا","المملكة المتحدة","الولايات المتحدة","كندا"];
+const LANGS=["العربية","English","Français","Español","Deutsch","Türkçe"];
+const TIERS="N1 N2 N3 K1 K2 K3 M1 M2 M3 B1 B2 B3".split(" ");
+const AS={vis:"public",countries:[],langs:[],users:[],pass:[],files:[]};
+
+function fill(sel,list,first){
+  sel.innerHTML=(first!=null?`<option value="">${first}</option>`:"")+list.map(x=>`<option>${x}</option>`).join("");
+}
+fill($("aCSel"),COUNTRIES,"إضافة دولة…");
+fill($("aLSel"),LANGS,"إضافة لغة…");
+$("aTier").innerHTML='<option value="">بدون شرط</option>'+TIERS.map(t=>`<option>${t}</option>`).join("");
+
+function chips(el,arr){
+  el.innerHTML="";
+  arr.forEach((v,i)=>{
+    const c=document.createElement("span");
+    c.className="chip";
+    c.innerHTML=esc(v)+'<button aria-label="حذف">×</button>';
+    c.querySelector("button").onclick=()=>{arr.splice(i,1);chips(el,arr)};
+    el.appendChild(c);
+  });
+}
+$("aCSel").onchange=e=>{const v=e.target.value;if(v&&!AS.countries.includes(v))AS.countries.push(v);e.target.value="";chips($("aCChips"),AS.countries)};
+$("aLSel").onchange=e=>{const v=e.target.value;if(v&&!AS.langs.includes(v))AS.langs.push(v);e.target.value="";chips($("aLChips"),AS.langs)};
+function addAnsUser(){let v=$("aUIn").value.trim().replace(/^@?/,"@");if(v.length>1&&!AS.users.includes(v))AS.users.push(v);$("aUIn").value="";chips($("aUChips"),AS.users)}
+$("aUAdd").onclick=addAnsUser;
+$("aUIn").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addAnsUser()}};
+function addAnsPass(v){v=(v||$("aPIn").value).trim();if(v&&!AS.pass.includes(v))AS.pass.push(v);$("aPIn").value="";chips($("aPChips"),AS.pass)}
+$("aPAdd").onclick=()=>addAnsPass();
+$("aPIn").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addAnsPass()}};
+$("aPGen").onclick=()=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";addAnsPass(Array.from(crypto.getRandomValues(new Uint8Array(8)),x=>c[x%c.length]).join("").replace(/(.{4})/,"$1-"))};
+
+const HINTS={public:"تظهر الإجابة للجميع.",excl:"تظهر فقط لمن تنطبق عليهم كل المعايير أدناه.",priv:"لا يراها سوى من تضيفهم أو من ينضم بكلمة سر."};
+$("ansVisSeg").querySelectorAll("button").forEach(b=>{
+  b.onclick=()=>{
+    $("ansVisSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+    AS.vis=b.dataset.v;
+    $("ansExclSub").classList.toggle("show",AS.vis==="excl");
+    $("ansPrivSub").classList.toggle("show",AS.vis==="priv");
+    $("ansVisHint").textContent=HINTS[AS.vis];
+  };
+});
+
+/* answer attachments */
+function fileType(f){
+  const m=f.type||"",n=(f.name||"").toLowerCase();
+  if(m.startsWith("image/"))return "image";
+  if(m.startsWith("video/"))return "video";
+  if(/\.(zip|rar|7z|tar|gz|tgz|bz2|xz)$/.test(n))return "archive";
+  return "doc";
+}
+function renderAnsAtt(){
+  $("ansAttCount").textContent=AS.files.length;
+  const list=$("ansAttList");
+  list.innerHTML=AS.files.map(f=>`
+    <div class="att-item" data-id="${f.id}">
+      <span class="ico">${attIcon(f.type)}</span>
+      <span class="info"><span class="nm">${esc(f.name)}</span><span class="sz">${fmtSize(f.size)}</span></span>
+      <button class="rm" title="حذف" aria-label="حذف">×</button>
+    </div>`).join("");
+  list.querySelectorAll(".rm").forEach(b=>{
+    b.onclick=()=>{
+      const id=b.closest(".att-item").dataset.id;
+      const i=AS.files.findIndex(x=>x.id===id);
+      if(i>-1)AS.files.splice(i,1);
+      renderAnsAtt();
+    };
+  });
+}
+function addAnsFile(file){
+  if(file.size>25*1024*1024)toast("الملف كبير (>25 م.ب) — قد يتأخر التحميل");
+  const id="f"+Date.now()+Math.random().toString(36).slice(2,7);
+  const r=new FileReader();
+  r.onload=()=>{
+    AS.files.push({id,name:file.name,size:file.size,type:fileType(file),url:r.result});
+    renderAnsAtt();
+  };
+  r.readAsDataURL(file);
+}
+$("ansFile").onchange=e=>{
+  const fs=e.target.files;
+  if(fs)for(const f of fs)addAnsFile(f);
+  e.target.value="";
+};
+const ansDrop=$("ansDrop");
+["dragenter","dragover"].forEach(ev=>ansDrop.addEventListener(ev,e=>{e.preventDefault();ansDrop.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>ansDrop.addEventListener(ev,e=>{e.preventDefault();ansDrop.classList.remove("over")}));
+ansDrop.addEventListener("drop",e=>{
+  const fs=e.dataTransfer.files;
+  if(fs)for(const f of fs)addAnsFile(f);
+});
+
+function openAnswerDlg(){
+  AS.vis="public";AS.countries=[];AS.langs=[];AS.users=[];AS.pass=[];AS.files=[];
+  $("ansText").value="";
+  $("aFol").checked=false;
+  $("aLvMin").value=0;$("aLvMax").value=10;$("aTier").value="";
+  $("ansVisSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.v==="public"));
+  $("ansExclSub").classList.remove("show");
+  $("ansPrivSub").classList.remove("show");
+  $("ansVisHint").textContent=HINTS.public;
+  chips($("aCChips"),AS.countries);chips($("aLChips"),AS.langs);
+  chips($("aUChips"),AS.users);chips($("aPChips"),AS.pass);
+  renderAnsAtt();
+  $("ansDlg").showModal();
+  setTimeout(()=>$("ansText").focus(),50);
+}
+$("ansCancel").onclick=()=>$("ansDlg").close();
+
+$("ansSend").onclick=()=>{
+  const txt=$("ansText").value.trim();
+  if(!txt&&!AS.files.length)return toast("اكتب إجابتك أو أرفق ملفًا");
+  if(AS.vis==="priv"&&!AS.users.length&&!AS.pass.length)return toast("أضف مستخدمًا أو كلمة سر واحدة على الأقل");
+  const ans={
+    id:"a"+Date.now(),
+    user:{name:"@أنت",level:5,points:980},
+    text:txt||"‏(مرفقات مرفقة)",
+    likes:0,dislikes:0,reports:0,
+    date:new Date().toISOString(),
+    visibility:AS.vis,
+    attachments:AS.files.map(f=>({name:f.name,size:f.size,type:f.type,url:f.url}))
+  };
+  current.answers.unshift(ans);
+  $("ansDlg").close();
+  renderDetail();
+  toast("تم نشر إجابتك بنجاح");
+};
+
+/* ══════════════ theme ══════════════ */
+$("themeBtn").onclick=()=>{
+  const h=document.documentElement,d=h.dataset.theme==="day";
+  h.dataset.theme=d?"night":"day";
+  $("themeBtn").textContent=d?"☀︎":"☾";
+  try{localStorage.setItem("cineaura:theme",h.dataset.theme)}catch(e){}
+};
+if(matchMedia("(prefers-color-scheme: light)").matches){
+  document.documentElement.dataset.theme="day";
+  $("themeBtn").textContent="☾";
+}
+
+$("askBtn").onclick=()=>toast("افتح صفحة «محرر الأسئلة» لطرح سؤال جديد");
+
+/* ══════════════ init ══════════════ */
+buildFilters();
+renderList();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     THEME CHANGER — presets (identical to article / question editor)
+     ═══════════════════════════════════════════════════════════════ -->
+<style id="artheme-css">
+/* ── FACEBOOK ── */
+html[data-style="facebook"]{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ar:var(--sans);
+  --cyan:#2d88ff; --green:#42b72a;
+  --text:#e4e6eb; --muted:#b0b3b8;
+  --line:#3e4042; --surface:#242526; --hdr:#242526;
+  --input:#3a3b3c; --sub:#3a3b3c;
+  --red:#ff6b70;
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+  --bg:#18191a; --radius:8px;
+}
+html[data-style="facebook"][data-theme="day"]{
+  --cyan:#1877f2; --text:#050505; --muted:#65676b;
+  --line:#ced0d4; --surface:#ffffff; --hdr:#ffffff;
+  --input:#f0f2f5; --sub:#f0f2f5;
+  --red:#fa383e; --shadow:0 1px 2px rgba(0,0,0,.2);
+  --bg:#f0f2f5;
+}
+/* ── YOUTUBE ── */
+html[data-style="youtube"]{
+  --sans:Roboto,"Segoe UI",Arial,sans-serif; --ar:var(--sans);
+  --cyan:#ff0000; --green:#2ba640;
+  --text:#f1f1f1; --muted:#aaa;
+  --line:#303030; --surface:#212121; --hdr:#0f0f0f;
+  --input:#121212; --sub:#272727;
+  --red:#ff0000; --shadow:0 1px 3px rgba(0,0,0,.45);
+  --bg:#0f0f0f; --radius:12px;
+}
+html[data-style="youtube"][data-theme="day"]{
+  --text:#0f0f0f; --muted:#606060;
+  --line:#e5e5e5; --surface:#ffffff; --hdr:#ffffff;
+  --input:#ffffff; --sub:#f2f2f2; --bg:#ffffff;
+}
+/* ── INSTAGRAM ── */
+html[data-style="instagram"]{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ar:var(--sans);
+  --cyan:#0095f6; --green:#78de45;
+  --text:#f5f5f5; --muted:#a8a8a8;
+  --line:#363636; --surface:#121212; --hdr:#000000;
+  --input:#262626; --sub:#262626;
+  --red:#ed4956; --shadow:0 0 0 1px #363636;
+  --bg:#000000; --radius:3px;
+}
+html[data-style="instagram"][data-theme="day"]{
+  --text:#1a1a1a; --muted:#575757;
+  --line:#dbdbdb; --surface:#ffffff; --hdr:#ffffff;
+  --input:#efefef; --sub:#efefef; --bg:#fafafa;
+}
+/* ── NETFLIX ── */
+html[data-style="netflix"]{
+  --sans:Inter,"Helvetica Neue",Helvetica,Arial,sans-serif; --ar:var(--sans);
+  --cyan:#e50914; --green:#46d369;
+  --text:#ffffff; --muted:#999999;
+  --line:#2f2f2f; --surface:#181818; --hdr:#000000;
+  --input:#333333; --sub:#232323;
+  --red:#e50914; --shadow:0 8px 28px rgba(0,0,0,.55);
+  --bg:#000000; --radius:4px;
+}
+html[data-style="netflix"][data-theme="day"]{
+  --text:#221f1f; --muted:#6a6a6a;
+  --line:#e5e5e5; --surface:#ffffff; --hdr:#000000;
+  --input:#e8e8e8; --sub:#f0f0f0; --bg:#f5f5f1;
+}
+/* ── PRIME ── */
+html[data-style="prime"]{
+  --sans:AmazonEmber,"Helvetica Neue",Helvetica,Arial,sans-serif; --ar:var(--sans);
+  --cyan:#00a8e1; --green:#25a18e;
+  --text:#ffffff; --muted:#a0aec0;
+  --line:#1e3a5f; --surface:#12233f; --hdr:#002e4b;
+  --input:#0f2847; --sub:#0f2847;
+  --red:#ff4d4f; --shadow:0 8px 24px rgba(0,0,0,.45);
+  --bg:linear-gradient(180deg,#0a1628 0%,#081a33 55%,#000d1f 100%);
+  --radius:8px;
+}
+html[data-style="prime"][data-theme="day"]{
+  --text:#0a1628; --muted:#5a6d85;
+  --line:#d0dce8; --surface:#ffffff; --hdr:#002e4b;
+  --input:#ffffff; --sub:#eef3f9; --bg:#eef3f9;
+}
+/* ── APPLETV ── */
+html[data-style="appletv"]{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display",Helvetica,Arial,sans-serif;
+  --ar:var(--sans);
+  --cyan:#2997ff; --green:#30d158;
+  --text:#f5f5f7; --muted:#86868b;
+  --line:#2c2c2e; --surface:#1c1c1e; --hdr:rgba(0,0,0,.85);
+  --input:#2c2c2e; --sub:#2c2c2e;
+  --red:#ff453a; --shadow:0 10px 30px rgba(0,0,0,.55);
+  --bg:#000000; --radius:12px;
+}
+html[data-style="appletv"][data-theme="day"]{
+  --cyan:#0071e3; --text:#1d1d1f; --muted:#525255;
+  --line:#d2d2d7; --surface:#ffffff; --hdr:rgba(250,250,252,.88);
+  --input:#ffffff; --sub:#f5f5f7; --bg:#f5f5f7;
+}
+/* ── WIN7 ── */
+html[data-style="win7"]{
+  --sans:"Segoe UI",Tahoma,Verdana,sans-serif; --ar:var(--sans);
+  --cyan:#1a5fb8; --green:#1e8e3e;
+  --text:#0a1930; --muted:#3b5a8a;
+  --line:#8fb4e2; --surface:rgba(255,255,255,.78);
+  --hdr:linear-gradient(180deg,#5aa8f0 0%,#2a7bd8 50%,#1a5fb8 100%);
+  --input:#ffffff; --sub:rgba(255,255,255,.9);
+  --red:#c53030;
+  --shadow:0 6px 18px rgba(15,66,150,.22),0 1px 3px rgba(0,0,0,.2);
+  --bg:linear-gradient(180deg,#7ab6f0 0%,#4a90d9 18%,#2a7bd8 55%,#3a9de8 100%);
+  --radius:6px;
+}
+html[data-style="win7"][data-theme="night"]{
+  --cyan:#5aa8f0; --text:#e6efff; --muted:#9cb8e0;
+  --line:#2a4a7a; --surface:rgba(18,38,74,.55);
+  --hdr:linear-gradient(180deg,#3a84d6 0%,#1d5aa8 60%,#123a7a 100%);
+  --input:#1a345f; --sub:rgba(26,52,100,.45);
+  --bg:linear-gradient(180deg,#0d1e3a 0%,#0d2748 35%,#0a1a33 100%);
+}
+/* ── WIN8 ── */
+html[data-style="win8"]{
+  --sans:"Segoe UI",Tahoma,sans-serif; --ar:var(--sans);
+  --cyan:#ffb900; --green:#107c10;
+  --text:#ffffff; --muted:#cce3ff;
+  --line:rgba(255,255,255,.18); --surface:#005a9e; --hdr:#0078d7;
+  --input:#005a9e; --sub:#006dc9;
+  --red:#e81123; --shadow:none;
+  --bg:#0078d7; --radius:0;
+}
+html[data-style="win8"][data-theme="day"]{
+  --cyan:#0078d7; --text:#000000; --muted:#666666;
+  --line:#e0e0e0; --surface:#ffffff; --hdr:#0078d7;
+  --input:#ffffff; --sub:#f2f2f2; --bg:#f2f2f2;
+}
+/* ── WIN10 ── */
+html[data-style="win10"]{
+  --sans:"Segoe UI",Tahoma,sans-serif; --ar:var(--sans);
+  --cyan:#0078d4; --green:#107c10;
+  --text:#ffffff; --muted:#9a9a9a;
+  --line:#3a3a3a; --surface:#2d2d2d; --hdr:#1f1f1f;
+  --input:#3a3a3a; --sub:#3a3a3a;
+  --red:#e81123; --shadow:0 4px 16px rgba(0,0,0,.35);
+  --bg:#1f1f1f; --radius:2px;
+}
+html[data-style="win10"][data-theme="day"]{
+  --text:#000000; --muted:#605e5c;
+  --line:#edebe9; --surface:#ffffff; --hdr:#ffffff;
+  --input:#ffffff; --sub:#f3f2f1; --bg:#f3f3f3;
+}
+/* ── WIN11 ── */
+html[data-style="win11"]{
+  --sans:"Segoe UI Variable","Segoe UI",Tahoma,sans-serif; --ar:var(--sans);
+  --cyan:#0067c0; --green:#0f7b0f;
+  --text:#ffffff; --muted:#9d9d9d;
+  --line:#2e2e2e; --surface:#2c2c2c; --hdr:#202020;
+  --input:#2d2d2d; --sub:#333333;
+  --red:#e81123;
+  --shadow:0 8px 24px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25);
+  --bg:#202020; --radius:8px;
+}
+html[data-style="win11"][data-theme="day"]{
+  --text:#000000; --muted:#605e5c;
+  --line:#e5e5e5; --surface:#fbfbfb; --hdr:#f3f3f3;
+  --input:#ffffff; --sub:#f3f3f3; --bg:#f3f3f3;
+}
+/* ── MACOS ── */
+html[data-style="macos"]{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --ar:var(--sans);
+  --cyan:#007aff; --green:#34c759;
+  --text:#1d1d1f; --muted:#4e4e52;
+  --line:#d2d2d7; --surface:rgba(255,255,255,.78); --hdr:rgba(255,255,255,.78);
+  --input:#ffffff; --sub:rgba(255,255,255,.9);
+  --red:#ff3b30;
+  --shadow:0 8px 24px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);
+  --bg:radial-gradient(1100px 500px at 0% 0%,#c7d2fe 0%,transparent 60%),
+       radial-gradient(900px 600px at 100% 0%,#fbcfe8 0%,transparent 55%),
+       linear-gradient(180deg,#f5f5f7 0%,#ececef 100%);
+  --radius:12px;
+}
+html[data-style="macos"][data-theme="night"]{
+  --cyan:#0a84ff; --text:#f5f5f7; --muted:#98989d;
+  --line:#38383a; --surface:rgba(44,44,46,.78); --hdr:rgba(44,44,46,.78);
+  --input:#3a3a3c; --sub:#3a3a3c;
+  --bg:radial-gradient(1000px 500px at 0% 0%,#1e293b 0%,transparent 60%),
+       linear-gradient(180deg,#1c1c1e 0%,#000000 100%);
+}
+/* ── ANDROID ── */
+html[data-style="android"]{
+  --sans:Roboto,"Google Sans","Noto Sans",Arial,sans-serif; --ar:var(--sans);
+  --cyan:#d0bcff; --green:#a0d8a0;
+  --text:#e6e0e9; --muted:#cac4d0;
+  --line:#49454f; --surface:#1d1b20; --hdr:#141218;
+  --input:#2b2930; --sub:#2b2930;
+  --red:#ffb4ab; --shadow:0 4px 12px rgba(0,0,0,.4);
+  --bg:#141218; --radius:16px;
+}
+html[data-style="android"][data-theme="day"]{
+  --cyan:#6750a4; --text:#1d1b20; --muted:#49454f;
+  --line:#e7e0ec; --surface:#fffbfe; --hdr:#fffbfe;
+  --input:#f3edf7; --sub:#f3edf7; --bg:#fffbfe;
+}
+/* ── IOS ── */
+html[data-style="ios"]{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Helvetica,Arial,sans-serif;
+  --ar:var(--sans);
+  --cyan:#007aff; --green:#34c759;
+  --text:#ffffff; --muted:#8e8e93;
+  --line:#38383a; --surface:#1c1c1e; --hdr:rgba(28,28,30,.86);
+  --input:#2c2c2e; --sub:#2c2c2e;
+  --red:#ff3b30; --shadow:0 10px 30px rgba(0,0,0,.45);
+  --bg:#000000; --radius:14px;
+}
+html[data-style="ios"][data-theme="day"]{
+  --text:#000000; --muted:#59595f;
+  --line:#c6c6c8; --surface:#ffffff; --hdr:rgba(249,249,249,.86);
+  --input:#ffffff; --sub:#ffffff; --bg:#f2f2f7;
+}
+html[data-style]:not([data-style="default"]) body::before{ display:none; }
+html[data-style]:not([data-style="default"]) :is(.header-inner,.card,.toolbar,#imgbar,#toast,.answer){
+  backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+html[data-style="win7"] :is(.header-inner,.card,#imgbar,.answer),
+html[data-style="macos"] :is(.header-inner,.card,#imgbar,.answer),
+html[data-style="ios"] :is(.header-inner,.card,#imgbar,.answer){
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+}
+html[data-style]:not([data-style="default"]) .btn-primary{
+  background:var(--cyan); color:#fff; border:1px solid var(--cyan); box-shadow:none;
+}
+html[data-style]:not([data-style="default"]) .btn-primary:hover{
+  background:var(--cyan); filter:brightness(.92); box-shadow:none;
+}
+#artheme-btn{
+  position:fixed !important; bottom:22px !important; left:22px !important;
+  z-index:2147483646 !important; width:52px !important; height:52px !important;
+  padding:0 !important; margin:0 !important; border-radius:50% !important;
+  border:1px solid var(--line) !important; background:var(--hdr) !important;
+  color:var(--text) !important; backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:var(--shadow),0 10px 28px rgba(0,0,0,.35) !important;
+  cursor:pointer !important; display:grid !important; place-items:center !important;
+  font:inherit !important; pointer-events:auto !important;
+  transition:transform .2s, border-color .2s;
+}
+#artheme-btn:hover{ transform:translateY(-2px); border-color:var(--cyan) !important; }
+#artheme-btn:focus-visible{ outline:2px solid var(--cyan) !important; outline-offset:3px !important; }
+#artheme-btn svg{ width:22px; height:22px; }
+#artheme-btn .at-dot{
+  position:absolute; top:6px; right:6px; width:10px; height:10px;
+  border-radius:50%; background:var(--cyan); box-shadow:0 0 0 2px var(--hdr);
+}
+#artheme-panel{
+  position:fixed !important; bottom:84px !important; left:22px !important;
+  z-index:2147483647 !important; width:min(400px,calc(100vw - 44px)) !important;
+  max-height:min(78vh,620px) !important; overflow-y:auto !important;
+  overscroll-behavior:contain; padding:16px !important; margin:0 !important;
+  border-radius:var(--radius) !important; background:var(--hdr) !important;
+  border:1px solid var(--line) !important; backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  box-shadow:var(--shadow),0 28px 70px rgba(0,0,0,.45) !important;
+  color:var(--text) !important; font-family:var(--ar) !important;
+  display:none !important; pointer-events:auto !important;
+}
+#artheme-panel.open{ display:block !important; }
+#artheme-panel .at-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--line);
+}
+#artheme-panel .at-head h3{ margin:0; font-size:15px; font-weight:700; color:var(--text); }
+#artheme-panel .at-close{
+  width:32px; height:32px; padding:0; border-radius:50%; border:0;
+  background:var(--sub); color:var(--text); cursor:pointer;
+  display:grid; place-items:center; font:inherit; font-size:20px; line-height:1;
+}
+#artheme-panel .at-mode{
+  display:grid; grid-template-columns:1fr 1fr; gap:4px;
+  padding:4px; margin-bottom:14px; border-radius:12px;
+  background:var(--input); border:1px solid var(--line);
+}
+#artheme-panel .at-mode button{
+  min-height:38px; padding:0 8px; border:0; border-radius:9px;
+  background:transparent; color:var(--text); font:inherit;
+  font-size:13.5px; font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  transition:background .15s;
+}
+#artheme-panel .at-mode button[aria-checked="true"]{ background:var(--cyan); color:#fff; }
+#artheme-panel .at-mode svg{ width:15px; height:15px; }
+#artheme-panel .at-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:8px;
+}
+#artheme-panel .at-card{
+  display:flex; flex-direction:column; gap:6px; padding:8px;
+  border-radius:10px; border:1px solid var(--line); background:var(--sub);
+  color:var(--text); font:inherit; cursor:pointer; text-align:start;
+  transition:border-color .15s, transform .15s, box-shadow .15s;
+}
+#artheme-panel .at-card:hover{ border-color:var(--cyan); transform:translateY(-1px); }
+#artheme-panel .at-card[aria-checked="true"]{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--cyan) 30%, transparent);
+}
+#artheme-panel .at-prev{
+  height:46px; border-radius:6px; overflow:hidden;
+  display:grid; grid-template-rows:12px 1fr;
+  border:1px solid var(--line); background:var(--input);
+}
+#artheme-panel .at-prev-bar{
+  display:flex; align-items:center; gap:3px; padding:0 5px; background:var(--hdr);
+}
+#artheme-panel .at-prev-dot{
+  width:5px; height:5px; border-radius:50%; background:var(--at-accent,var(--cyan));
+}
+#artheme-panel .at-prev-body{
+  display:grid; place-items:center; color:var(--muted); font-size:12px; font-weight:700;
+}
+#artheme-panel .at-name{ font-size:11.5px; font-weight:700; color:var(--text); }
+#artheme-panel .at-foot{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line);
+}
+#artheme-panel .at-reset{
+  padding:8px 14px; border-radius:9px;
+  border:1px solid color-mix(in srgb, var(--red) 40%, transparent);
+  background:color-mix(in srgb, var(--red) 10%, transparent);
+  color:var(--red); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
+}
+#artheme-panel .at-reset:hover{ background:color-mix(in srgb, var(--red) 18%, transparent); }
+#artheme-panel .at-cur{ font-size:12px; color:var(--muted); }
+@media (max-width:480px){
+  #artheme-btn{ bottom:14px !important; left:14px !important; width:48px !important; height:48px !important; }
+  #artheme-panel{ bottom:72px !important; left:12px !important; width:calc(100vw - 24px) !important; }
+}
+</style>
+
+<style id="artheme-contrast">
+html { --green-ink: var(--green); }
+html[data-style="default"][data-theme="day"]   { --green-ink: #2a6b3e; }
+html[data-style="facebook"][data-theme="day"]  { --green-ink: #2a6b1f; }
+html[data-style="youtube"][data-theme="day"]   { --green-ink: #1a6b28; }
+html[data-style="instagram"][data-theme="day"] { --green-ink: #2a5c1a; }
+html[data-style="netflix"][data-theme="day"]   { --green-ink: #1e6b32; }
+html[data-style="prime"][data-theme="day"]     { --green-ink: #1a6b5e; }
+html[data-style="appletv"][data-theme="day"]   { --green-ink: #1e6b32; }
+html[data-style="macos"][data-theme="day"]     { --green-ink: #1e6b32; }
+html[data-style="android"][data-theme="day"]   { --green-ink: #2a5c2a; }
+html[data-style="ios"][data-theme="day"]       { --green-ink: #1e6b32; }
+.logo-word span {
+  background-image: linear-gradient(90deg, var(--cyan), var(--green));
+  background-image: linear-gradient(90deg, var(--cyan), var(--green-ink));
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+.chip {
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  border-color: color-mix(in srgb, var(--green) 32%, transparent);
+}
+.chip button { color: inherit; opacity: .85; }
+.chip button:hover { opacity: 1; }
+.seg button.on {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cyan) 60%, transparent);
+}
+.hint { color: color-mix(in srgb, var(--muted) 85%, var(--text)); }
+.page-title { color: color-mix(in srgb, var(--muted) 85%, var(--text)); }
+.att-badge { background: var(--cyan); }
+</style>
+
+<script id="artheme-js">
+(function () {
+  'use strict';
+  if (window.__arthemeInited) return;
+  window.__arthemeInited = true;
+
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('reset-theme') === '1') {
+      try { localStorage.removeItem('cineaura:style'); } catch (e) {}
+      try { localStorage.removeItem('cineaura:theme'); } catch (e) {}
+      qs.delete('reset-theme');
+      var clean = location.pathname + (qs.toString() ? '?' + qs.toString() : '') + location.hash;
+      location.replace(clean); return;
+    }
+  } catch (e) {}
+
+  var THEMES = [
+    { id:'default',   name:'CineAura',   accent:'#01b4e4' },
+    { id:'facebook',  name:'Facebook',   accent:'#1877f2' },
+    { id:'youtube',   name:'YouTube',    accent:'#ff0000' },
+    { id:'instagram', name:'Instagram',  accent:'#d62976' },
+    { id:'netflix',   name:'Netflix',    accent:'#e50914' },
+    { id:'prime',     name:'Prime',      accent:'#00a8e1' },
+    { id:'appletv',   name:'Apple TV+',  accent:'#2997ff' },
+    { id:'win7',      name:'Windows 7',  accent:'#2a7bd8' },
+    { id:'win8',      name:'Windows 8',  accent:'#0078d7' },
+    { id:'win10',     name:'Windows 10', accent:'#0078d4' },
+    { id:'win11',     name:'Windows 11', accent:'#0067c0' },
+    { id:'macos',     name:'macOS',      accent:'#007aff' },
+    { id:'android',   name:'Android',    accent:'#3ddc84' },
+    { id:'ios',       name:'iOS',        accent:'#007aff' }
+  ];
+  var VALID = THEMES.map(function (t) { return t.id; });
+  var STYLE_KEY = 'cineaura:style';
+  var MODE_KEY  = 'cineaura:theme';
+  var okS = function (v) { return VALID.indexOf(v) !== -1; };
+  var okM = function (v) { return v === 'day' || v === 'night'; };
+  var read = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  var save = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var del  = function (k) { try { localStorage.removeItem(k); } catch (e) {} };
+
+  function boot() {
+    var root = document.documentElement;
+
+    var s = read(STYLE_KEY), m = read(MODE_KEY);
+    if (s && okS(s)) { root.setAttribute('data-style', s); }
+    else if (s) { del(STYLE_KEY); }
+    else if (!root.getAttribute('data-style')) { root.setAttribute('data-style', 'default'); }
+
+    if (m && okM(m)) { root.setAttribute('data-theme', m); }
+    else if (m) { del(MODE_KEY); }
+    else if (!root.getAttribute('data-theme')) {
+      try { root.setAttribute('data-theme',
+        matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'night'); }
+      catch (e) { root.setAttribute('data-theme', 'night'); }
+    }
+
+    var hdrBtn = document.getElementById('themeBtn');
+    function syncHdr() {
+      if (!hdrBtn) return;
+      var day = root.getAttribute('data-theme') === 'day';
+      hdrBtn.textContent = day ? '☾' : '☀︎';
+      hdrBtn.title = day ? 'التبديل إلى الوضع الليلي' : 'التبديل إلى الوضع النهاري';
+    }
+    syncHdr();
+    if (hdrBtn) {
+      hdrBtn.onclick = function () {
+        var next = root.getAttribute('data-theme') === 'day' ? 'night' : 'day';
+        root.setAttribute('data-theme', next);
+        save(MODE_KEY, next);
+        syncHdr();
+        syncUI();
+      };
+    }
+
+    var frag = document.createElement('div');
+    frag.innerHTML =
+      '<button type="button" id="artheme-btn" aria-label="تغيير المظهر" aria-expanded="false" aria-controls="artheme-panel">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>' +
+          '<circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>' +
+          '<circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>' +
+          '<circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>' +
+          '<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>' +
+        '</svg>' +
+        '<span class="at-dot" aria-hidden="true"></span>' +
+      '</button>' +
+      '<div id="artheme-panel" role="dialog" aria-label="إعدادات المظهر">' +
+        '<div class="at-head"><h3>المظهر</h3><button type="button" class="at-close" aria-label="إغلاق">&times;</button></div>' +
+        '<div class="at-mode" role="radiogroup" aria-label="وضع الألوان">' +
+          '<button type="button" role="radio" data-mode="day" aria-checked="false">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>' +
+            'نهاري</button>' +
+          '<button type="button" role="radio" data-mode="night" aria-checked="false">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' +
+            'ليلي</button>' +
+        '</div>' +
+        '<div class="at-grid" role="radiogroup" aria-label="نمط الثيم"></div>' +
+        '<div class="at-foot">' +
+          '<button type="button" class="at-reset">إعادة تعيين</button>' +
+          '<span class="at-cur"></span>' +
+        '</div>' +
+      '</div>';
+    while (frag.firstChild) document.body.appendChild(frag.firstChild);
+
+    var btn   = document.getElementById('artheme-btn');
+    var panel = document.getElementById('artheme-panel');
+    var grid  = panel.querySelector('.at-grid');
+
+    THEMES.forEach(function (t) {
+      var card = document.createElement('button');
+      card.type = 'button'; card.className = 'at-card';
+      card.setAttribute('role', 'radio');
+      card.setAttribute('aria-checked', 'false');
+      card.dataset.style = t.id;
+      card.style.setProperty('--at-accent', t.accent);
+      card.innerHTML =
+        '<span class="at-prev" aria-hidden="true">' +
+          '<span class="at-prev-bar">' +
+            '<span class="at-prev-dot"></span><span class="at-prev-dot"></span><span class="at-prev-dot"></span>' +
+          '</span>' +
+          '<span class="at-prev-body">Aa</span>' +
+        '</span>' +
+        '<span class="at-name"></span>';
+      card.querySelector('.at-name').textContent = t.name;
+      grid.appendChild(card);
+    });
+
+    function curS() { return root.getAttribute('data-style') || 'default'; }
+    function curM() { return root.getAttribute('data-theme') || 'night'; }
+
+    function syncUI() {
+      var s = curS(), m = curM();
+      grid.querySelectorAll('.at-card').forEach(function (c) {
+        c.setAttribute('aria-checked', c.dataset.style === s ? 'true' : 'false');
+      });
+      panel.querySelectorAll('.at-mode button').forEach(function (b) {
+        b.setAttribute('aria-checked', b.dataset.mode === m ? 'true' : 'false');
+      });
+      var t = THEMES.filter(function (x) { return x.id === s; })[0];
+      var dot = btn.querySelector('.at-dot');
+      if (t && dot) dot.style.background = t.accent;
+      var cur = panel.querySelector('.at-cur');
+      if (cur) cur.textContent = 'الحالي: ' + (t ? t.name : 'CineAura') + ' · ' + (m === 'day' ? 'نهاري' : 'ليلي');
+      syncHdr();
+    }
+
+    function applyStyle(id) {
+      if (!okS(id)) return;
+      root.setAttribute('data-style', id);
+      save(STYLE_KEY, id);
+      syncUI();
+    }
+    function applyMode(mode) {
+      if (!okM(mode)) return;
+      root.setAttribute('data-theme', mode);
+      save(MODE_KEY, mode);
+      syncUI();
+    }
+    function resetAll() {
+      del(STYLE_KEY); del(MODE_KEY);
+      root.setAttribute('data-style', 'default');
+      root.setAttribute('data-theme', 'night');
+      syncUI();
+    }
+
+    grid.addEventListener('click', function (e) {
+      var card = e.target.closest('.at-card');
+      if (card) applyStyle(card.dataset.style);
+    });
+    panel.querySelector('.at-mode').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-mode]');
+      if (b) applyMode(b.dataset.mode);
+    });
+    panel.querySelector('.at-reset').addEventListener('click', resetAll);
+
+    var open = false;
+    function openP()  { open = true;  panel.classList.add('open');  btn.setAttribute('aria-expanded', 'true');  syncUI(); }
+    function closeP() { open = false; panel.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function () { open ? closeP() : openP(); });
+    panel.querySelector('.at-close').addEventListener('click', closeP);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) closeP(); });
+    document.addEventListener('click', function (e) {
+      if (!open) return;
+      if (panel.contains(e.target) || btn.contains(e.target)) return;
+      closeP();
+    });
+
+    syncUI();
+
+    window.CineAuraTheme = {
+      set: applyStyle, setMode: applyMode, reset: resetAll,
+      list: THEMES.slice(),
+      current: function () { return { style: curS(), mode: curM() }; }
+    };
+  }
+
+  try { boot(); }
+  catch (err) { console.error('[artheme] init failed:', err); }
+})();
+</script>
+
+</body>
+</html>

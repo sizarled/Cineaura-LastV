@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-style="default" data-theme="night">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <script src="js/prefs.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title data-i18n-title="ae.pageTitle">Article editor — CineAura</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230d253f'/%3E%3Cpolygon points='26,18 48,32 26,46' fill='%2390cea1'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Outfit:wght@400;600;700;750&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/article-editor.css" />
+</head>
+<body class="ae-page" data-auth-gate="note">
+  <main class="ae-page-main" id="ae-root"></main>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/streamtape.js"></script>
+  <script src="js/post-rich.js"></script>
+  <script src="js/videos.js"></script>
+  <script src="js/content-studio.js"></script>
+  <script src="js/market-forms.js"></script>
+  <script src="js/community.js"></script>
+  <script src="js/documents.js"></script>
+  <script src="js/article-editor.js"></script>
+  <script>
+    // Keep the site's session, language and appearance preferences, while this
+    // page uses the standalone writing layout from the provided article mockup.
+    document.addEventListener("DOMContentLoaded", () => {
+      const boot = () => {
+        if (!window.CineAura?.getSession) return setTimeout(boot, 60);
+        window.CineAura.setupChrome?.();
+        window.CineAuraArticles.mount(document.getElementById("ae-root"));
+      };
+      boot();
+    });
+  </script>
+</body>
+</html>

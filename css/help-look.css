@@ -1,0 +1,207 @@
+/* ==========================================================
+   CineAura — "Help Center" look = the DEFAULT appearance
+   Scoped to html[data-style="default"] only, so the 13 other
+   styles in themes.css are untouched. Works with day / night
+   (all colours come from the style.css tokens, exactly like
+   css/help.css) and with the customizer vars --radius/--gap/--pad.
+   Source of truth: css/help.css (hero, search, TOC, cards, chips).
+   ========================================================== */
+
+/* ---- Header: always the solid, compact bar used on Help ---- */
+html[data-style="default"] .header-inner{
+  background:var(--header-bg-scrolled);
+  box-shadow:0 16px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+}
+html[data-style="default"][data-theme="day"] .header-inner{
+  box-shadow:0 12px 36px rgba(13,37,63,.12), inset 0 1px 0 rgba(255,255,255,.6);
+}
+html[data-style="default"] .nav a.active{ color:var(--cyan); }
+
+/* ---- Cards / panels: Help card (surface, 1px line, blur, inset highlight) ---- */
+html[data-style="default"] .glass,
+html[data-style="default"] .plan,
+html[data-style="default"] .iptv-card,
+html[data-style="default"] .contact-card,
+html[data-style="default"] .form-card,
+html[data-style="default"] .watch-panel,
+html[data-style="default"] .auth-card,
+html[data-style="default"] .gate-card,
+html[data-style="default"] .dash-gate,
+html[data-style="default"] .dash-side,
+html[data-style="default"] .dash-main,
+html[data-style="default"] .prof-side,
+html[data-style="default"] .prof-main,
+html[data-style="default"] .modal-card,
+html[data-style="default"] .lg-card,
+html[data-style="default"] .lg-toc{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius,18px);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:var(--shadow,none), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* ---- Page headings: Help hero (serif H1, muted lead) ---- */
+html[data-style="default"] body.page-inner .page-main h1{
+  font-family:var(--serif);
+  line-height:1.05;
+  letter-spacing:-.01em;
+}
+html[data-style="default"] .eyebrow{ color:var(--cyan); }
+
+/* ---- Inputs: Help search pill + soft cyan focus halo ---- */
+html[data-style="default"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+html[data-style="default"] select,
+html[data-style="default"] textarea{
+  background:var(--input-bg);
+  border:1px solid var(--line);
+  color:var(--text);
+  outline:none;
+}
+html[data-style="default"] input[type="search"]{ border-radius:999px; }
+html[data-style="default"] select,
+html[data-style="default"] textarea{ border-radius:12px; }
+html[data-style="default"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus,
+html[data-style="default"] select:focus,
+html[data-style="default"] textarea:focus{
+  border-color:rgba(1,180,228,.5);
+  box-shadow:0 0 0 4px rgba(1,180,228,.12);
+}
+
+/* ---- Side lists / TOC items: Help category buttons ---- */
+html[data-style="default"] .lg-toc a,
+html[data-style="default"] .dash-side a,
+html[data-style="default"] .dash-side button,
+html[data-style="default"] .prof-side a{
+  border-radius:8px;
+  border-inline-start:2px solid transparent;
+  color:var(--muted);
+  font-weight:600;
+}
+html[data-style="default"] .lg-toc a:hover,
+html[data-style="default"] .dash-side a:hover,
+html[data-style="default"] .dash-side button:hover,
+html[data-style="default"] .prof-side a:hover{
+  color:var(--text);
+  background:var(--sub-bg,rgba(255,255,255,.05));
+}
+html[data-style="default"] .lg-toc a.on,
+html[data-style="default"] .lg-toc a.active,
+html[data-style="default"] .dash-side .active,
+html[data-style="default"] .dash-side [aria-current="page"],
+html[data-style="default"] .prof-side .active{
+  color:var(--text);
+  background:var(--sub-bg,rgba(1,180,228,.09));
+  border-inline-start-color:var(--cyan);
+}
+html[data-style="default"] .lg-toc-title{ color:var(--green); }
+
+/* ---- Chips / badges: Help green chip ---- */
+html[data-style="default"] .chip-soft{
+  background:rgba(144,206,161,.12);
+  color:var(--green);
+  border:1px solid rgba(144,206,161,.18);
+  border-radius:999px;
+}
+
+/* ---- Hover on list rows / cards: Help item hover ---- */
+html[data-style="default"] .iptv-card:hover,
+html[data-style="default"] .plan:hover{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(24,119,242,.12), var(--shadow,none);
+}
+
+/* ---- Selection + links inside long text (article body style) ---- */
+html[data-style="default"] .lg-card a,
+html[data-style="default"] .page-main p a{ color:var(--cyan); font-weight:600; }
+html[data-style="default"] .lg-card blockquote{
+  border-inline-start:3px solid var(--cyan);
+  background:rgba(1,180,228,.08);
+  padding:12px 14px;
+  border-radius:10px;
+}
+
+/* ==========================================================
+   Site-wide completion (all pages)
+   ========================================================== */
+
+/* Tokens that only the old global Facebook layer used to define.
+   Defined here so page CSS that references them keeps working. */
+html[data-style="default"]{
+  --sub-bg:rgba(255,255,255,.05);
+  --btn-blue:#01b4e4; --btn-blue-h:#2ec7ea;
+  --red:#ff6b6b; --scroll:rgba(145,196,220,.3);
+}
+html[data-style="default"][data-theme="day"]{
+  --sub-bg:rgba(13,37,63,.05);
+  --red:#d93025; --scroll:rgba(13,37,63,.25);
+}
+
+/* ---- Site logo: the Help header logo on every page ---- */
+html[data-style="default"] .logo{ gap:10px; }
+html[data-style="default"] .logo-mark{
+  width:34px; height:34px; border-radius:10px;
+  background:linear-gradient(160deg, rgba(1,180,228,.28), rgba(144,206,161,.12));
+  border:1px solid rgba(1,180,228,.35);
+}
+html[data-style="default"] .logo-mark svg{ width:14px; height:14px; }
+html[data-style="default"] .logo-mark svg path{ fill:#90cea1 !important; }
+html[data-style="default"] .logo-word{
+  font-family:var(--sans); font-weight:750; font-size:18px; letter-spacing:-.04em;
+  color:var(--text);
+}
+html[data-style="default"] .logo-word span{
+  background:linear-gradient(90deg, var(--cyan), var(--green));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+/* ---- Page frame: same offsets as Help ---- */
+html[data-style="default"] .header{ top:var(--header-offset,18px); }
+html[data-style="default"] body.page-inner{ padding-top:110px; }
+
+/* ---- Buttons: Help gradient primary, soft ghost ---- */
+html[data-style="default"] .btn{ border-radius:12px; font-weight:650; }
+html[data-style="default"] .btn-primary{
+  background:linear-gradient(90deg,#01b4e4 0%,#2ec7ea 48%,#90cea1 160%);
+  color:#032541; box-shadow:0 8px 24px rgba(1,180,228,.22);
+}
+html[data-style="default"] .btn-primary:hover{ box-shadow:0 12px 30px rgba(1,180,228,.34); }
+html[data-style="default"] .btn-ghost{
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); color:var(--text);
+}
+html[data-style="default"][data-theme="day"] .btn-ghost{
+  background:rgba(13,37,63,.04); border-color:rgba(13,37,63,.14);
+}
+html[data-style="default"] .btn-ghost:hover{ border-color:rgba(1,180,228,.5); background:rgba(1,180,228,.08); }
+html[data-style="default"] .btn-danger{
+  border:1px solid rgba(255,120,120,.28); background:rgba(255,80,80,.08); color:var(--red);
+}
+
+/* ---- Other page cards (dashboard, market, videos, profile, panel, prizes) ---- */
+html[data-style="default"] .pf-card,
+html[data-style="default"] .prof-card,
+html[data-style="default"] .dash-card,
+html[data-style="default"] .mkt-card,
+html[data-style="default"] .vw-card,
+html[data-style="default"] .vs-card,
+html[data-style="default"] .panel-card,
+html[data-style="default"] .report-card,
+html[data-style="default"] .chat-box,
+html[data-style="default"] .bell-panel,
+html[data-style="default"] .header-bell-panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius,18px);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:var(--shadow,none), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* ---- Background: orbs + grain (Help page) ---- */
+html[data-style="default"] .bg-orbs,
+html[data-style="default"] .grain{ display:block; }
+
+
+/* Arabic: the decorative serif has no Arabic glyphs — Cairo takes over */
+html[lang="ar"] html[data-style="default"] body.page-inner .page-main h1 { font-family: "Cairo", var(--sans); }

@@ -1,0 +1,46 @@
+/* Live Updates — unified feed on homepage */
+#live-updates{ padding: 28px 0 12px; }
+.live-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+.live-title{ display:grid; gap:6px; }
+.live-kicker{ display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan-2, #01b4e4); }
+.live-live{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:rgba(231, 76, 60, .14); border:1px solid rgba(231,76,60,.28); color:#e74c3c; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.live-live i{ width:8px; height:8px; border-radius:50%; background:#e74c3c; box-shadow:0 0 0 6px rgba(231,76,60,.18); animation: livePulse 1.6s infinite; }
+@keyframes livePulse{ 0%{ transform:scale(1)} 50%{ transform:scale(1.08)} 100%{ transform:scale(1)} }
+.live-filters{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.live-chip{ padding:7px 14px; border-radius:999px; border:1px solid var(--line, rgba(255,255,255,.12)); background:var(--sub-bg, rgba(255,255,255,.06)); color:var(--muted, #9bb0c2); font-size:12.5px; font-weight:600; cursor:pointer; transition:.18s; }
+.live-chip.active, .live-chip:hover{ background:var(--cyan, #01b4e4); color:#032541; border-color:var(--cyan); transform:translateY(-1px); }
+.live-chip small{ opacity:.8; font-weight:700; margin-inline-start:4px; }
+.live-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px; }
+.live-card{ display:grid; grid-template-columns:56px 1fr; gap:14px; padding:14px; border-radius:16px; background:var(--surface, rgba(9,22,36,.52)); border:1px solid var(--line, rgba(255,255,255,.08)); backdrop-filter:blur(10px); transition:.22s; position:relative; overflow:hidden; }
+.live-card::before{ content:""; position:absolute; inset:0; background:radial-gradient(400px 120px at 0% 0%, rgba(1,180,228,.06), transparent 60%); pointer-events:none; }
+.live-card:hover{ transform:translateY(-3px); border-color:rgba(1,180,228,.22); box-shadow:0 14px 32px rgba(0,0,0,.18); }
+.live-media{ width:56px; height:56px; border-radius:12px; overflow:hidden; background:var(--sub-bg); display:grid; place-items:center; flex:none; }
+.live-media img{ width:100%; height:100%; object-fit:cover; }
+.live-media .live-ico{ font-size:22px; }
+.live-body{ display:grid; gap:4px; min-width:0; }
+.live-type{ display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--cyan-2); }
+.live-type.market{ color:#f39c12; }
+.live-type.video{ color:#e74c3c; }
+.live-type.iptv{ color:#2ecc71; }
+.live-type.movie{ color:#01b4e4; }
+.live-type.promo{ color:#9b59b6; }
+.live-title-text{ font-size:14.5px; font-weight:700; line-height:1.35; color:var(--text, #f4fbff); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.live-meta{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:11.5px; color:var(--muted); }
+.live-meta b{ color:var(--text); font-weight:700; }
+.live-time{ margin-inline-start:auto; font-size:11px; color:var(--muted); opacity:.9; }
+.live-actions{ display:flex; gap:6px; margin-top:2px; }
+.live-actions a{ padding:5px 10px; border-radius:999px; font-size:11px; font-weight:700; text-decoration:none; border:1px solid var(--line); background:var(--sub-bg); color:var(--text); }
+.live-actions a.primary{ background:var(--cyan); border-color:var(--cyan); color:#032541; }
+.live-empty, .live-loading{ padding:24px; text-align:center; border-radius:16px; background:var(--surface); border:1px dashed var(--line); color:var(--muted); }
+.live-more{ display:flex; justify-content:center; margin-top:16px; }
+.live-more button,
+.live-more a.live-more-link{ display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-weight:700; cursor:pointer; text-decoration:none; transition:.2s; }
+.live-more a.live-more-link:hover{ background:rgba(1,180,228,.12); border-color:var(--accent); color:var(--accent); }
+
+/* Compact in themes where cards are smaller */
+html[data-style="facebook"] .live-card,
+html[data-style="win8"] .live-card{ border-radius:8px; }
+html[data-style="youtube"] .live-card{ border-radius:12px; }
+
+/* Hidden state */
+.live-card[hidden]{ display:none !important; }

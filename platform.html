@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- YouTube needs the site in the Referer of its player (else error 153) -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <script src="js/prefs.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Social networks — CineAura</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230d253f'/%3E%3Cpolygon points='26,18 48,32 26,46' fill='%2390cea1'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <link rel="stylesheet" href="css/panel.css" />
+  <link rel="stylesheet" href="css/mobile.css" />
+  <link rel="stylesheet" href="css/platforms.css" />
+</head>
+<body class="platform-page">
+  <!-- Link a social network to the Panel: pick one, fill its API data, done.
+       See js/platform.js — the networks come from js/social-icons.js. -->
+  <header class="pfg-top">
+    <a class="pfg-brand" href="index.html">
+      <svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0d253f"/><polygon points="26,18 48,32 26,46" fill="#90cea1"/></svg>
+      <b>CineAura</b>
+    </a>
+    <span class="spacer"></span>
+    <a class="btn btn-sm btn-ghost" href="panel.html" data-t="platform.goPanel">Back to the Panel</a>
+  </header>
+  <main id="pfg-root"><p class="muted" style="text-align:center;padding:40px 0">…</p></main>
+  <footer class="pfg-foot muted">youneselradi95@gmail.com</footer>
+  <script src="js/i18n.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/social-icons.js"></script>
+  <script src="js/platform.js"></script>
+</body>
+</html>

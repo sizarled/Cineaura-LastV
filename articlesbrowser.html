@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-style="default" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تصفح المقالات — CineAura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Outfit:wght@400;600;750&display=swap" rel="stylesheet">
+<style>
+/* ── المتغيرات الأساسية ── */
+:root{--cyan:#01b4e4;--green:#90cea1;--text:#f4fbff;--muted:#9bb0c2;--line:rgba(145,196,220,.16);--sans:"Outfit","Cairo","Segoe UI",sans-serif;--ar:"Cairo","Outfit",sans-serif;--surface:rgba(9,22,36,.62);--hdr:rgba(7,18,30,.82);--input:rgba(4,14,24,.55);--sub:rgba(255,255,255,.05);--red:#ff6b6b;--shadow:0 24px 80px rgba(0,0,0,.42);--bg:linear-gradient(180deg,#08131e,#070f18 46%,#0a1826);--radius:18px}
+html[data-theme="day"]{--text:#0d253f;--muted:#4a6578;--line:rgba(13,37,63,.12);--surface:rgba(255,255,255,.86);--hdr:rgba(255,255,255,.94);--input:rgba(255,255,255,.95);--sub:rgba(13,37,63,.05);--red:#d93025;--shadow:0 18px 48px rgba(13,37,63,.1);--bg:linear-gradient(180deg,#f4f8fb,#e8f1f6 48%,#dceaf3)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);scroll-behavior:smooth}
+body{min-height:100%;background:var(--bg);background-attachment:fixed;color:var(--text);font-family:var(--ar);font-size:16px;line-height:1.8;padding:104px 0 48px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(520px 320px at 85% 8%,rgba(1,180,228,.16),transparent 70%),radial-gradient(480px 300px at 10% 90%,rgba(144,206,161,.12),transparent 70%)}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+a{color:var(--cyan);text-decoration:none}
+
+/* ── الهيدر ── */
+.header{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));inset-inline:16px;z-index:20;max-width:1240px;margin:auto}
+.header-inner{display:flex;align-items:center;gap:10px;padding:10px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--hdr);backdrop-filter:blur(22px) saturate(150%);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.08)}
+.logo{display:flex;align-items:center;gap:10px;margin-inline-end:auto}
+.logo-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(160deg,rgba(1,180,228,.28),rgba(144,206,161,.12));border:1px solid rgba(1,180,228,.35)}
+.logo-mark svg{width:14px;height:14px;fill:var(--green)}
+.logo-word{font-family:var(--sans);font-weight:750;font-size:18px;letter-spacing:-.04em}
+.logo-word span{background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{border:1px solid var(--line);background:var(--sub);border-radius:12px;padding:8px 16px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:rgba(1,180,228,.5);background:rgba(1,180,228,.08)}
+.btn-primary{background:linear-gradient(90deg,#01b4e4,#2ec7ea 48%,#90cea1 160%);color:#032541;border:0;box-shadow:0 8px 24px rgba(1,180,228,.22)}
+.btn-primary:hover{box-shadow:0 12px 30px rgba(1,180,228,.34);background:linear-gradient(90deg,#01b4e4,#2ec7ea 48%,#90cea1 160%)}
+
+/* ── مربع البحث ── */
+.search-section{max-width:1240px;margin:0 auto 40px;padding:0 16px}
+.search-box{display:flex;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:50px;padding:8px 20px;box-shadow:var(--shadow);transition:border-color .2s, box-shadow .2s}
+.search-box:focus-within{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(1,180,228,.1)}
+.search-box svg{width:24px;height:24px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0}
+.search-box input{flex:1;border:none;background:transparent;padding:12px 16px;font-size:16px;color:var(--text);outline:none;font-family:inherit}
+.search-box input::placeholder{color:var(--muted)}
+
+/* ── الأقسام الأفقية ── */
+.domain-section{max-width:1240px;margin:0 auto 50px;padding:0 16px}
+.domain-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.domain-title{font-size:24px;font-weight:700;display:flex;align-items:center;gap:10px}
+.domain-title::before{content:'';width:6px;height:24px;background:var(--cyan);border-radius:4px}
+.articles-row{display:flex;overflow-x:auto;gap:16px;padding-bottom:16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.articles-row::-webkit-scrollbar{height:8px}
+.articles-row::-webkit-scrollbar-track{background:var(--sub);border-radius:4px}
+.articles-row::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.articles-row::-webkit-scrollbar-thumb:hover{background:var(--cyan)}
+
+/* ── بطاقة المقال ── */
+.article-card{flex:0 0 320px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,border-color .2s;scroll-snap-align:start}
+.article-card:hover{border-color:var(--cyan);transform:translateY(-4px)}
+.ac-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--input);display:block}
+.ac-content{padding:16px;display:flex;flex-direction:column;flex:1}
+.ac-meta-top{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ac-domain{font-size:11px;font-weight:700;color:var(--cyan);background:rgba(1,180,228,.1);padding:2px 8px;border-radius:4px}
+.ac-category{font-size:11px;color:var(--muted);background:var(--sub);padding:2px 8px;border-radius:4px;border:1px solid var(--line)}
+.ac-title{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--text);text-decoration:none}
+.ac-title:hover{color:var(--cyan)}
+.ac-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.ac-publisher{display:flex;align-items:center;gap:6px;margin-bottom:12px;font-size:12px;font-weight:600;color:var(--text)}
+.ac-publisher img{width:24px;height:24px;border-radius:50%;border:1px solid var(--line)}
+.ac-stats{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);padding-top:12px;border-top:1px solid var(--line);margin-bottom:12px}
+.ac-stat{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.ac-stat svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.ac-btn{width:100%;padding:10px;border-radius:10px;border:none;background:var(--cyan);color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:filter .2s;font-family:inherit}
+.ac-btn:hover{filter:brightness(.9)}
+
+/* ── نتائج البحث ── */
+.search-results{display:none;max-width:1240px;margin:0 auto 50px;padding:0 16px}
+.search-results.active{display:block}
+.search-results h2{font-size:22px;font-weight:700;margin-bottom:20px;padding-inline-start:10px;border-inline-start:4px solid var(--cyan)}
+.search-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.search-grid .article-card{flex:initial;width:100%}
+
+/* ── التوست ── */
+#toast{position:fixed;bottom:24px;inset-inline:0;margin:auto;width:max-content;max-width:90vw;z-index:50;background:var(--hdr);border:1px solid var(--line);border-radius:12px;padding:10px 18px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;font-weight:600}
+#toast.on{opacity:1;transform:none}
+
+/* ── شاشات صغيرة ── */
+@media(max-width:980px){
+  .article-card{flex:0 0 280px}
+}
+@media(max-width:480px){
+  .article-card{flex:0 0 260px}
+}
+</style>
+</head>
+<body>
+
+<header class="header"><div class="header-inner">
+  <a href="#" class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="logo-word">Cine<span>Aura</span></span></a>
+  <button class="btn" id="themeBtn" aria-label="تبديل النهار والليل">☀︎</button>
+  <button class="btn btn-primary" onclick="window.location.href='article editor.html'">كتابة مقال</button>
+</div></header>
+
+<main>
+  <!-- مربع البحث -->
+  <div class="search-section">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="searchInput" placeholder="ابحث عن مقال، ناشر، تصنيف..." aria-label="بحث">
+    </div>
+  </div>
+
+  <!-- نتائج البحث (تظهر عند الكتابة فقط) -->
+  <section id="searchResultsSection" class="search-results">
+    <h2>نتائج البحث</h2>
+    <div class="search-grid" id="searchGrid"></div>
+  </section>
+
+  <!-- أقسام المجالات الخمسة -->
+  <div id="domainsContainer"></div>
+</main>
+
+<div id="toast" role="status"></div>
+
+<!-- ═══════════════ THEMES CSS ═══════════════ -->
+<style id="artheme-css">
+html[data-style="facebook"]{--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#2d88ff;--green:#42b72a;--text:#e4e6eb;--muted:#b0b3b8;--line:#3e4042;--surface:#242526;--hdr:#242526;--input:#3a3b3c;--sub:#3a3b3c;--red:#ff6b70;--shadow:0 1px 2px rgba(0,0,0,.35);--bg:#18191a;--radius:8px}
+html[data-style="facebook"][data-theme="day"]{--cyan:#1877f2;--text:#050505;--muted:#65676b;--line:#ced0d4;--surface:#ffffff;--hdr:#ffffff;--input:#f0f2f5;--sub:#f0f2f5;--red:#fa383e;--shadow:0 1px 2px rgba(0,0,0,.2);--bg:#f0f2f5}
+html[data-style="youtube"]{--sans:Roboto,"Segoe UI",Arial,sans-serif;--ar:var(--sans);--cyan:#ff0000;--green:#2ba640;--text:#f1f1f1;--muted:#aaa;--line:#303030;--surface:#212121;--hdr:#0f0f0f;--input:#121212;--sub:#272727;--red:#ff0000;--shadow:0 1px 3px rgba(0,0,0,.45);--bg:#0f0f0f;--radius:12px}
+html[data-style="youtube"][data-theme="day"]{--text:#0f0f0f;--muted:#606060;--line:#e5e5e5;--surface:#ffffff;--hdr:#ffffff;--input:#ffffff;--sub:#f2f2f2;--bg:#ffffff}
+html[data-style="instagram"]{--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#0095f6;--green:#78de45;--text:#f5f5f5;--muted:#a8a8a8;--line:#363636;--surface:#121212;--hdr:#000000;--input:#262626;--sub:#262626;--red:#ed4956;--shadow:0 0 0 1px #363636;--bg:#000000;--radius:3px}
+html[data-style="instagram"][data-theme="day"]{--text:#1a1a1a;--muted:#575757;--line:#dbdbdb;--surface:#ffffff;--hdr:#ffffff;--input:#efefef;--sub:#efefef;--bg:#fafafa}
+html[data-style="netflix"]{--sans:Inter,"Helvetica Neue",Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#e50914;--green:#46d369;--text:#ffffff;--muted:#999999;--line:#2f2f2f;--surface:#181818;--hdr:#000000;--input:#333333;--sub:#232323;--red:#e50914;--shadow:0 8px 28px rgba(0,0,0,.55);--bg:#000000;--radius:4px}
+html[data-style="netflix"][data-theme="day"]{--text:#221f1f;--muted:#6a6a6a;--line:#e5e5e5;--surface:#ffffff;--hdr:#000000;--input:#e8e8e8;--sub:#f0f0f0;--bg:#f5f5f1}
+html[data-style="prime"]{--sans:AmazonEmber,"Helvetica Neue",Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#00a8e1;--green:#25a18e;--text:#ffffff;--muted:#a0aec0;--line:#1e3a5f;--surface:#12233f;--hdr:#002e4b;--input:#0f2847;--sub:#0f2847;--red:#ff4d4f;--shadow:0 8px 24px rgba(0,0,0,.45);--bg:linear-gradient(180deg,#0a1628 0%,#081a33 55%,#000d1f 100%);--radius:8px}
+html[data-style="prime"][data-theme="day"]{--text:#0a1628;--muted:#5a6d85;--line:#d0dce8;--surface:#ffffff;--hdr:#002e4b;--input:#ffffff;--sub:#eef3f9;--bg:#eef3f9}
+html[data-style="appletv"]{--sans:-apple-system,BlinkMacSystemFont,"SF Pro Display",Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#2997ff;--green:#30d158;--text:#f5f5f7;--muted:#86868b;--line:#2c2c2e;--surface:#1c1c1e;--hdr:rgba(0,0,0,.85);--input:#2c2c2e;--sub:#2c2c2e;--red:#ff453a;--shadow:0 10px 30px rgba(0,0,0,.55);--bg:#000000;--radius:12px}
+html[data-style="appletv"][data-theme="day"]{--cyan:#0071e3;--text:#1d1d1f;--muted:#525255;--line:#d2d2d7;--surface:#ffffff;--hdr:rgba(250,250,252,.88);--input:#ffffff;--sub:#f5f5f7;--bg:#f5f5f7}
+html[data-style="win7"]{--sans:"Segoe UI",Tahoma,Verdana,sans-serif;--ar:var(--sans);--cyan:#1a5fb8;--green:#1e8e3e;--text:#0a1930;--muted:#3b5a8a;--line:#8fb4e2;--surface:rgba(255,255,255,.78);--hdr:linear-gradient(180deg,#5aa8f0 0%,#2a7bd8 50%,#1a5fb8 100%);--input:#ffffff;--sub:rgba(255,255,255,.9);--red:#c53030;--shadow:0 6px 18px rgba(15,66,150,.22),0 1px 3px rgba(0,0,0,.2);--bg:linear-gradient(180deg,#7ab6f0 0%,#4a90d9 18%,#2a7bd8 55%,#3a9de8 100%);--radius:6px}
+html[data-style="win7"][data-theme="night"]{--cyan:#5aa8f0;--text:#e6efff;--muted:#9cb8e0;--line:#2a4a7a;--surface:rgba(18,38,74,.55);--hdr:linear-gradient(180deg,#3a84d6 0%,#1d5aa8 60%,#123a7a 100%);--input:#1a345f;--sub:rgba(26,52,100,.45);--bg:linear-gradient(180deg,#0d1e3a 0%,#0d2748 35%,#0a1a33 100%)}
+html[data-style="win8"]{--sans:"Segoe UI",Tahoma,sans-serif;--ar:var(--sans);--cyan:#ffb900;--green:#107c10;--text:#ffffff;--muted:#cce3ff;--line:rgba(255,255,255,.18);--surface:#005a9e;--hdr:#0078d7;--input:#005a9e;--sub:#006dc9;--red:#e81123;--shadow:none;--bg:#0078d7;--radius:0}
+html[data-style="win8"][data-theme="day"]{--cyan:#0078d7;--text:#000000;--muted:#666666;--line:#e0e0e0;--surface:#ffffff;--hdr:#0078d7;--input:#ffffff;--sub:#f2f2f2;--bg:#f2f2f2}
+html[data-style="win10"]{--sans:"Segoe UI",Tahoma,sans-serif;--ar:var(--sans);--cyan:#0078d4;--green:#107c10;--text:#ffffff;--muted:#9a9a9a;--line:#3a3a3a;--surface:#2d2d2d;--hdr:#1f1f1f;--input:#3a3a3a;--sub:#3a3a3a;--red:#e81123;--shadow:0 4px 16px rgba(0,0,0,.35);--bg:#1f1f1f;--radius:2px}
+html[data-style="win10"][data-theme="day"]{--text:#000000;--muted:#605e5c;--line:#edebe9;--surface:#ffffff;--hdr:#ffffff;--input:#ffffff;--sub:#f3f2f1;--bg:#f3f3f3}
+html[data-style="win11"]{--sans:"Segoe UI Variable","Segoe UI",Tahoma,sans-serif;--ar:var(--sans);--cyan:#0067c0;--green:#0f7b0f;--text:#ffffff;--muted:#9d9d9d;--line:#2e2e2e;--surface:#2c2c2c;--hdr:#202020;--input:#2d2d2d;--sub:#333333;--red:#e81123;--shadow:0 8px 24px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25);--bg:#202020;--radius:8px}
+html[data-style="win11"][data-theme="day"]{--text:#000000;--muted:#605e5c;--line:#e5e5e5;--surface:#fbfbfb;--hdr:#f3f3f3;--input:#ffffff;--sub:#f3f3f3;--bg:#f3f3f3}
+html[data-style="macos"]{--sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#007aff;--green:#34c759;--text:#1d1d1f;--muted:#4e4e52;--line:#d2d2d7;--surface:rgba(255,255,255,.78);--hdr:rgba(255,255,255,.78);--input:#ffffff;--sub:rgba(255,255,255,.9);--red:#ff3b30;--shadow:0 8px 24px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);--bg:radial-gradient(1100px 500px at 0% 0%,#c7d2fe 0%,transparent 60%),radial-gradient(900px 600px at 100% 0%,#fbcfe8 0%,transparent 55%),linear-gradient(180deg,#f5f5f7 0%,#ececef 100%);--radius:12px}
+html[data-style="macos"][data-theme="night"]{--cyan:#0a84ff;--text:#f5f5f7;--muted:#98989d;--line:#38383a;--surface:rgba(44,44,46,.78);--hdr:rgba(44,44,46,.78);--input:#3a3a3c;--sub:#3a3a3c;--bg:radial-gradient(1000px 500px at 0% 0%,#1e293b 0%,transparent 60%),linear-gradient(180deg,#1c1c1e 0%,#000000 100%)}
+html[data-style="android"]{--sans:Roboto,"Google Sans","Noto Sans",Arial,sans-serif;--ar:var(--sans);--cyan:#d0bcff;--green:#a0d8a0;--text:#e6e0e9;--muted:#cac4d0;--line:#49454f;--surface:#1d1b20;--hdr:#141218;--input:#2b2930;--sub:#2b2930;--red:#ffb4ab;--shadow:0 4px 12px rgba(0,0,0,.4);--bg:#141218;--radius:16px}
+html[data-style="android"][data-theme="day"]{--cyan:#6750a4;--text:#1d1b20;--muted:#49454f;--line:#e7e0ec;--surface:#fffbfe;--hdr:#fffbfe;--input:#f3edf7;--sub:#f3edf7;--bg:#fffbfe}
+html[data-style="ios"]{--sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Helvetica,Arial,sans-serif;--ar:var(--sans);--cyan:#007aff;--green:#34c759;--text:#ffffff;--muted:#8e8e93;--line:#38383a;--surface:#1c1c1e;--hdr:rgba(28,28,30,.86);--input:#2c2c2e;--sub:#2c2c2e;--red:#ff3b30;--shadow:0 10px 30px rgba(0,0,0,.45);--bg:#000000;--radius:14px}
+html[data-style="ios"][data-theme="day"]{--text:#000000;--muted:#59595f;--line:#c6c6c8;--surface:#ffffff;--hdr:rgba(249,249,249,.86);--input:#ffffff;--sub:#ffffff;--bg:#f2f2f7}
+
+html[data-style]:not([data-style="default"]) body::before{display:none}
+html[data-style]:not([data-style="default"]) :is(.header-inner,.search-box,.article-card,#toast){backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-style="win7"] :is(.header-inner,.search-box,.article-card),html[data-style="macos"] :is(.header-inner,.search-box,.article-card),html[data-style="ios"] :is(.header-inner,.search-box,.article-card){backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%)}
+html[data-style]:not([data-style="default"]) .btn-primary{background:var(--cyan);color:#fff;border:1px solid var(--cyan);box-shadow:none}
+html[data-style]:not([data-style="default"]) .btn-primary:hover{background:var(--cyan);filter:brightness(.92);box-shadow:none}
+
+/* الزر العائم */
+#artheme-btn{position:fixed;bottom:22px;left:22px;z-index:9999;width:52px;height:52px;padding:0;margin:0;border-radius:50%;border:1px solid var(--line);background:var(--hdr);color:var(--text);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--shadow),0 10px 28px rgba(0,0,0,.35);cursor:pointer;display:grid;place-items:center;font:inherit;transition:transform .2s,border-color .2s}
+#artheme-btn:hover{transform:translateY(-2px);border-color:var(--cyan)}
+#artheme-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+#artheme-btn svg{width:22px;height:22px}
+#artheme-btn .at-dot{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 2px var(--hdr)}
+#artheme-panel{position:fixed;bottom:84px;left:22px;z-index:10000;width:min(400px,calc(100vw - 44px));max-height:min(78vh,620px);overflow-y:auto;overscroll-behavior:contain;padding:16px;margin:0;border-radius:var(--radius);background:var(--hdr);border:1px solid var(--line);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:var(--shadow),0 28px 70px rgba(0,0,0,.45);color:var(--text);font-family:var(--ar);display:none;pointer-events:auto}
+#artheme-panel.open{display:block}
+#artheme-panel .at-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+#artheme-panel .at-head h3{margin:0;font-size:15px;font-weight:700;color:var(--text)}
+#artheme-panel .at-close{width:32px;height:32px;padding:0;border-radius:50%;border:0;background:var(--sub);color:var(--text);cursor:pointer;display:grid;place-items:center;font:inherit;font-size:20px;line-height:1}
+#artheme-panel .at-mode{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin-bottom:14px;border-radius:12px;background:var(--input);border:1px solid var(--line)}
+#artheme-panel .at-mode button{min-height:38px;padding:0 8px;border:0;border-radius:9px;background:transparent;color:var(--text);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+#artheme-panel .at-mode button[aria-checked="true"]{background:var(--cyan);color:#fff}
+#artheme-panel .at-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}
+#artheme-panel .at-card{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--sub);color:var(--text);font:inherit;cursor:pointer;text-align:start;transition:border-color .15s,transform .15s,box-shadow .15s}
+#artheme-panel .at-card:hover{border-color:var(--cyan);transform:translateY(-1px)}
+#artheme-panel .at-card[aria-checked="true"]{border-color:var(--cyan);box-shadow:0 0 0 2px color-mix(in srgb,var(--cyan) 30%,transparent)}
+#artheme-panel .at-prev{height:46px;border-radius:6px;overflow:hidden;display:grid;grid-template-rows:12px 1fr;border:1px solid var(--line);background:var(--input)}
+#artheme-panel .at-prev-bar{display:flex;align-items:center;gap:3px;padding:0 5px;background:var(--hdr)}
+#artheme-panel .at-prev-dot{width:5px;height:5px;border-radius:50%;background:var(--at-accent,var(--cyan))}
+#artheme-panel .at-prev-body{display:grid;place-items:center;color:var(--muted);font-size:12px;font-weight:700}
+#artheme-panel .at-name{font-size:11.5px;font-weight:700;color:var(--text)}
+#artheme-panel .at-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+#artheme-panel .at-reset{padding:8px 14px;border-radius:9px;border:1px solid color-mix(in srgb,var(--red) 40%,transparent);background:color-mix(in srgb,var(--red) 10%,transparent);color:var(--red);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+#artheme-panel .at-reset:hover{background:color-mix(in srgb,var(--red) 18%,transparent)}
+#artheme-panel .at-cur{font-size:12px;color:var(--muted)}
+@media(max-width:480px){#artheme-btn{bottom:14px;left:14px;width:48px;height:48px}#artheme-panel{bottom:72px;left:12px;width:calc(100vw - 24px)}}
+</style>
+
+<style id="artheme-contrast">
+html { --green-ink: var(--green); }
+html[data-style="default"][data-theme="day"]   { --green-ink: #2a6b3e; }
+html[data-style="facebook"][data-theme="day"]  { --green-ink: #2a6b1f; }
+html[data-style="youtube"][data-theme="day"]   { --green-ink: #1a6b28; }
+html[data-style="instagram"][data-theme="day"] { --green-ink: #2a5c1a; }
+html[data-style="netflix"][data-theme="day"]   { --green-ink: #1e6b32; }
+html[data-style="prime"][data-theme="day"]     { --green-ink: #1a6b5e; }
+html[data-style="appletv"][data-theme="day"]   { --green-ink: #1e6b32; }
+html[data-style="macos"][data-theme="day"]     { --green-ink: #1e6b32; }
+html[data-style="android"][data-theme="day"]   { --green-ink: #2a5c2a; }
+html[data-style="ios"][data-theme="day"]       { --green-ink: #1e6b32; }
+.logo-word span { background-image: linear-gradient(90deg, var(--cyan), var(--green)); background-image: linear-gradient(90deg, var(--cyan), var(--green-ink)); -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important; }
+</style>
+
+<script id="artheme-js">
+(function () {
+  'use strict';
+  if (window.__arthemeInited) return;
+  window.__arthemeInited = true;
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('reset-theme') === '1') {
+      try { localStorage.removeItem('cineaura:style'); } catch (e) {}
+      try { localStorage.removeItem('cineaura:theme'); } catch (e) {}
+      qs.delete('reset-theme');
+      var clean = location.pathname + (qs.toString() ? '?' + qs.toString() : '') + location.hash;
+      location.replace(clean); return;
+    }
+  } catch (e) {}
+  var THEMES = [
+    { id:'default',   name:'CineAura',   accent:'#01b4e4' },
+    { id:'facebook',  name:'Facebook',   accent:'#1877f2' },
+    { id:'youtube',   name:'YouTube',    accent:'#ff0000' },
+    { id:'instagram', name:'Instagram',  accent:'#d62976' },
+    { id:'netflix',   name:'Netflix',    accent:'#e50914' },
+    { id:'prime',     name:'Prime',      accent:'#00a8e1' },
+    { id:'appletv',   name:'Apple TV+',  accent:'#2997ff' },
+    { id:'win7',      name:'Windows 7',  accent:'#2a7bd8' },
+    { id:'win8',      name:'Windows 8',  accent:'#0078d7' },
+    { id:'win10',     name:'Windows 10', accent:'#0078d4' },
+    { id:'win11',     name:'Windows 11', accent:'#0067c0' },
+    { id:'macos',     name:'macOS',      accent:'#007aff' },
+    { id:'android',   name:'Android',    accent:'#3ddc84' },
+    { id:'ios',       name:'iOS',        accent:'#007aff' }
+  ];
+  var VALID = THEMES.map(function (t) { return t.id; });
+  var STYLE_KEY = 'cineaura:style', MODE_KEY = 'cineaura:theme';
+  var okS = function (v) { return VALID.indexOf(v) !== -1; };
+  var okM = function (v) { return v === 'day' || v === 'night'; };
+  var read = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  var save = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var del  = function (k) { try { localStorage.removeItem(k); } catch (e) {} };
+
+  function boot() {
+    var root = document.documentElement;
+    var s = read(STYLE_KEY), m = read(MODE_KEY);
+    if (s && okS(s)) { root.setAttribute('data-style', s); }
+    else if (s) { del(STYLE_KEY); }
+    else if (!root.getAttribute('data-style')) { root.setAttribute('data-style', 'default'); }
+    if (m && okM(m)) { root.setAttribute('data-theme', m); }
+    else if (m) { del(MODE_KEY); }
+    else if (!root.getAttribute('data-theme')) {
+      try { root.setAttribute('data-theme', matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'night'); }
+      catch (e) { root.setAttribute('data-theme', 'night'); }
+    }
+    var hdrBtn = document.getElementById('themeBtn');
+    function syncHdr() {
+      if (!hdrBtn) return;
+      var day = root.getAttribute('data-theme') === 'day';
+      hdrBtn.textContent = day ? '☾' : '☀︎';
+      hdrBtn.title = day ? 'التبديل إلى الوضع الليلي' : 'التبديل إلى الوضع النهاري';
+    }
+    syncHdr();
+    if (hdrBtn) {
+      hdrBtn.onclick = function () {
+        var next = root.getAttribute('data-theme') === 'day' ? 'night' : 'day';
+        root.setAttribute('data-theme', next);
+        save(MODE_KEY, next); syncHdr(); syncUI();
+      };
+    }
+    var frag = document.createElement('div');
+    frag.innerHTML =
+      '<button type="button" id="artheme-btn" aria-label="تغيير المظهر" aria-expanded="false" aria-controls="artheme-panel">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>' +
+        '<span class="at-dot" aria-hidden="true"></span>' +
+      '</button>' +
+      '<div id="artheme-panel" role="dialog" aria-label="إعدادات المظهر">' +
+        '<div class="at-head"><h3>المظهر</h3><button type="button" class="at-close" aria-label="إغلاق">&times;</button></div>' +
+        '<div class="at-mode" role="radiogroup" aria-label="وضع الألوان">' +
+          '<button type="button" role="radio" data-mode="day" aria-checked="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>نهاري</button>' +
+          '<button type="button" role="radio" data-mode="night" aria-checked="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>ليلي</button>' +
+        '</div>' +
+        '<div class="at-grid" role="radiogroup" aria-label="نمط الثيم"></div>' +
+        '<div class="at-foot"><button type="button" class="at-reset">إعادة تعيين</button><span class="at-cur"></span></div>' +
+      '</div>';
+    while (frag.firstChild) document.body.appendChild(frag.firstChild);
+
+    var btn = document.getElementById('artheme-btn');
+    var panel = document.getElementById('artheme-panel');
+    var grid = panel.querySelector('.at-grid');
+    THEMES.forEach(function (t) {
+      var card = document.createElement('button');
+      card.type = 'button'; card.className = 'at-card';
+      card.setAttribute('role', 'radio');
+      card.setAttribute('aria-checked', 'false');
+      card.dataset.style = t.id;
+      card.style.setProperty('--at-accent', t.accent);
+      card.innerHTML = '<span class="at-prev" aria-hidden="true"><span class="at-prev-bar"><span class="at-prev-dot"></span><span class="at-prev-dot"></span><span class="at-prev-dot"></span></span><span class="at-prev-body">Aa</span></span><span class="at-name"></span>';
+      card.querySelector('.at-name').textContent = t.name;
+      grid.appendChild(card);
+    });
+    function curS() { return root.getAttribute('data-style') || 'default'; }
+    function curM() { return root.getAttribute('data-theme') || 'night'; }
+    function syncUI() {
+      var s = curS(), m = curM();
+      grid.querySelectorAll('.at-card').forEach(function (c) { c.setAttribute('aria-checked', c.dataset.style === s ? 'true' : 'false'); });
+      panel.querySelectorAll('.at-mode button').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.mode === m ? 'true' : 'false'); });
+      var t = THEMES.filter(function (x) { return x.id === s; })[0];
+      var dot = btn.querySelector('.at-dot');
+      if (t && dot) dot.style.background = t.accent;
+      var cur = panel.querySelector('.at-cur');
+      if (cur) cur.textContent = 'الحالي: ' + (t ? t.name : 'CineAura') + ' · ' + (m === 'day' ? 'نهاري' : 'ليلي');
+      syncHdr();
+    }
+    function applyStyle(id) { if (!okS(id)) return; root.setAttribute('data-style', id); save(STYLE_KEY, id); syncUI(); }
+    function applyMode(mode) { if (!okM(mode)) return; root.setAttribute('data-theme', mode); save(MODE_KEY, mode); syncUI(); }
+    function resetAll() { del(STYLE_KEY); del(MODE_KEY); root.setAttribute('data-style', 'default'); root.setAttribute('data-theme', 'night'); syncUI(); }
+    grid.addEventListener('click', function (e) { var card = e.target.closest('.at-card'); if (card) applyStyle(card.dataset.style); });
+    panel.querySelector('.at-mode').addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (b) applyMode(b.dataset.mode); });
+    panel.querySelector('.at-reset').addEventListener('click', resetAll);
+    var open = false;
+    function openP() { open = true; panel.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); syncUI(); }
+    function closeP() { open = false; panel.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function () { open ? closeP() : openP(); });
+    panel.querySelector('.at-close').addEventListener('click', closeP);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) closeP(); });
+    document.addEventListener('click', function (e) { if (!open) return; if (panel.contains(e.target) || btn.contains(e.target)) return; closeP(); });
+    syncUI();
+  }
+  try { boot(); } catch (err) { console.error('[artheme] init failed:', err); }
+})();
+</script>
+
+<!-- ═══════════════ BROWSE LOGIC & MOCK DATA ═══════════════ -->
+<script>
+const $ = id => document.getElementById(id);
+const DOMAINS = [
+  { id: 'movies', name: 'الأفلام', categories: ['دراما', 'أكشن', 'رعب', 'كوميديا', 'خيال علمي'] },
+  { id: 'series', name: 'المسلسلات', categories: ['عربية', 'تركية', 'كورية', 'أجنبية', 'وثائقية'] },
+  { id: 'anime', name: 'الأنمي', categories: ['شونين', 'رومانسي', 'خيال علمي', 'مغامرة', 'كلاسيكي'] },
+  { id: 'games', name: 'الألعاب', categories: ['حركة', 'استراتيجية', 'جوال', 'رياضة', 'مغامرة'] },
+  { id: 'tech', name: 'التقنية', categories: ['ذكاء اصطناعي', 'أجهزة', 'تطبيقات', 'أمن سيبراني', 'بلوكشين'] }
+];
+const PUBLISHERS = ['أحمد_السينمائي', 'سارة_النقاد', 'محمد_المخرج', 'ليلى_الكاتبة', 'يوسف_الجيمر', 'مريم_التقنية', 'خالد_المحلل', 'نورة_الفنية', 'عمر_المراجع', 'رنا_المحررة'];
+
+// توليد البيانات (50 مقالاً لكل مجال)
+const allArticles = [];
+let globalId = 1;
+DOMAINS.forEach(domain => {
+  for (let i = 0; i < 50; i++) {
+    const cat = domain.categories[Math.floor(Math.random() * domain.categories.length)];
+    const pub = PUBLISHERS[Math.floor(Math.random() * PUBLISHERS.length)];
+    const pubSeed = encodeURIComponent(pub);
+    allArticles.push({
+      id: `art_${domain.id}_${i}`,
+      domain: domain.name,
+      category: cat,
+      title: `مقال ${domain.name} رقم ${i + 1}: ${cat} وتأثيرها على الساحة`,
+      desc: `تحليل شامل ومراجعة نقدية حول ${cat} في قسم ${domain.name}، مع استعراض أحدث الإصدارات والمقارنات.`,
+      thumbnail: `https://picsum.photos/seed/${domain.id}${i}/600/340`,
+      publisher: pub,
+      avatar: `https://i.pravatar.cc/80?u=${pubSeed}${i}`,
+      readTime: Math.floor(Math.random() * 15) + 3,
+      comments: Math.floor(Math.random() * 200),
+      helpful: Math.floor(Math.random() * 500) + 10,
+      notHelpful: Math.floor(Math.random() * 50),
+      reports: Math.floor(Math.random() * 10),
+      views: Math.floor(Math.random() * 50000) + 500
+    });
+  }
+});
+
+// ترتيب المقالات حسب الأكثر مشاهدة (تنازلي)
+allArticles.sort((a, b) => b.views - a.views);
+
+// بناء كارت المقال
+function createCardHTML(article) {
+  return `
+    <div class="article-card">
+      <img src="${article.thumbnail}" class="ac-thumb" alt="${article.title}" loading="lazy">
+      <div class="ac-content">
+        <div class="ac-meta-top">
+          <span class="ac-domain">${article.domain}</span>
+          <span class="ac-category">${article.category}</span>
+        </div>
+        <a href="article.html?id=${article.id}" class="ac-title">${article.title}</a>
+        <p class="ac-desc">${article.desc}</p>
+        <div class="ac-publisher">
+          <img src="${article.avatar}" alt="${article.publisher}" loading="lazy">
+          <span>${article.publisher}</span>
+        </div>
+        <div class="ac-stats">
+          <div class="ac-stat" title="وقت القراءة">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            ${article.readTime} د
+          </div>
+          <div class="ac-stat" title="التعليقات">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            ${article.comments}
+          </div>
+          <div class="ac-stat" title="مفيد">
+            <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+            ${article.helpful}
+          </div>
+          <div class="ac-stat" title="غير مفيد">
+            <svg viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+            ${article.notHelpful}
+          </div>
+          <div class="ac-stat" title="الإبلاغات">
+            <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"></path></svg>
+            ${article.reports}
+          </div>
+        </div>
+        <button class="ac-btn" onclick="window.location.href='article.html?id=${article.id}'">قراءة المقال</button>
+      </div>
+    </div>
+  `;
+}
+
+// بناء الصفحة عند التحميل
+document.addEventListener('DOMContentLoaded', () => {
+  const container = $('domainsContainer');
+  
+  DOMAINS.forEach(domain => {
+    // تصفية المقالات الخاصة بهذا المجال (مرتبة مسبقاً بالأكثر مشاهدة)
+    const domainArticles = allArticles.filter(a => a.domain === domain.name);
+    
+    const section = document.createElement('section');
+    section.className = 'domain-section';
+    section.innerHTML = `
+      <div class="domain-header">
+        <h2 class="domain-title">${domain.name}</h2>
+      </div>
+      <div class="articles-row">
+        ${domainArticles.map(a => createCardHTML(a)).join('')}
+      </div>
+    `;
+    container.appendChild(section);
+  });
+
+  // ── البحث ──
+  const searchInput = $('searchInput');
+  const searchResultsSection = $('searchResultsSection');
+  const searchGrid = $('searchGrid');
+
+  searchInput.addEventListener('input', (e) => {
+    const term = e.target.value.trim().toLowerCase();
+    
+    if (!term) {
+      container.style.display = '';
+      searchResultsSection.classList.remove('active');
+      return;
+    }
+    
+    container.style.display = 'none';
+    searchResultsSection.classList.add('active');
+    
+    const filtered = allArticles.filter(a => 
+      a.title.toLowerCase().includes(term) || 
+      a.desc.toLowerCase().includes(term) || 
+      a.publisher.toLowerCase().includes(term) ||
+      a.category.toLowerCase().includes(term) ||
+      a.domain.toLowerCase().includes(term)
+    );
+    
+    if (filtered.length === 0) {
+      searchGrid.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px 0;grid-column:1/-1;">لا توجد مقالات تطابق بحثك.</p>';
+    } else {
+      searchGrid.innerHTML = filtered.map(a => createCardHTML(a)).join('');
+    }
+  });
+});
+</script>
+</body>
+</html>

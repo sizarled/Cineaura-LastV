@@ -1,0 +1,74 @@
+/* CineAura — Documents (content.html?document=ID, the Documents tab, Studio) */
+.doc-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .14);
+  white-space: nowrap;
+}
+.doc-pdf { color: #ff8f8f; border-color: rgba(255, 143, 143, .45); }
+.doc-word { color: #8fb8ff; border-color: rgba(143, 184, 255, .45); }
+.doc-sheet { color: #8fe0b0; border-color: rgba(143, 224, 176, .45); }
+.doc-slides { color: #ffb489; border-color: rgba(255, 180, 137, .45); }
+.doc-database { color: #d3a6ff; border-color: rgba(211, 166, 255, .45); }
+.doc-other { color: #cfd6e4; }
+
+.doc-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+.doc-row:hover { border-color: rgba(255, 255, 255, .22); }
+.doc-row-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.doc-row-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-row-main .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-row-stats { font-size: 12px; white-space: nowrap; }
+
+.doc-page { display: flex; flex-direction: column; gap: 14px; }
+.doc-title { margin: 6px 0 2px; }
+.doc-author { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.doc-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255, 255, 255, .1);
+  object-fit: cover; flex: none;
+}
+.doc-desc { white-space: pre-wrap; line-height: 1.6; }
+.doc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.doc-tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: rgba(255, 255, 255, .06); }
+.doc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.doc-counts { font-size: 13px; }
+.doc-preview { padding: 10px; }
+.doc-frame { width: 100%; height: 70vh; border: 0; border-radius: 10px; background: #fff; }
+.doc-nopreview { font-size: 13px; }
+
+.doc-mrow {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 14px; margin-bottom: 10px;
+}
+.doc-mrow-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.doc-mrow-main .muted { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .doc-row { flex-wrap: wrap; }
+  .doc-row-stats { width: 100%; }
+  .doc-frame { height: 55vh; }
+}
+
+/* Result of the VirusTotal check, shown on the document page */
+.doc-scan {
+  display: inline-block;
+  font-size: 12.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin: 4px 0 0;
+}
+.doc-scan.ok { background: rgba(144, 206, 161, .12); border: 1px solid rgba(144, 206, 161, .28); color: #90cea1; }
+.doc-scan.warn { background: rgba(255, 180, 137, .12); border: 1px solid rgba(255, 180, 137, .3); color: #ffb489; }

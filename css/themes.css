@@ -1,0 +1,938 @@
+/* ==========================================================
+   Cineaura themes.css — 14 appearances
+
+   html[data-style="..."] values:
+     default | facebook | youtube | instagram | netflix |
+     prime | appletv | win7 | win8 | win10 | win11 |
+     macos | android | ios
+
+   Orthogonal to html[data-theme="day|night"].
+   Load AFTER style.css / facebook.css is safe.
+   ========================================================== */
+
+/* ---------- Global theme-picker styles (settings modal + dashboard) ---------- */
+.sset-themes { display:grid; gap:10px; }
+.sset-themes-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.sset-themes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:10px; }
+.sset-theme-card{
+  display:flex; flex-direction:column; gap:8px; align-items:stretch;
+  padding:10px; border-radius:12px; border:1px solid var(--line,rgba(255,255,255,.14));
+  background:var(--sub-bg,rgba(255,255,255,.06)); cursor:pointer;
+  transition:transform .15s, box-shadow .15s, border-color .15s; text-align:center; position:relative;
+}
+.sset-theme-card:hover{ transform:translateY(-1px); border-color:var(--cyan); box-shadow:0 6px 20px rgba(0,0,0,.18); }
+.sset-theme-card.active{ border-color:var(--cyan); box-shadow:0 0 0 2px color-mix(in srgb, var(--cyan) 22%, transparent); background:var(--surface); }
+.sset-theme-prev{ height:56px; border-radius:10px; overflow:hidden; display:grid; grid-template-rows:14px 1fr; border:1px solid var(--line,rgba(255,255,255,.14)); }
+.sset-theme-prev__bar{ display:flex; align-items:center; gap:4px; padding:0 6px; }
+.sset-theme-prev__dot{ width:6px; height:6px; border-radius:50%; }
+.sset-theme-prev__body{ display:grid; place-items:center; font-size:18px; }
+.sset-theme-name{ font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; line-height:1.2; }
+.sset-theme-sub{ font-size:11px; opacity:.7; line-height:1.2; }
+
+/* ---------- DEFAULT — keep native Cineaura glass (no overrides) ---------- */
+html[data-style="default"]{ /* explicit default: inherits style.css */ }
+
+/* ---------- Shared helpers to kill glass orbs for OS/platform themes ---------- */
+html[data-style="facebook"] .bg-orbs,
+html[data-style="youtube"] .bg-orbs,
+html[data-style="instagram"] .bg-orbs,
+html[data-style="netflix"] .bg-orbs,
+html[data-style="prime"] .bg-orbs,
+html[data-style="appletv"] .bg-orbs,
+html[data-style="win7"] .bg-orbs,
+html[data-style="win8"] .bg-orbs,
+html[data-style="win10"] .bg-orbs,
+html[data-style="win11"] .bg-orbs,
+html[data-style="macos"] .bg-orbs,
+html[data-style="android"] .bg-orbs,
+html[data-style="ios"] .bg-orbs{ display:none !important; }
+html[data-style="facebook"] .grain,
+html[data-style="youtube"] .grain,
+html[data-style="instagram"] .grain,
+html[data-style="netflix"] .grain,
+html[data-style="prime"] .grain,
+html[data-style="appletv"] .grain,
+html[data-style="win7"] .grain,
+html[data-style="win8"] .grain,
+html[data-style="win10"] .grain,
+html[data-style="win11"] .grain,
+html[data-style="macos"] .grain,
+html[data-style="android"] .grain,
+html[data-style="ios"] .grain{ display:none !important; }
+
+/* ==========================================================
+   FACEBOOK — scoped variant of facebook.css
+   ========================================================== */
+html[data-style="facebook"]{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:var(--sans);
+  --cyan:#2d88ff; --cyan-2:#4599ff; --green:#42b72a;
+  --ink:#18191a; --text:#e4e6eb; --muted:#b0b3b8; --line:#3e4042;
+  --surface:#242526; --sub-bg:#3a3b3c; --input-bg:#3a3b3c; --header-bg:#242526; --header-bg-scrolled:#242526;
+  --mobile-bg:#242526; --card-bg:#3a3b3c; --btn-blue:#2374e1; --btn-blue-h:#1b74e4; --red:#ff6b70;
+  --shadow:0 1px 2px rgba(0,0,0,.35); --header-h:56px; --scroll:#4e4f50;
+}
+html[data-style="facebook"][data-theme="day"]{
+  --cyan:#1877f2; --cyan-2:#1877f2; --ink:#f0f2f5; --text:#050505; --muted:#65676b; --line:#ced0d4;
+  --surface:#ffffff; --sub-bg:#f0f2f5; --input-bg:#f0f2f5; --header-bg:#ffffff; --header-bg-scrolled:#ffffff;
+  --mobile-bg:#ffffff; --card-bg:#f0f2f5; --btn-blue:#1877f2; --btn-blue-h:#166fe5; --red:#fa383e;
+  --shadow:0 1px 2px rgba(0,0,0,.2); --scroll:#bcc0c4;
+}
+html[data-style="facebook"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); letter-spacing:0; font-size:15px; line-height:1.4; }
+html[data-style="facebook"] .glass,
+html[data-style="facebook"] .search-box, html[data-style="facebook"] .iptv-card, html[data-style="facebook"] .plan,
+html[data-style="facebook"] .contact-card, html[data-style="facebook"] .form-card, html[data-style="facebook"] .watch-panel,
+html[data-style="facebook"] .gate-card, html[data-style="facebook"] .empty-note, html[data-style="facebook"] .page-error,
+html[data-style="facebook"] .auth-card, html[data-style="facebook"] .dash-gate, html[data-style="facebook"] .dash-side,
+html[data-style="facebook"] .dash-main, html[data-style="facebook"] .wizard, html[data-style="facebook"] .prof-side,
+html[data-style="facebook"] .prof-main, html[data-style="facebook"] .panel-login, html[data-style="facebook"] .bell-panel,
+html[data-style="facebook"] .chat-box, html[data-style="facebook"] .modal-card, html[data-style="facebook"] .report-card{
+  background:var(--surface); border:0; border-radius:8px; box-shadow:var(--shadow); backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+html[data-style="facebook"] .header-inner, html[data-style="facebook"] .header.scrolled .header-inner{
+  width:100%; max-width:none; margin:0; min-height:56px; padding:0 16px; border-radius:0; border:0;
+  background:var(--surface); backdrop-filter:none; -webkit-backdrop-filter:none;
+  box-shadow:0 2px 4px rgba(0,0,0,.1),0 8px 16px rgba(0,0,0,.1);
+}
+html[data-style="facebook"] body.page-inner{ padding-top:76px; }
+html[data-style="facebook"] .logo-mark{ width:40px; height:40px; border-radius:50%; background:#1877f2; border:0; }
+html[data-style="facebook"] .logo-word{ font-weight:800; font-size:24px; letter-spacing:-.5px; color:#1877f2; }
+html[data-style="facebook"][data-theme="night"] .logo-word, html[data-style="facebook"]:not([data-theme="day"]) .logo-word{ color:#2d88ff; }
+html[data-style="facebook"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="facebook"] .nav a{ font-weight:600; color:var(--muted); border-radius:8px; }
+html[data-style="facebook"] .nav a:hover{ background:var(--sub-bg); color:var(--text); }
+html[data-style="facebook"] .hamburger{ border:0; border-radius:50%; background:var(--sub-bg); }
+html[data-style="facebook"] .mobile-menu{ inset:0 8px auto; border:0; border-radius:0 0 8px 8px; box-shadow:0 12px 28px rgba(0,0,0,.2),0 2px 4px rgba(0,0,0,.1); backdrop-filter:none; }
+html[data-style="facebook"] .btn{ border-radius:6px; font-weight:600; }
+html[data-style="facebook"] .btn-primary{ background:var(--btn-blue); color:#fff; box-shadow:none; }
+html[data-style="facebook"] .btn-primary:hover{ background:var(--btn-blue-h); }
+html[data-style="facebook"] .btn-ghost{ background:var(--sub-bg); border:0; color:var(--text); }
+html[data-style="facebook"] .poster-card{ background:var(--surface); border:0; border-radius:8px; box-shadow:var(--shadow); }
+html[data-style="facebook"] .footer{ background:var(--surface); border-top:1px solid var(--line); }
+html[data-style="facebook"] .play-orb, html[data-style="facebook"] .play-btn{ background:#1877f2; color:#fff; box-shadow:none; }
+html[data-style="facebook"] .form-grid input, html[data-style="facebook"] .stack input,
+html[data-style="facebook"] input, html[data-style="facebook"] select, html[data-style="facebook"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:6px;
+}
+
+/* ==========================================================
+   YOUTUBE
+   ========================================================== */
+html[data-style="youtube"]{
+  --sans:Roboto,"Segoe UI",Arial,sans-serif; --serif:var(--sans);
+  --ink:#0f0f0f; --text:#f1f1f1; --muted:#aaa; --line:#303030;
+  --surface:#212121; --sub-bg:#272727; --input-bg:#121212; --header-bg:#0f0f0f; --header-bg-scrolled:#0f0f0f;
+  --mobile-bg:#0f0f0f; --card-bg:#212121; --cyan:#ff0000; --cyan-2:#ff0000; --green:#2ba640;
+  --btn-blue:#ff0000; --btn-blue-h:#cc0000; --red:#ff0000; --scroll:#717171; --shadow:0 1px 3px rgba(0,0,0,.45);
+  --header-h:56px;
+}
+html[data-style="youtube"][data-theme="day"]{
+  --ink:#ffffff; --text:#0f0f0f; --muted:#606060; --line:#e5e5e5;
+  --surface:#ffffff; --sub-bg:#f2f2f2; --input-bg:#ffffff; --header-bg:#ffffff; --header-bg-scrolled:#ffffff;
+  --mobile-bg:#ffffff; --card-bg:#f8f8f8; --scroll:#b0b0b0;
+}
+html[data-style="youtube"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); letter-spacing:0; font-size:14px; }
+html[data-style="youtube"] h1, html[data-style="youtube"] h2, html[data-style="youtube"] .logo-word{ font-family:Roboto,"Segoe UI",sans-serif; font-weight:700; letter-spacing:0; }
+html[data-style="youtube"] .logo-mark{ width:36px; height:28px; border-radius:6px; background:#ff0000; border:0; }
+html[data-style="youtube"] .logo-mark svg{ width:16px; height:16px; }
+html[data-style="youtube"] .logo-mark svg path{ fill:#fff !important; }
+html[data-style="youtube"] .logo-word{ color:var(--text); font-size:19px; letter-spacing:-.3px; }
+html[data-style="youtube"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="youtube"] .header-inner, html[data-style="youtube"] .header.scrolled .header-inner{
+  width:100%; max-width:none; margin:0; min-height:56px; padding:0 16px; border-radius:0; border:0; border-bottom:1px solid var(--line);
+  background:var(--header-bg); backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:none;
+}
+html[data-style="youtube"] body.page-inner{ padding-top:70px; }
+html[data-style="youtube"] .nav{ gap:20px; }
+html[data-style="youtube"] .nav a{ padding:6px 0; font-size:14px; font-weight:500; color:var(--text); border-radius:0; border-bottom:2px solid transparent; }
+html[data-style="youtube"] .nav a:hover{ background:transparent; border-bottom-color:var(--text); }
+html[data-style="youtube"] .nav a[aria-current="page"]{ border-bottom-color:var(--text); background:transparent; }
+html[data-style="youtube"] .glass, html[data-style="youtube"] .search-box, html[data-style="youtube"] .iptv-card,
+html[data-style="youtube"] .plan, html[data-style="youtube"] .contact-card, html[data-style="youtube"] .form-card,
+html[data-style="youtube"] .watch-panel, html[data-style="youtube"] .auth-card, html[data-style="youtube"] .dash-side,
+html[data-style="youtube"] .dash-main, html[data-style="youtube"] .wizard, html[data-style="youtube"] .prof-side,
+html[data-style="youtube"] .prof-main, html[data-style="youtube"] .panel-login{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:none; backdrop-filter:none;
+}
+html[data-style="youtube"] .search-box{ border-radius:24px; padding:8px 14px; }
+html[data-style="youtube"] .search-box h2{ font-size:18px; }
+html[data-style="youtube"] .poster-card{ background:transparent; border:0; box-shadow:none; border-radius:12px; overflow:hidden; }
+html[data-style="youtube"] .poster-media img{ border-radius:12px; }
+html[data-style="youtube"] .poster-info h3{ font-weight:500; }
+html[data-style="youtube"] .btn{ border-radius:20px; font-weight:600; text-transform:none; letter-spacing:0; }
+html[data-style="youtube"] .btn-primary{ background:#ff0000; color:#fff; }
+html[data-style="youtube"] .btn-primary:hover{ background:#cc0000; }
+html[data-style="youtube"] .btn-ghost{ background:var(--sub-bg); border:1px solid var(--line); }
+html[data-style="youtube"] .chip, html[data-style="youtube"] .lang-chip{ background:var(--sub-bg); border:0; border-radius:18px; font-weight:500; }
+html[data-style="youtube"] .lang-chip.all{ background:var(--text); color:var(--surface); }
+html[data-style="youtube"] .hero-overlay{ background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.65)); }
+html[data-style="youtube"] .play-orb, html[data-style="youtube"] .play-btn{ background:#ff0000; }
+html[data-style="youtube"] .side-nav button, html[data-style="youtube"] .prof-side nav button{ border-radius:10px; font-weight:500; }
+html[data-style="youtube"] .side-nav button.active{ background:var(--sub-bg); color:var(--text); }
+html[data-style="youtube"] input, html[data-style="youtube"] select, html[data-style="youtube"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:20px;
+}
+html[data-style="youtube"] .form-grid input, html[data-style="youtube"] .stack input{ min-height:40px; border-radius:20px; }
+html[data-style="youtube"] .footer{ background:var(--surface); border-top:1px solid var(--line); }
+
+/* ==========================================================
+   INSTAGRAM
+   ========================================================== */
+html[data-style="instagram"]{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; --serif:var(--sans);
+  --ink:#000000; --text:#f5f5f5; --muted:#a8a8a8; --line:#363636;
+  --surface:#121212; --sub-bg:#262626; --input-bg:#262626; --header-bg:#000000; --header-bg-scrolled:#000000;
+  --mobile-bg:#000000; --card-bg:#1e1e1e; --cyan:#0095f6; --cyan-2:#0095f6; --green:#78de45; --btn-blue:#0095f6; --btn-blue-h:#1877f2; --red:#ed4956;
+  --shadow:0 0 0 1px var(--line); --header-h:60px; --scroll:#555;
+}
+html[data-style="instagram"][data-theme="day"]{
+  --ink:#fafafa; --text:#1a1a1a; --muted:#575757; --line:#dbdbdb;
+  --surface:#ffffff; --sub-bg:#efefef; --input-bg:#efefef; --header-bg:#ffffff; --header-bg-scrolled:#ffffff;
+  --mobile-bg:#ffffff; --card-bg:#fafafa; --scroll:#c7c7c7;
+}
+html[data-style="instagram"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); letter-spacing:0; font-size:14px; }
+html[data-style="instagram"] .logo-mark{
+  width:32px; height:32px; border-radius:8px; border:0;
+  background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+}
+html[data-style="instagram"] .logo-word{ font-family:"Segoe UI",sans-serif; font-weight:800; background:none; -webkit-background-clip:border-box; background-clip:border-box; color:var(--text); font-size:20px; letter-spacing:-.4px; }
+html[data-style="instagram"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="instagram"] .header-inner, html[data-style="instagram"] .header.scrolled .header-inner{
+  min-height:60px; padding:0 16px; border:0; border-bottom:1px solid var(--line); border-radius:0;
+  background:var(--header-bg); backdrop-filter:none;
+  width:100%; max-width:none; margin:0; box-shadow:none;
+}
+html[data-style="instagram"] body.page-inner{ padding-top:74px; }
+html[data-style="instagram"] .nav a{ font-size:13px; font-weight:600; border-radius:8px; }
+html[data-style="instagram"] .nav a:hover{ background:var(--sub-bg); }
+html[data-style="instagram"] .glass, html[data-style="instagram"] .search-box, html[data-style="instagram"] .iptv-card,
+html[data-style="instagram"] .plan, html[data-style="instagram"] .contact-card, html[data-style="instagram"] .form-card,
+html[data-style="instagram"] .watch-panel, html[data-style="instagram"] .auth-card, html[data-style="instagram"] .dash-side,
+html[data-style="instagram"] .dash-main, html[data-style="instagram"] .wizard, html[data-style="instagram"] .prof-side,
+html[data-style="instagram"] .prof-main{ background:var(--surface); border:1px solid var(--line); border-radius:3px; box-shadow:none; backdrop-filter:none; }
+html[data-style="instagram"] .poster-card{ border-radius:0; border:1px solid var(--line); background:var(--surface); box-shadow:none; }
+html[data-style="instagram"] .poster-media img{ border-radius:0; }
+html[data-style="instagram"] .btn{ border-radius:8px; font-weight:600; }
+html[data-style="instagram"] .btn-primary{ background:#0095f6; }
+html[data-style="instagram"] .btn-primary:hover{ background:#1877f2; }
+html[data-style="instagram"] .btn-ghost{ background:var(--sub-bg); border:0; }
+html[data-style="instagram"] .chip{ background:var(--sub-bg); border:1px solid var(--line); border-radius:16px; }
+html[data-style="instagram"] .play-orb{ background:rgba(0,0,0,.5); backdrop-filter:blur(6px); }
+html[data-style="instagram"] input, html[data-style="instagram"] select, html[data-style="instagram"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:3px;
+}
+html[data-style="instagram"] .footer{ background:var(--surface); border-top:1px solid var(--line); }
+html[data-style="instagram"] .hero-content{ padding-top:110px; }
+
+/* ==========================================================
+   NETFLIX
+   ========================================================== */
+html[data-style="netflix"]{
+  --sans:Inter,"Helvetica Neue",Helvetica,Arial,sans-serif; --serif:var(--sans);
+  --ink:#000000; --text:#ffffff; --muted:#999999; --line:#2f2f2f;
+  --surface:#181818; --sub-bg:#232323; --input-bg:#333333; --header-bg:#000000; --header-bg-scrolled:rgba(0,0,0,.92);
+  --mobile-bg:#181818; --card-bg:#232323; --cyan:#e50914; --cyan-2:#b81d24; --green:#46d369; --btn-blue:#e50914; --btn-blue-h:#b81d24; --red:#e50914;
+  --shadow:0 8px 28px rgba(0,0,0,.55); --header-h:68px; --scroll:#555;
+}
+html[data-style="netflix"][data-theme="day"]{
+  --ink:#f5f5f1; --text:#221f1f; --muted:#6a6a6a; --line:#e5e5e5;
+  --surface:#ffffff; --sub-bg:#f0f0f0; --input-bg:#e8e8e8; --header-bg:#000000; --header-bg-scrolled:rgba(0,0,0,.88);
+  --mobile-bg:#ffffff; --card-bg:#f2f2f2;
+}
+html[data-style="netflix"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); letter-spacing:.01em; }
+html[data-style="netflix"] h1, html[data-style="netflix"] h2{ letter-spacing:-.02em; }
+html[data-style="netflix"] .logo-mark{ width:28px; height:28px; border-radius:3px; background:#e50914; border:0; }
+html[data-style="netflix"] .logo-word{ color:#e50914; font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size:22px; }
+html[data-style="netflix"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="netflix"] .header-inner{
+  min-height:68px; padding:0 20px; border:0; border-radius:0; background:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,.0)); backdrop-filter:none;
+  width:100%; max-width:none; margin:0; box-shadow:none;
+}
+html[data-style="netflix"] .header.scrolled .header-inner{ background:rgba(0,0,0,.95); }
+html[data-style="netflix"] body.page-inner{ padding-top:84px; }
+html[data-style="netflix"] .nav a{ font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#e5e5e5; }
+html[data-style="netflix"] .nav a:hover{ color:#fff; background:transparent; }
+html[data-style="netflix"] .glass, html[data-style="netflix"] .search-box, html[data-style="netflix"] .iptv-card,
+html[data-style="netflix"] .plan, html[data-style="netflix"] .contact-card, html[data-style="netflix"] .form-card,
+html[data-style="netflix"] .watch-panel, html[data-style="netflix"] .auth-card, html[data-style="netflix"] .dash-side,
+html[data-style="netflix"] .dash-main, html[data-style="netflix"] .wizard, html[data-style="netflix"] .prof-side,
+html[data-style="netflix"] .prof-main{ background:var(--surface); border:0; border-radius:4px; box-shadow:none; backdrop-filter:none; }
+html[data-style="netflix"] .poster-card{ background:var(--surface); border-radius:4px; border:0; box-shadow:0 6px 18px rgba(0,0,0,.35); }
+html[data-style="netflix"] .poster-card:hover{ transform:scale(1.03); }
+html[data-style="netflix"] .poster-media img{ border-radius:4px; }
+html[data-style="netflix"] .btn{ border-radius:4px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; font-size:13px; }
+html[data-style="netflix"] .btn-primary{ background:#e50914; }
+html[data-style="netflix"] .btn-primary:hover{ background:#b81d24; }
+html[data-style="netflix"] .btn-ghost{ background:rgba(255,255,255,.15); color:#fff; border:0; }
+html[data-style="netflix"][data-theme="day"] .btn-ghost{ background:rgba(0,0,0,.08); color:var(--text); }
+html[data-style="netflix"] .chip{ background:var(--sub-bg); border:0; border-radius:4px; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+html[data-style="netflix"] .score{ background:#e50914; }
+html[data-style="netflix"] .play-orb, html[data-style="netflix"] .play-btn{ background:#e50914; color:#fff; box-shadow:none; }
+html[data-style="netflix"] input, html[data-style="netflix"] select, html[data-style="netflix"] textarea{
+  background:var(--input-bg); color:var(--text); border:1px solid var(--line); border-radius:4px;
+}
+html[data-style="netflix"] .footer{ background:#000; border-top:1px solid #232323; color:#808080; }
+html[data-style="netflix"] .footer a{ color:#808080; }
+html[data-style="netflix"] .footer a:hover{ color:#fff; text-decoration:underline; }
+
+/* ==========================================================
+   AMAZON PRIME VIDEO
+   ========================================================== */
+html[data-style="prime"]{
+  --sans:AmazonEmber,"Helvetica Neue",Helvetica,Arial,sans-serif; --serif:var(--sans);
+  --ink:#0a1628; --text:#ffffff; --muted:#a0aec0; --line:#1e3a5f;
+  --surface:#12233f; --sub-bg:#0f2847; --input-bg:#0f2847; --header-bg:#002e4b; --header-bg-scrolled:#002e4b;
+  --mobile-bg:#0a1628; --card-bg:#132a4c; --cyan:#00a8e1; --cyan-2:#00a8e1; --green:#25a18e; --btn-blue:#00a8e1; --btn-blue-h:#0f79af; --red:#ff4d4f;
+  --shadow:0 8px 24px rgba(0,0,0,.45); --header-h:60px; --scroll:#2d4a6f;
+}
+html[data-style="prime"][data-theme="day"]{
+  --ink:#eef3f9; --text:#0a1628; --muted:#5a6d85; --line:#d0dce8;
+  --surface:#ffffff; --sub-bg:#eef3f9; --input-bg:#ffffff; --header-bg:#002e4b; --header-bg-scrolled:#002e4b;
+  --mobile-bg:#ffffff; --card-bg:#f4f7fb;
+}
+html[data-style="prime"] body{ background:linear-gradient(180deg,var(--ink) 0%, #081a33 55%, #000d1f 100%); color:var(--text); font-family:var(--sans); }
+html[data-style="prime"][data-theme="day"] body{ background:var(--ink); }
+html[data-style="prime"] .logo-mark{ width:32px; height:22px; border-radius:4px; background:#00a8e1; border:0; }
+html[data-style="prime"] .logo-word{ color:#00a8e1; font-weight:800; font-size:18px; letter-spacing:.12em; text-transform:uppercase; }
+html[data-style="prime"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:#fff; font-weight:900; }
+html[data-style="prime"][data-theme="day"] .logo-word span{ color:#0a1628; }
+html[data-style="prime"] .header-inner{ min-height:60px; padding:0 18px; border:0; border-radius:0; background:var(--header-bg); width:100%; max-width:none; margin:0; box-shadow:0 2px 12px rgba(0,0,0,.4); }
+html[data-style="prime"] body.page-inner{ padding-top:74px; }
+html[data-style="prime"] .nav a{ font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+html[data-style="prime"] .nav a:hover{ color:#00a8e1; }
+html[data-style="prime"] .glass, html[data-style="prime"] .search-box, html[data-style="prime"] .iptv-card,
+html[data-style="prime"] .plan, html[data-style="prime"] .contact-card, html[data-style="prime"] .form-card,
+html[data-style="prime"] .watch-panel, html[data-style="prime"] .auth-card, html[data-style="prime"] .dash-side,
+html[data-style="prime"] .dash-main, html[data-style="prime"] .wizard, html[data-style="prime"] .prof-side,
+html[data-style="prime"] .prof-main{ background:var(--surface); border:1px solid rgba(0,168,225,.18); border-radius:8px; box-shadow:var(--shadow); backdrop-filter:none; }
+html[data-style="prime"] .poster-card{ border-radius:8px; border:0; background:var(--card-bg); box-shadow:0 6px 16px rgba(0,0,0,.35); }
+html[data-style="prime"] .btn{ border-radius:4px; font-weight:700; letter-spacing:.02em; }
+html[data-style="prime"] .btn-primary{ background:#00a8e1; color:#001a2e; }
+html[data-style="prime"] .btn-primary:hover{ background:#0f79af; color:#fff; }
+html[data-style="prime"] .btn-ghost{ background:rgba(255,255,255,.12); border:0; color:var(--text); }
+html[data-style="prime"][data-theme="day"] .btn-ghost{ background:rgba(0,46,75,.08); }
+html[data-style="prime"] input, html[data-style="prime"] select, html[data-style="prime"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:4px;
+}
+html[data-style="prime"] .footer{ background:#00152e; border-top:1px solid #0f2847; }
+html[data-style="prime"] .footer a:hover{ color:#00a8e1; }
+
+/* ==========================================================
+   APPLE TV+
+   ========================================================== */
+html[data-style="appletv"]{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display",Helvetica,Arial,sans-serif; --serif:var(--sans);
+  --ink:#000000; --text:#f5f5f7; --muted:#86868b; --line:#2c2c2e;
+  --surface:#1c1c1e; --sub-bg:#2c2c2e; --input-bg:#2c2c2e; --header-bg:rgba(0,0,0,.85); --header-bg-scrolled:rgba(28,28,30,.88);
+  --mobile-bg:#1c1c1e; --card-bg:#1c1c1e; --cyan:#2997ff; --cyan-2:#2997ff; --green:#30d158; --btn-blue:#0071e3; --btn-blue-h:#0077ed; --red:#ff453a;
+  --shadow:0 10px 30px rgba(0,0,0,.55); --header-h:52px; --scroll:#48484a;
+}
+html[data-style="appletv"][data-theme="day"]{
+  --ink:#f5f5f7; --text:#1d1d1f; --muted:#525255; --line:#d2d2d7;
+  --surface:#ffffff; --sub-bg:#f5f5f7; --input-bg:#ffffff; --header-bg:rgba(250,250,252,.88); --header-bg-scrolled:rgba(255,255,255,.9);
+  --mobile-bg:#ffffff; --card-bg:#f5f5f7;
+}
+html[data-style="appletv"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; letter-spacing:-.015em; }
+html[data-style="appletv"] h1, html[data-style="appletv"] h2{ font-weight:700; letter-spacing:-.03em; }
+html[data-style="appletv"] .logo-mark{ width:28px; height:28px; border-radius:6px; background:#000; border:1px solid var(--line); color:#fff; }
+html[data-style="appletv"][data-theme="day"] .logo-mark{ background:#000; }
+html[data-style="appletv"] .logo-word{ font-weight:700; font-size:18px; letter-spacing:-.02em; background:none; -webkit-background-clip:border-box; background-clip:border-box; color:var(--text); }
+html[data-style="appletv"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="appletv"] .header-inner, html[data-style="appletv"] .header.scrolled .header-inner{
+  min-height:52px; padding:0 20px; border:0; border-radius:0; background:var(--header-bg); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
+  width:100%; max-width:none; margin:0;
+}
+html[data-style="appletv"] body.page-inner{ padding-top:66px; }
+html[data-style="appletv"] .nav a{ font-size:12px; font-weight:500; letter-spacing:-.01em; opacity:.85; }
+html[data-style="appletv"] .nav a:hover{ opacity:1; background:transparent; }
+html[data-style="appletv"] .glass, html[data-style="appletv"] .search-box, html[data-style="appletv"] .iptv-card,
+html[data-style="appletv"] .plan, html[data-style="appletv"] .contact-card, html[data-style="appletv"] .form-card,
+html[data-style="appletv"] .watch-panel, html[data-style="appletv"] .auth-card, html[data-style="appletv"] .dash-side,
+html[data-style="appletv"] .dash-main, html[data-style="appletv"] .wizard, html[data-style="appletv"] .prof-side,
+html[data-style="appletv"] .prof-main{ background:var(--surface); border:0; border-radius:12px; box-shadow:none; backdrop-filter:none; }
+html[data-style="appletv"] .poster-card{ border-radius:12px; border:0; background:var(--surface); overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+html[data-style="appletv"] .poster-media img{ border-radius:12px; }
+html[data-style="appletv"] .btn{ border-radius:999px; font-weight:600; padding:0 18px; }
+html[data-style="appletv"] .btn-primary{ background:#fff; color:#000; }
+html[data-style="appletv"][data-theme="night"] .btn-primary, html[data-style="appletv"]:not([data-theme="day"]) .btn-primary{ background:#0071e3; color:#fff; }
+html[data-style="appletv"] .btn-primary:hover{ filter:brightness(0.96); }
+html[data-style="appletv"] .play-orb{ background:#fff; color:#000; width:48px; height:48px; border-radius:50%; }
+html[data-style="appletv"] input, html[data-style="appletv"] select, html[data-style="appletv"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:8px;
+}
+html[data-style="appletv"] .footer{ background:var(--surface); border-top:1px solid var(--line); }
+
+/* ==========================================================
+   WINDOWS 7 — Aero Glass
+   ========================================================== */
+html[data-style="win7"]{
+  --sans:"Segoe UI",Tahoma,Verdana,sans-serif; --serif:var(--sans);
+  --ink:#a9d0f0; --text:#0a1930; --muted:#3b5a8a; --line:#8fb4e2;
+  --surface:rgba(255,255,255,.78); --sub-bg:rgba(255,255,255,.9); --input-bg:#ffffff; --header-bg:linear-gradient(180deg,#5aa8f0 0%,#2a7bd8 50%,#1a5fb8 100%); --header-bg-scrolled:linear-gradient(180deg,#5aa8f0 0%,#2a7bd8 50%,#1a5fb8 100%);
+  --mobile-bg:#eaf3ff; --card-bg:#f4f8ff; --cyan:#1a5fb8; --cyan-2:#2a7bd8; --green:#1e8e3e; --btn-blue:#1a5fb8; --btn-blue-h:#1e6ad1; --red:#c53030;
+  --shadow:0 6px 18px rgba(15,66,150,.22),0 1px 3px rgba(0,0,0,.2); --header-h:46px; --scroll:#8fb4e2;
+}
+html[data-style="win7"][data-theme="night"]{
+  --ink:#0d2748; --text:#e6efff; --muted:#9cb8e0; --line:#2a4a7a;
+  --surface:rgba(18,38,74,.55); --sub-bg:rgba(26,52,100,.45); --input-bg:#1a345f; --header-bg:linear-gradient(180deg,#3a84d6 0%,#1d5aa8 60%,#123a7a 100%); --header-bg-scrolled:linear-gradient(180deg,#3a84d6 0%,#1d5aa8 60%,#123a7a 100%);
+  --mobile-bg:#12264a; --card-bg:rgba(26,52,100,.6); --cyan:#5aa8f0; --cyan-2:#7ab8f5;
+}
+html[data-style="win7"] body{
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #cfe6ff 0%, transparent 55%),
+    radial-gradient(900px 500px at 90% 0%, #8fbff0 0%, transparent 50%),
+    linear-gradient(180deg,#7ab6f0 0%, #4a90d9 18%, #2a7bd8 55%, #3a9de8 100%);
+  background-attachment:fixed; color:var(--text); font-family:var(--sans); font-size:14px;
+}
+html[data-style="win7"][data-theme="night"] body{
+  background:
+    radial-gradient(1200px 600px at 10% 0%, #2a5a9a 0%, transparent 60%),
+    linear-gradient(180deg,#0d1e3a 0%,#0d2748 35%,#0a1a33 100%);
+  background-attachment:fixed;
+}
+html[data-style="win7"] .header-inner{
+  min-height:30px; padding:0 10px; border:1px solid rgba(255,255,255,.55); border-radius:6px 6px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.25) 48%,rgba(255,255,255,.08));
+  backdrop-filter:blur(10px) saturate(140%); -webkit-backdrop-filter:blur(10px) saturate(140%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 4px 16px rgba(0,0,0,.22);
+  width:min(1280px,calc(100% - 14px)); margin:6px auto 0;
+}
+/* Aero titlebar shine */
+html[data-style="win7"] .header::before{
+  content:""; position:absolute; inset:6px 7px auto 7px; height:18px; border-radius:6px 6px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),transparent); pointer-events:none;
+}
+html[data-style="win7"] .header{ background:transparent; backdrop-filter:none; }
+html[data-style="win7"] .header.scrolled .header-inner{ background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.18)); }
+html[data-style="win7"] body.page-inner{ padding-top:62px; }
+html[data-style="win7"] .logo-mark{ width:26px; height:26px; border-radius:4px; background:linear-gradient(135deg,#00a3ff,#0050b3); border:1px solid rgba(255,255,255,.7); box-shadow:inset 0 1px 0 rgba(255,255,255,.7); }
+html[data-style="win7"] .logo-word{ font-weight:700; font-size:13px; letter-spacing:0; color:#002a66; text-shadow:0 1px 0 rgba(255,255,255,.8); }
+html[data-style="win7"][data-theme="night"] .logo-word{ color:#e6efff; text-shadow:0 1px 2px rgba(0,0,0,.6); }
+html[data-style="win7"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="win7"] .nav a{ font-size:12px; font-weight:600; padding:4px 10px; border-radius:4px; border:1px solid transparent; }
+html[data-style="win7"] .nav a:hover{ background:linear-gradient(180deg,#dbeeff,#b8d4f5); border-color:#8fb4e2; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
+html[data-style="win7"] .nav a[aria-current="page"]{ background:linear-gradient(180deg,#b8d4f5,#8fb4e2); border-color:#6a9edc; }
+html[data-style="win7"] .hamburger{ background:linear-gradient(180deg,#eaf3ff,#b8d4f5); border:1px solid #8fb4e2; border-radius:4px; }
+html[data-style="win7"] .glass, html[data-style="win7"] .search-box, html[data-style="win7"] .iptv-card,
+html[data-style="win7"] .plan, html[data-style="win7"] .contact-card, html[data-style="win7"] .form-card,
+html[data-style="win7"] .watch-panel, html[data-style="win7"] .auth-card, html[data-style="win7"] .dash-side,
+html[data-style="win7"] .dash-main, html[data-style="win7"] .wizard, html[data-style="win7"] .prof-side, html[data-style="win7"] .prof-main{
+  background:var(--surface); border:1px solid rgba(255,255,255,.65); border-radius:8px;
+  backdrop-filter:blur(14px) saturate(130%); -webkit-backdrop-filter:blur(14px) saturate(130%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 8px 24px rgba(0,0,0,.18);
+}
+html[data-style="win7"] .poster-card{ border-radius:6px; border:1px solid rgba(255,255,255,.6); background:rgba(255,255,255,.88); box-shadow:0 4px 12px rgba(0,0,0,.12); }
+html[data-style="win7"][data-theme="night"] .poster-card{ background:rgba(18,38,74,.55); }
+html[data-style="win7"] .btn{ border-radius:4px; font-weight:600; border:1px solid #8fb4e2; background:linear-gradient(180deg,#ffffff 0%,#e6f0ff 55%,#d0e2ff 100%); color:#002a66; box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(0,0,0,.15); }
+html[data-style="win7"] .btn:hover{ background:linear-gradient(180deg,#ffffff,#dbeeff); }
+html[data-style="win7"] .btn-primary{ background:linear-gradient(180deg,#5aa8f0,#1a5fb8); color:#fff; border-color:#1a5fb8; text-shadow:0 1px 0 rgba(0,0,0,.3); }
+html[data-style="win7"] .btn-primary:hover{ background:linear-gradient(180deg,#6ab0f2,#1e6ad1); }
+html[data-style="win7"] .btn-ghost{ background:linear-gradient(180deg,#ffffff,#f0f6ff); }
+html[data-style="win7"] input, html[data-style="win7"] select, html[data-style="win7"] textarea{
+  background:var(--input-bg); border:1px solid #8fb4e2; border-radius:4px; box-shadow:inset 0 1px 2px rgba(0,0,0,.08);
+}
+html[data-style="win7"] input:focus, html[data-style="win7"] select:focus, html[data-style="win7"] textarea:focus{
+  border-color:#1a5fb8; box-shadow:0 0 0 2px rgba(42,123,216,.25);
+}
+html[data-style="win7"] .footer{ background:rgba(255,255,255,.55); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.7); }
+html[data-style="win7"][data-theme="night"] .footer{ background:rgba(13,39,72,.55); border-top-color:rgba(255,255,255,.12); }
+
+/* ==========================================================
+   WINDOWS 8 — Metro flat tiles
+   ========================================================== */
+html[data-style="win8"]{
+  --sans:"Segoe UI",Tahoma,sans-serif; --serif:var(--sans);
+  --ink:#0078d7; --text:#ffffff; --muted:#cce3ff; --line:rgba(255,255,255,.18);
+  --surface:#005a9e; --sub-bg:#006dc9; --input-bg:#005a9e; --header-bg:#0078d7; --header-bg-scrolled:#0078d7;
+  --mobile-bg:#005a9e; --card-bg:#006dc9; --cyan:#ffb900; --cyan-2:#ffb900; --green:#107c10; --btn-blue:#ffb900; --btn-blue-h:#ffaa00; --red:#e81123;
+  --shadow:none; --header-h:48px; --scroll:#4a90d9;
+}
+html[data-style="win8"][data-theme="day"]{
+  --ink:#f2f2f2; --text:#000000; --muted:#666666; --line:#e0e0e0;
+  --surface:#ffffff; --sub-bg:#f2f2f2; --input-bg:#ffffff; --header-bg:#0078d7; --header-bg-scrolled:#0078d7;
+  --mobile-bg:#ffffff; --card-bg:#f2f2f2; --cyan:#0078d7;
+}
+html[data-style="win8"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); font-size:14px; letter-spacing:0; }
+html[data-style="win8"] h1, html[data-style="win8"] h2{ font-weight:300; text-transform:uppercase; letter-spacing:.02em; }
+html[data-style="win8"] .logo-mark{ width:28px; height:28px; border-radius:0; background:transparent; border:0; display:grid; grid-template-columns:1fr 1fr; gap:2px; padding:2px; }
+html[data-style="win8"] .logo-mark::before, html[data-style="win8"] .logo-mark::after{
+  content:""; background:#fff; display:block; border-radius:0;
+}
+html[data-style="win8"][data-theme="day"] .logo-mark::before, html[data-style="win8"][data-theme="day"] .logo-mark::after{ background:#0078d7; }
+html[data-style="win8"] .logo-mark svg{ display:none; }
+html[data-style="win8"] .logo-word{ color:#fff; font-weight:300; font-size:18px; letter-spacing:.06em; text-transform:uppercase; }
+html[data-style="win8"][data-theme="day"] .logo-word{ color:#000; }
+html[data-style="win8"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="win8"] .header-inner, html[data-style="win8"] .header.scrolled .header-inner{
+  min-height:48px; padding:0 16px; border:0; border-radius:0; background:var(--header-bg); box-shadow:none; backdrop-filter:none;
+  width:100%; max-width:none; margin:0;
+}
+html[data-style="win8"] body.page-inner{ padding-top:60px; }
+html[data-style="win8"] .nav a{ font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; border-radius:0; padding:6px 10px; border:2px solid transparent; }
+html[data-style="win8"] .nav a:hover{ background:rgba(255,255,255,.15); }
+html[data-style="win8"][data-theme="day"] .nav a:hover{ background:rgba(0,0,0,.06); }
+html[data-style="win8"] .nav a[aria-current="page"]{ border-color:currentColor; background:transparent; }
+html[data-style="win8"] .glass, html[data-style="win8"] .search-box, html[data-style="win8"] .iptv-card,
+html[data-style="win8"] .plan, html[data-style="win8"] .contact-card, html[data-style="win8"] .form-card,
+html[data-style="win8"] .watch-panel, html[data-style="win8"] .auth-card, html[data-style="win8"] .dash-side,
+html[data-style="win8"] .dash-main, html[data-style="win8"] .wizard, html[data-style="win8"] .prof-side, html[data-style="win8"] .prof-main{
+  background:var(--surface); border:2px solid transparent; border-radius:0; box-shadow:none; backdrop-filter:none;
+}
+html[data-style="win8"] .glass:hover, html[data-style="win8"] .iptv-card:hover{ border-color:rgba(255,255,255,.3); }
+html[data-style="win8"] .poster-card{ border-radius:0; border:0; background:var(--card-bg); box-shadow:none; }
+html[data-style="win8"] .poster-media img{ border-radius:0; }
+html[data-style="win8"] .btn{ border-radius:0; font-weight:600; text-transform:uppercase; letter-spacing:.06em; font-size:13px; border:2px solid currentColor; background:transparent; color:var(--text); }
+html[data-style="win8"] .btn-primary{ background:#fff; color:#0078d7; border-color:#fff; }
+html[data-style="win8"][data-theme="day"] .btn-primary{ background:#0078d7; color:#fff; border-color:#0078d7; }
+html[data-style="win8"] .btn-primary:hover{ background:#f2f2f2; }
+html[data-style="win8"] .chip{ border-radius:0; border:2px solid currentColor; background:transparent; font-size:12px; font-weight:700; text-transform:uppercase; }
+html[data-style="win8"] input, html[data-style="win8"] select, html[data-style="win8"] textarea{
+  background:var(--input-bg); border:2px solid var(--line); border-radius:0; color:var(--text);
+}
+html[data-style="win8"] input:focus{ border-color:#fff; }
+html[data-style="win8"] .footer{ background:#005a9e; border-top:2px solid rgba(255,255,255,.15); border-radius:0; }
+html[data-style="win8"][data-theme="day"] .footer{ background:#0078d7; }
+
+/* ==========================================================
+   WINDOWS 10 — Fluent / Acrylic
+   ========================================================== */
+html[data-style="win10"]{
+  --sans:"Segoe UI",Tahoma,sans-serif; --serif:var(--sans);
+  --ink:#1f1f1f; --text:#ffffff; --muted:#9a9a9a; --line:#3a3a3a;
+  --surface:#2d2d2d; --sub-bg:#3a3a3a; --input-bg:#3a3a3a; --header-bg:#1f1f1f; --header-bg-scrolled:#1f1f1f;
+  --mobile-bg:#2d2d2d; --card-bg:#323232; --cyan:#0078d4; --cyan-2:#0078d4; --green:#107c10; --btn-blue:#0078d4; --btn-blue-h:#106ebe; --red:#e81123;
+  --shadow:0 4px 16px rgba(0,0,0,.35); --header-h:48px; --scroll:#5a5a5a;
+}
+html[data-style="win10"][data-theme="day"]{
+  --ink:#f3f3f3; --text:#000000; --muted:#605e5c; --line:#edebe9;
+  --surface:#ffffff; --sub-bg:#f3f2f1; --input-bg:#ffffff; --header-bg:#ffffff; --header-bg-scrolled:#ffffff;
+  --mobile-bg:#ffffff; --card-bg:#fafafa; --scroll:#c8c6c4;
+}
+html[data-style="win10"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); font-size:14px; letter-spacing:0; }
+html[data-style="win10"] h1, html[data-style="win10"] h2{ font-weight:600; letter-spacing:0; }
+html[data-style="win10"] .logo-mark{ width:20px; height:20px; border-radius:0; background:transparent; border:0; display:grid; grid-template-columns:1fr 1fr; gap:1px; padding:0; }
+html[data-style="win10"] .logo-mark svg{ display:none; }
+html[data-style="win10"] .logo-mark::before{ content:""; background:#f25022; }
+html[data-style="win10"] .logo-mark::after{ content:""; background:#80cc28; box-shadow:20px 0 0 #00adef, 0 20px 0 #ffb900; display:block; width:9px; height:9px; }
+html[data-style="win10"] .logo-word{ color:var(--text); font-weight:600; font-size:15px; letter-spacing:0; }
+html[data-style="win10"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="win10"] .header-inner, html[data-style="win10"] .header.scrolled .header-inner{
+  min-height:48px; padding:0 12px; border:0; border-radius:0; background:var(--header-bg); box-shadow:0 1px 0 var(--line); backdrop-filter:none;
+  width:100%; max-width:none; margin:0;
+}
+html[data-style="win10"] body.page-inner{ padding-top:56px; }
+html[data-style="win10"] .nav a{ font-size:14px; font-weight:400; border-radius:0; border-bottom:2px solid transparent; }
+html[data-style="win10"] .nav a:hover{ background:var(--sub-bg); border-bottom-color:transparent; }
+html[data-style="win10"] .nav a[aria-current="page"]{ border-bottom-color:var(--cyan); }
+html[data-style="win10"] .glass, html[data-style="win10"] .search-box, html[data-style="win10"] .iptv-card,
+html[data-style="win10"] .plan, html[data-style="win10"] .contact-card, html[data-style="win10"] .form-card,
+html[data-style="win10"] .watch-panel, html[data-style="win10"] .auth-card, html[data-style="win10"] .dash-side,
+html[data-style="win10"] .dash-main, html[data-style="win10"] .wizard, html[data-style="win10"] .prof-side, html[data-style="win10"] .prof-main{
+  background:var(--surface); border:1px solid var(--line); border-radius:2px; box-shadow:var(--shadow); backdrop-filter:none;
+}
+html[data-style="win10"] .poster-card{ border-radius:2px; border:1px solid var(--line); background:var(--surface); box-shadow:0 2px 8px rgba(0,0,0,.12); }
+html[data-style="win10"] .btn{ border-radius:2px; font-weight:600; font-size:14px; }
+html[data-style="win10"] .btn-primary{ background:#0078d4; border:1px solid #0078d4; }
+html[data-style="win10"] .btn-primary:hover{ background:#106ebe; }
+html[data-style="win10"] .btn-ghost{ background:var(--sub-bg); border:1px solid var(--line); }
+html[data-style="win10"] input, html[data-style="win10"] select, html[data-style="win10"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:2px;
+}
+html[data-style="win10"] input:focus{ border-color:#0078d4; box-shadow:none; }
+html[data-style="win10"] .footer{ background:var(--surface); border-top:1px solid var(--line); border-radius:0; }
+
+/* ==========================================================
+   WINDOWS 11 — Mica / Rounded
+   ========================================================== */
+html[data-style="win11"]{
+  --sans:"Segoe UI Variable","Segoe UI",Tahoma,sans-serif; --serif:var(--sans);
+  --ink:#202020; --text:#ffffff; --muted:#9d9d9d; --line:#2e2e2e;
+  --surface:#2c2c2c; --sub-bg:#333333; --input-bg:#2d2d2d; --header-bg:#202020; --header-bg-scrolled:#202020;
+  --mobile-bg:#202020; --card-bg:#2b2b2b; --cyan:#0067c0; --cyan-2:#60a8ff; --green:#0f7b0f; --btn-blue:#0067c0; --btn-blue-h:#005a9e; --red:#e81123;
+  --shadow:0 8px 24px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25); --header-h:48px; --scroll:#555;
+}
+html[data-style="win11"][data-theme="day"]{
+  --ink:#f3f3f3; --text:#000000; --muted:#605e5c; --line:#e5e5e5;
+  --surface:#fbfbfb; --sub-bg:#f3f3f3; --input-bg:#ffffff; --header-bg:#f3f3f3; --header-bg-scrolled:#f3f3f3;
+  --mobile-bg:#f3f3f3; --card-bg:#ffffff; --scroll:#c7c7c7;
+}
+html[data-style="win11"] body{
+  background:var(--ink); color:var(--text); font-family:var(--sans); font-size:14px;
+}
+html[data-style="win11"] .header{
+  background:transparent; backdrop-filter:none;
+}
+html[data-style="win11"] .header-inner, html[data-style="win11"] .header.scrolled .header-inner{
+  min-height:48px; padding:6px 10px; border:1px solid var(--line); border-radius:8px;
+  background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(20px) saturate(140%); -webkit-backdrop-filter:blur(20px) saturate(140%);
+  box-shadow:var(--shadow);
+  width:min(1240px,calc(100% - 16px)); margin:8px auto 0;
+}
+html[data-style="win11"] body.page-inner{ padding-top:72px; }
+html[data-style="win11"] .logo-mark{ width:18px; height:18px; border-radius:2px; background:transparent; border:0; display:grid; grid-template-columns:1fr 1fr; gap:1px; }
+html[data-style="win11"] .logo-mark svg{ display:none; }
+html[data-style="win11"] .logo-mark::before{ content:""; background:#0067c0; border-radius:2px; }
+html[data-style="win11"] .logo-mark::after{ content:""; background:#0067c0; opacity:.55; border-radius:2px; }
+html[data-style="win11"] .logo-word{ color:var(--text); font-weight:600; font-size:14px; letter-spacing:0; }
+html[data-style="win11"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="win11"] .nav{ gap:4px; }
+html[data-style="win11"] .nav a{ font-size:13px; font-weight:500; border-radius:6px; padding:6px 12px; }
+html[data-style="win11"] .nav a:hover{ background:var(--sub-bg); }
+html[data-style="win11"] .nav a[aria-current="page"]{ background:var(--sub-bg); }
+html[data-style="win11"] .glass, html[data-style="win11"] .search-box, html[data-style="win11"] .iptv-card,
+html[data-style="win11"] .plan, html[data-style="win11"] .contact-card, html[data-style="win11"] .form-card,
+html[data-style="win11"] .watch-panel, html[data-style="win11"] .auth-card, html[data-style="win11"] .dash-side,
+html[data-style="win11"] .dash-main, html[data-style="win11"] .wizard, html[data-style="win11"] .prof-side, html[data-style="win11"] .prof-main{
+  background:var(--surface); border:1px solid var(--line); border-radius:8px; box-shadow:var(--shadow); backdrop-filter:none;
+}
+html[data-style="win11"] .poster-card{ border-radius:8px; border:1px solid var(--line); background:var(--card-bg); box-shadow:0 4px 16px rgba(0,0,0,.18); overflow:hidden; }
+html[data-style="win11"] .poster-media img{ border-radius:8px; }
+html[data-style="win11"] .btn{ border-radius:4px; font-weight:600; }
+html[data-style="win11"] .btn-primary{ background:#0067c0; }
+html[data-style="win11"] .btn-primary:hover{ background:#005a9e; }
+html[data-style="win11"] input, html[data-style="win11"] select, html[data-style="win11"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:4px; border-bottom-width:1px;
+}
+html[data-style="win11"] input:focus{ border-color:#0067c0; border-bottom-width:2px; }
+html[data-style="win11"] .footer{ background:var(--surface); border-top:1px solid var(--line); border-radius:8px; width:min(1240px,calc(100% - 16px)); margin:0 auto; }
+
+/* ==========================================================
+   macOS — Tahoe / Sonoma translucent
+   ========================================================== */
+html[data-style="macos"]{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif; --serif:var(--sans);
+  --ink:#ececef; --text:#1d1d1f; --muted:#4e4e52; --line:#d2d2d7;
+  --surface:rgba(255,255,255,.72); --sub-bg:rgba(255,255,255,.9); --input-bg:#ffffff; --header-bg:rgba(255,255,255,.72); --header-bg-scrolled:rgba(255,255,255,.86);
+  --mobile-bg:rgba(255,255,255,.92); --card-bg:#ffffff; --cyan:#007aff; --cyan-2:#007aff; --green:#34c759; --btn-blue:#007aff; --btn-blue-h:#0066d6; --red:#ff3b30;
+  --shadow:0 8px 24px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08); --header-h:28px; --scroll:#c7c7cc;
+}
+html[data-style="macos"][data-theme="night"]{
+  --ink:#1c1c1e; --text:#f5f5f7; --muted:#98989d; --line:#38383a;
+  --surface:rgba(44,44,46,.72); --sub-bg:#3a3a3c; --input-bg:#3a3a3c; --header-bg:rgba(44,44,46,.72); --header-bg-scrolled:rgba(44,44,46,.88);
+  --mobile-bg:#2c2c2e; --card-bg:#2c2c2e; --cyan:#0a84ff; --cyan-2:#0a84ff; --scroll:#636366;
+}
+html[data-style="macos"] body{
+  background:
+    radial-gradient(1100px 500px at 0% 0%, #c7d2fe 0%, transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, #fbcfe8 0%, transparent 55%),
+    linear-gradient(180deg,#f5f5f7 0%,#ececef 100%);
+  background-attachment:fixed; color:var(--text); font-family:var(--sans); font-size:14px; -webkit-font-smoothing:antialiased;
+}
+html[data-style="macos"][data-theme="night"] body{
+  background:
+    radial-gradient(1000px 500px at 0% 0%, #1e293b 0%, transparent 60%),
+    linear-gradient(180deg,#1c1c1e 0%,#000000 100%);
+  background-attachment:fixed;
+}
+html[data-style="macos"] .header{
+  background:transparent; backdrop-filter:none;
+}
+html[data-style="macos"] .header-inner, html[data-style="macos"] .header.scrolled .header-inner{
+  min-height:28px; padding:0 12px; border:1px solid rgba(255,255,255,.5); border-radius:10px;
+  background:var(--header-bg); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:0 4px 16px rgba(0,0,0,.12); width:min(1220px,calc(100% - 16px)); margin:10px auto 0;
+}
+html[data-style="macos"] .header-inner::before{
+  content:""; display:flex; align-items:center; gap:6px;
+  /* traffic lights */
+  width:52px; height:28px; flex:none;
+  background:
+    radial-gradient(circle 6px at 8px 14px, #ff5f56 6px, transparent 7px),
+    radial-gradient(circle 6px at 24px 14px, #ffbd2e 6px, transparent 7px),
+    radial-gradient(circle 6px at 40px 14px, #27c93f 6px, transparent 7px);
+  margin-inline-end:8px;
+}
+html[data-style="macos"][dir="rtl"] .header-inner::before{ margin-inline-end:0; margin-inline-start:8px; }
+html[data-style="macos"] body.page-inner{ padding-top:56px; }
+html[data-style="macos"] .logo-mark{ width:20px; height:20px; border-radius:4px; background:#000; border:0; }
+html[data-style="macos"][data-theme="night"] .logo-mark{ background:#fff; }
+html[data-style="macos"] .logo-mark svg path{ fill:#fff !important; }
+html[data-style="macos"][data-theme="night"] .logo-mark svg path{ fill:#000 !important; }
+html[data-style="macos"] .logo-word{ font-weight:600; font-size:13px; letter-spacing:-.02em; color:var(--text); background:none; -webkit-background-clip:border-box; background-clip:border-box; }
+html[data-style="macos"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="macos"] .nav a{ font-size:12.5px; font-weight:500; border-radius:6px; padding:4px 10px; }
+html[data-style="macos"] .nav a:hover{ background:rgba(0,0,0,.06); }
+html[data-style="macos"][data-theme="night"] .nav a:hover{ background:rgba(255,255,255,.1); }
+html[data-style="macos"] .glass, html[data-style="macos"] .search-box, html[data-style="macos"] .iptv-card,
+html[data-style="macos"] .plan, html[data-style="macos"] .contact-card, html[data-style="macos"] .form-card,
+html[data-style="macos"] .watch-panel, html[data-style="macos"] .auth-card, html[data-style="macos"] .dash-side,
+html[data-style="macos"] .dash-main, html[data-style="macos"] .wizard, html[data-style="macos"] .prof-side, html[data-style="macos"] .prof-main{
+  background:var(--surface); border:1px solid rgba(255,255,255,.6); border-radius:12px;
+  backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:var(--shadow);
+}
+html[data-style="macos"][data-theme="night"] .glass, html[data-style="macos"][data-theme="night"] .search-box{
+  border-color:rgba(255,255,255,.08);
+}
+html[data-style="macos"] .poster-card{ border-radius:10px; border:0; background:var(--card-bg); box-shadow:0 6px 18px rgba(0,0,0,.12); overflow:hidden; }
+html[data-style="macos"] .poster-media img{ border-radius:10px; }
+html[data-style="macos"] .btn{ border-radius:6px; font-weight:600; font-size:13px; }
+html[data-style="macos"] .btn-primary{ background:#007aff; border:0; }
+html[data-style="macos"] .btn-primary:hover{ background:#0066d6; }
+html[data-style="macos"] .btn-ghost{ background:rgba(0,0,0,.06); border:0; }
+html[data-style="macos"][data-theme="night"] .btn-ghost{ background:rgba(255,255,255,.1); }
+html[data-style="macos"] input, html[data-style="macos"] select, html[data-style="macos"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:8px;
+}
+html[data-style="macos"] .footer{ background:rgba(255,255,255,.6); backdrop-filter:blur(20px); border-top:1px solid rgba(0,0,0,.08); }
+
+/* ==========================================================
+   ANDROID — Material 3
+   ========================================================== */
+html[data-style="android"]{
+  --sans:Roboto,"Google Sans","Noto Sans",Arial,sans-serif; --serif:var(--sans);
+  --ink:#141218; --text:#e6e0e9; --muted:#cac4d0; --line:#49454f;
+  --surface:#1d1b20; --sub-bg:#2b2930; --input-bg:#2b2930; --header-bg:#141218; --header-bg-scrolled:#141218;
+  --mobile-bg:#1d1b20; --card-bg:#2b2930; --cyan:#d0bcff; --cyan-2:#d0bcff; --green:#a0d8a0; --btn-blue:#d0bcff; --btn-blue-h:#b69df8; --red:#ffb4ab;
+  --shadow:0 4px 12px rgba(0,0,0,.4); --header-h:64px; --scroll:#49454f;
+}
+html[data-style="android"][data-theme="day"]{
+  --ink:#fffbfe; --text:#1d1b20; --muted:#49454f; --line:#e7e0ec;
+  --surface:#fffbfe; --sub-bg:#f3edf7; --input-bg:#f3edf7; --header-bg:#fffbfe; --header-bg-scrolled:#fffbfe;
+  --mobile-bg:#fffbfe; --card-bg:#f3edf7; --cyan:#6750a4; --cyan-2:#6750a4; --btn-blue:#6750a4; --btn-blue-h:#5a3ea6; --scroll:#cac4d0;
+}
+html[data-style="android"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); font-size:14px; letter-spacing:.01em; }
+html[data-style="android"] h1, html[data-style="android"] h2{ font-weight:500; letter-spacing:0; }
+html[data-style="android"] .logo-mark{ width:36px; height:36px; border-radius:10px; background:#3ddc84; border:0; }
+html[data-style="android"] .logo-mark svg{ width:18px; height:18px; }
+html[data-style="android"] .logo-word{ color:#3ddc84; font-weight:500; font-size:18px; letter-spacing:0; }
+html[data-style="android"][data-theme="day"] .logo-word{ color:#1d1b20; }
+html[data-style="android"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="android"] .header-inner, html[data-style="android"] .header.scrolled .header-inner{
+  min-height:64px; padding:0 16px; border:0; border-radius:16px; background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.15);
+  width:min(1240px,calc(100% - 16px)); margin:8px auto 0;
+}
+html[data-style="android"] body.page-inner{ padding-top:84px; }
+html[data-style="android"] .nav a{ font-size:14px; font-weight:500; border-radius:999px; padding:6px 14px; }
+html[data-style="android"] .nav a:hover{ background:var(--sub-bg); }
+html[data-style="android"] .nav a[aria-current="page"]{ background:var(--sub-bg); }
+html[data-style="android"] .glass, html[data-style="android"] .search-box, html[data-style="android"] .iptv-card,
+html[data-style="android"] .plan, html[data-style="android"] .contact-card, html[data-style="android"] .form-card,
+html[data-style="android"] .watch-panel, html[data-style="android"] .auth-card, html[data-style="android"] .dash-side,
+html[data-style="android"] .dash-main, html[data-style="android"] .wizard, html[data-style="android"] .prof-side, html[data-style="android"] .prof-main{
+  background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:none; backdrop-filter:none;
+}
+html[data-style="android"] .poster-card{ border-radius:16px; border:0; background:var(--card-bg); box-shadow:0 2px 8px rgba(0,0,0,.1); overflow:hidden; }
+html[data-style="android"] .poster-media img{ border-radius:12px; }
+html[data-style="android"] .btn{ border-radius:999px; font-weight:500; letter-spacing:.02em; font-size:14px; }
+html[data-style="android"] .btn-primary{ background:#d0bcff; color:#381e72; }
+html[data-style="android"][data-theme="day"] .btn-primary{ background:#6750a4; color:#fff; }
+html[data-style="android"] .btn-primary:hover{ filter:brightness(.96); }
+html[data-style="android"] .btn-ghost{ background:var(--sub-bg); border:0; border-radius:999px; }
+html[data-style="android"] .chip{ background:var(--sub-bg); border:1px solid var(--line); border-radius:8px; font-weight:500; }
+html[data-style="android"] input, html[data-style="android"] select, html[data-style="android"] textarea{
+  background:var(--input-bg); border:1px solid var(--line); border-radius:12px;
+}
+html[data-style="android"] .footer{ background:var(--surface); border-top:1px solid var(--line); border-radius:16px 16px 0 0; }
+
+/* ==========================================================
+   iOS — iOS 17 / glass + tab bar
+   ========================================================== */
+html[data-style="ios"]{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Helvetica,Arial,sans-serif; --serif:var(--sans);
+  --ink:#000000; --text:#ffffff; --muted:#8e8e93; --line:#38383a;
+  --surface:#1c1c1e; --sub-bg:#2c2c2e; --input-bg:#2c2c2e; --header-bg:rgba(28,28,30,.86); --header-bg-scrolled:rgba(28,28,30,.92);
+  --mobile-bg:#1c1c1e; --card-bg:#2c2c2e; --cyan:#007aff; --cyan-2:#007aff; --green:#34c759; --btn-blue:#007aff; --btn-blue-h:#0051d5; --red:#ff3b30;
+  --shadow:0 10px 30px rgba(0,0,0,.45); --header-h:44px; --scroll:#48484a;
+}
+html[data-style="ios"][data-theme="day"]{
+  --ink:#f2f2f7; --text:#000000; --muted:#59595f; --line:#c6c6c8;
+  --surface:rgba(255,255,255,.92); --sub-bg:#ffffff; --input-bg:#ffffff; --header-bg:rgba(249,249,249,.86); --header-bg-scrolled:rgba(255,255,255,.94);
+  --mobile-bg:#ffffff; --card-bg:#ffffff; --scroll:#c7c7cc;
+}
+html[data-style="ios"] body{ background:var(--ink); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; font-size:15px; letter-spacing:-.01em; }
+html[data-style="ios"] h1, html[data-style="ios"] h2{ font-weight:700; letter-spacing:-.02em; }
+html[data-style="ios"] .logo-mark{ width:28px; height:28px; border-radius:6px; background:#007aff; border:0; }
+html[data-style="ios"] .logo-word{ font-weight:700; font-size:17px; letter-spacing:-.02em; background:none; -webkit-background-clip:border-box; background-clip:border-box; color:var(--text); }
+html[data-style="ios"] .logo-word span{ background:none; -webkit-background-clip:border-box; background-clip:border-box; color:inherit; }
+html[data-style="ios"] .header{ background:transparent; }
+html[data-style="ios"] .header-inner, html[data-style="ios"] .header.scrolled .header-inner{
+  min-height:44px; padding:0 16px; border:0; border-bottom:.5px solid var(--line); border-radius:0;
+  background:var(--header-bg); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); box-shadow:none;
+  width:100%; max-width:none; margin:0;
+}
+html[data-style="ios"] body.page-inner{ padding-top:54px; }
+html[data-style="ios"] .nav a{ font-size:15px; font-weight:400; border-radius:8px; padding:6px 12px; }
+html[data-style="ios"] .nav a:hover{ background:rgba(120,120,128,.12); }
+html[data-style="ios"] .nav a[aria-current="page"]{ color:var(--cyan); background:rgba(0,122,255,.12); }
+html[data-style="ios"] .glass, html[data-style="ios"] .search-box, html[data-style="ios"] .iptv-card,
+html[data-style="ios"] .plan, html[data-style="ios"] .contact-card, html[data-style="ios"] .form-card,
+html[data-style="ios"] .watch-panel, html[data-style="ios"] .auth-card, html[data-style="ios"] .dash-side,
+html[data-style="ios"] .dash-main, html[data-style="ios"] .wizard, html[data-style="ios"] .prof-side, html[data-style="ios"] .prof-main{
+  background:var(--surface); border:0; border-radius:14px; box-shadow:0 4px 16px rgba(0,0,0,.08); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
+}
+html[data-style="ios"] .glass{ border:.5px solid rgba(0,0,0,.04); }
+html[data-style="ios"][data-theme="night"] .glass{ border-color:rgba(255,255,255,.06); }
+html[data-style="ios"] .poster-card{ border-radius:12px; border:0; background:var(--card-bg); box-shadow:0 4px 16px rgba(0,0,0,.12); overflow:hidden; }
+html[data-style="ios"] .poster-media img{ border-radius:12px; }
+html[data-style="ios"] .btn{ border-radius:10px; font-weight:600; font-size:15px; }
+html[data-style="ios"] .btn-primary{ background:#007aff; border-radius:10px; }
+html[data-style="ios"] .btn-primary:hover{ background:#0051d5; }
+html[data-style="ios"] .btn-ghost{ background:rgba(120,120,128,.12); border:0; }
+html[data-style="ios"] input, html[data-style="ios"] select, html[data-style="ios"] textarea{
+  background:var(--input-bg); border:0; border-radius:10px; box-shadow:inset 0 0 0 .5px var(--line);
+}
+html[data-style="ios"] .footer{ background:var(--surface); border-top:.5px solid var(--line); backdrop-filter:saturate(180%) blur(20px); }
+
+/* ---------- Header search / auth tweaks per theme (optional polish) ---------- */
+html[data-style="youtube"] .auth .btn{ min-height:36px; }
+html[data-style="instagram"] .auth .btn{ border-radius:8px; }
+html[data-style="netflix"] .header .auth .btn{ border-radius:4px; }
+
+/* ---------- Mobile menu matches theme surface ---------- */
+html[data-style="youtube"] .mobile-menu,
+html[data-style="instagram"] .mobile-menu,
+html[data-style="netflix"] .mobile-menu,
+html[data-style="prime"] .mobile-menu,
+html[data-style="appletv"] .mobile-menu,
+html[data-style="win7"] .mobile-menu,
+html[data-style="win8"] .mobile-menu,
+html[data-style="win10"] .mobile-menu,
+html[data-style="win11"] .mobile-menu,
+html[data-style="macos"] .mobile-menu,
+html[data-style="android"] .mobile-menu,
+html[data-style="ios"] .mobile-menu{
+  background:var(--surface); border:1px solid var(--line); backdrop-filter:none;
+}
+
+/* ---- Day-mode readability safety net: ensure gray text meets contrast on white ---- */
+html[data-theme="day"][data-style="instagram"]{ --muted:#575757; }
+html[data-theme="day"][data-style="ios"]{ --muted:#59595f; --line:#c2c2c8; }
+html[data-theme="day"][data-style="youtube"]{ --muted:#555555; }
+html[data-theme="day"][data-style="appletv"]{ --muted:#525255; }
+html[data-theme="day"][data-style="macos"]{ --muted:#4e4e52; }
+html[data-theme="day"] .muted{ color:var(--muted); }
+html[data-theme="day"] :is(.sset-hint,.lead,.section-head p,.kicker,.eyebrow){ color:var(--muted); }
+html[data-theme="day"] ::placeholder{ color:var(--muted); opacity:1; }
+html[data-theme="day"][data-style="instagram"] .glass,
+html[data-theme="day"][data-style="instagram"] .search-box,
+html[data-theme="day"][data-style="instagram"] .iptv-card,
+html[data-theme="day"][data-style="instagram"] .plan{ border-color:#e5e5e5; }
+html[data-theme="day"][data-style="ios"] .glass{ border-color:rgba(0,0,0,.08); }
+
+/* Extra day opacity boosts for glass themes that used translucent white over white -> washed look */
+html[data-theme="day"][data-style="macos"]{ --surface:rgba(255,255,255,.92); --header-bg:rgba(255,255,255,.88); --header-bg-scrolled:#ffffff; }
+html[data-theme="day"][data-style="win7"]{ --surface:rgba(255,255,255,.96); --sub-bg:#f0f6ff; --header-bg:linear-gradient(180deg,#5aa8f0 0%,#2a7bd8 50%,#1a5fb8 100%); }
+html[data-theme="day"][data-style="win11"]{ --surface:#ffffff; }
+html[data-theme="day"][data-style="android"]{ --surface:#ffffff; }
+html[data-theme="day"][data-style="ios"]{ --surface:#ffffff; --header-bg:#ffffff; --header-bg-scrolled:#ffffff; }
+html[data-theme="day"][data-style="appletv"]{ --surface:#ffffff; --header-bg:rgba(255,255,255,.96); --header-bg-scrolled:#ffffff; }
+html[data-theme="day"][data-style="youtube"]{ --sub-bg:#f2f2f2; }
+html[data-theme="day"][data-style="instagram"]{ --sub-bg:#f5f5f5; }
+
+/* Ensure day inputs and placeholders are readable */
+html[data-theme="day"] input::placeholder,
+html[data-theme="day"] textarea::placeholder,
+html[data-theme="day"] select{ color:var(--muted); }
+html[data-theme="day"] input, html[data-theme="day"] select, html[data-theme="day"] textarea{ border-color:var(--line); }
+
+/* Force muted to meet AA on white: minimum #5a5a5a */
+html[data-theme="day"]{ --a11y-muted:#5a6578; }
+html[data-theme="day"][data-style="default"]{ --muted:#4a6578; }
+
+/* Fix header contrast for day themes where header stays dark over light page */
+html[data-theme="day"][data-style="prime"] .nav a{ color:#e8f6ff; }
+html[data-theme="day"][data-style="prime"] .nav a:hover{ color:#ffffff; background:rgba(255,255,255,.12); }
+html[data-theme="day"][data-style="prime"] .logo-word span{ color:#ffffff; }
+html[data-theme="day"][data-style="win8"] .nav a{ color:#ffffff; }
+html[data-theme="day"][data-style="win8"] .nav a:hover{ background:rgba(255,255,255,.18); }
+html[data-theme="day"][data-style="win8"] .logo-word{ color:#ffffff; }
+html[data-theme="day"][data-style="win8"] .logo-mark::before,
+html[data-theme="day"][data-style="win8"] .logo-mark::after{ background:#ffffff; }
+html[data-theme="day"][data-style="win8"] .hamburger{ border-color:rgba(255,255,255,.4); }
+
+/* Hero title breathing space — keep story title away from screen edge */
+.hero-content{ padding-inline:20px; }
+@media(max-width:900px){ .hero-content{ padding-inline:16px; } }
+html[data-style] .hero-content{ padding-inline:20px; }
+html[data-style="facebook"] .hero-content,
+html[data-style="win7"] .hero-content,
+html[data-style="macos"] .hero-content{ padding-inline:20px; }
+.hero-copy{ padding-inline:8px; }
+
+/* ---------- Site name: "CineAura WEB" in every style ----------
+   The only word that follows CineAura in the logo is WEB (old " YouTube" / " tv+" suffixes removed). */
+.logo-word::after{ content:" WEB"; font-weight:400; opacity:.9; letter-spacing:0; }
+
+/* ==========================================================
+   DEFAULT THEME — PERFORMANCE PASS (task: keep the Cineaura
+   glass attractive but light. Only data-style="default" pages
+   are touched; the preset styles above are unchanged.)
+
+   1. Blur is expensive: 22px backdrop blur + 80px blurred,
+      animating orbs repaint whole regions on every scroll frame.
+   2. Everything here keeps the translucent look with much
+      cheaper effects: a hairline blur (6px) on the sticky
+      chrome only, cheap transforms for the three orbs (their
+      smooth edge now comes from a radial-gradient, no filter),
+      and calmer static radial pools on the background.
+   3. Cheap enough that phones and long pages stay fluid.
+   ========================================================== */
+
+/* --- 1. background: static pool gradients instead of SVG noise --- */
+html[data-style="default"] .grain { display: none; }
+html[data-style="default"] .bg-orbs {
+  background:
+    radial-gradient(1100px 620px at 8% -8%, rgba(1, 180, 228, 0.13), transparent 58%),
+    radial-gradient(900px 520px at 100% 0%, rgba(144, 206, 161, 0.09), transparent 52%),
+    radial-gradient(700px 480px at 70% 100%, rgba(1, 180, 228, 0.06), transparent 55%),
+    var(--orbs-base);
+}
+
+/* --- 2. floating orbs: same drift, but NO blur filter --- */
+html[data-style="default"] .orb {
+  filter: none;
+  opacity: 0.55;
+  animation-duration: 45s;
+  animation-timing-function: linear;
+  will-change: transform;
+  border-radius: 50%;
+  /* the radial gradient fakes the soft edge the blur used to give;
+     the color stop matches the previous blur halo */
+}
+html[data-style="default"] .orb-cyan,
+html[data-style="default"] .orb-mid {
+  background: radial-gradient(closest-side, rgba(1, 180, 228, 0.5), rgba(1, 180, 228, 0) 72%);
+}
+html[data-style="default"] .orb-green {
+  background: radial-gradient(closest-side, rgba(144, 206, 161, 0.45), rgba(144, 206, 161, 0) 72%);
+}
+
+/* --- 3. sticky chrome: keep glass, but a hairline blur --- */
+html[data-style="default"] .header.scrolled .header-inner {
+  backdrop-filter: blur(6px) saturate(135%);
+  -webkit-backdrop-filter: blur(6px) saturate(135%);
+}
+html[data-style="default"] .mobile-menu {
+  backdrop-filter: blur(6px) saturate(135%);
+  -webkit-backdrop-filter: blur(6px) saturate(135%);
+}
+
+/* --- 4. cards & page elements: NO constant glass repaint --- */
+html[data-style="default"] .glass,
+html[data-style="default"] .watch-panel,
+html[data-style="default"] .profile-card,
+html[data-style="default"] .card,
+html[data-style="default"] .help-toc,
+html[data-style="default"] .help-section-card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* the translucent fills were tuned to sit on a blurred backdrop;
+   make them slightly denser so text contrast is unchanged */
+html[data-style="default"]:not([data-theme="day"]) {
+  --surface: rgba(12, 28, 45, 0.9);
+  --card-bg: rgba(14, 32, 51, 0.92);
+  --input-bg: rgba(10, 24, 40, 0.94);
+}
+html[data-style="default"][data-theme="day"] {
+  --surface: rgba(255, 255, 255, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --input-bg: rgba(255, 255, 255, 0.95);
+}
+
+/* --- 5. cheaper ambience: the hero's saturate/contrast filter repaints
+       on every Ken Burns frame; the drop-shadows on small icons add a
+       painter to each card. The look survives without them. --- */
+html[data-style="default"] .hero-bg { filter: none; }
+html[data-style="default"] .hero-thumbs button.active::after,
+html[data-style="default"] .live-dot i { animation-duration: 60s; }

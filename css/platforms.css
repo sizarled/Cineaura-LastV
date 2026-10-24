@@ -1,0 +1,250 @@
+/* Social platforms — the home "Follow us" strip, the Panel composer and the
+   Panel settings forms. Loaded by index.html and panel.html. */
+
+.pf-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22%;
+  font-weight: 800;
+  line-height: 1;
+  flex: 0 0 auto;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* ── home strip ─────────────────────────────────────────────────────────── */
+.pf-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+}
+.pf-strip a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+html[dir="rtl"] .pf-strip a { padding: 6px 7px 6px 12px; }
+.pf-strip a:hover {
+  border-color: var(--accent);
+  background: rgba(1, 180, 228, 0.08);
+  transform: translateY(-1px);
+}
+.pf-strip-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.pf-strip-head h4 { margin: 0; }
+.pf-strip-hint { font-size: 12px; color: var(--muted); }
+
+/* ── panel: settings & composer ─────────────────────────────────────────── */
+.pf-set-card,
+.pf-box {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  display: grid;
+  gap: 8px;
+}
+.pf-set-head { display: flex; align-items: center; gap: 8px; }
+.pf-set-head b { font-size: 14px; }
+.pf-set-head .spacer { flex: 1; }
+.pf-set-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.pf-set-grid label, .pf-composer label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+.pf-set-grid input, .pf-composer input, .pf-composer textarea, .pf-composer select {
+  width: 100%;
+}
+.pf-cred-note { font-size: 11.5px; color: var(--muted); }
+.pf-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pf-day select { min-width: 110px; }
+
+.pf-plats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pf-plat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  user-select: none;
+  transition: 0.15s;
+}
+.pf-plat-chip input { display: none; }
+.pf-plat-chip.on {
+  border-color: var(--accent);
+  background: rgba(1, 180, 228, 0.12);
+  color: var(--accent);
+}
+.pf-plat-chip .pf-day-tag {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.pf-media-tabs { display: inline-flex; gap: 6px; }
+.pf-media-tabs button {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+.pf-media-tabs button.on { border-color: var(--accent); color: var(--accent); background: rgba(1,180,228,.1); }
+.pf-media-preview { max-width: 260px; max-height: 140px; border-radius: 10px; border: 1px solid var(--line); display: block; }
+
+.pf-posts { display: grid; gap: 10px; }
+.pf-post {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  display: grid;
+  gap: 8px;
+}
+.pf-post-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pf-post-top b { font-size: 14px; }
+.pf-post-desc { font-size: 12.5px; color: var(--muted); white-space: pre-wrap; }
+.pf-post-tags { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11.5px; color: var(--accent); }
+.pf-post-plats { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.pf-state {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.pf-state.pending { color: #eab308; border-color: rgba(234, 179, 8, 0.4); }
+.pf-state.pending_webhook { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+.pf-state.published { color: #90cea1; border-color: rgba(144, 206, 161, 0.4); }
+.pf-state.partial { color: #f59e0b; border-color: rgba(245, 158, 11, 0.45); }
+.pf-state.failed { color: #f87171; border-color: rgba(248, 113, 113, 0.45); }
+.pf-post-meta { font-size: 11.5px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.pf-post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.pf-res { font-size: 11px; color: var(--muted); }
+
+/* ── platform.html: pick a network ─────────────────────────────────────── */
+body.platform-page { min-height: 100vh; display: flex; flex-direction: column; }
+.pfg-top {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px clamp(16px, 5vw, 48px);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface, rgba(13, 37, 63, 0.5));
+  position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+}
+.pfg-brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); font-size: 17px; }
+.pfg-top .spacer { flex: 1; }
+#pfg-root { flex: 1; width: min(1040px, 100% - 32px); margin: 0 auto; padding: 26px 0 40px; }
+.pfg-foot { text-align: center; padding: 18px 0 26px; font-size: 12.5px; border-top: 1px solid var(--line); }
+.pfg-hero { text-align: center; margin: 18px 0 26px; }
+.pfg-hero h1 { margin: 8px 0 6px; }
+.pfg-hero .muted { max-width: 640px; margin: 0 auto; }
+
+.pfg-grid {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+.pfg-card {
+  position: relative; display: grid; justify-items: center; gap: 7px;
+  padding: 22px 14px 16px; border-radius: 16px;
+  border: 1px solid var(--line); background: var(--surface);
+  text-decoration: none; color: var(--text); text-align: center;
+  transition: 0.18s; cursor: pointer;
+}
+.pfg-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.pfg-card.linked { border-color: rgba(34, 197, 94, 0.55); }
+.pfg-tick {
+  position: absolute; top: 10px; inset-inline-end: 10px;
+  width: 24px; height: 24px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #22c55e; color: #fff; font-weight: 800; font-size: 14px;
+  box-shadow: 0 2px 8px rgba(34,197,94,.5);
+}
+.pfg-name { font-weight: 700; font-size: 14.5px; }
+.pfg-state { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); }
+.pfg-state.on { color: #22c55e; border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.08); }
+.pfg-state.off { color: var(--muted); }
+.pfg-url { font-size: 11px; color: var(--muted); word-break: break-all; }
+.pfg-day { font-size: 10.5px; color: var(--accent); }
+.pfg-mail { text-align: center; margin-top: 26px; }
+
+/* ── platform.html#net: the link form (full width) ─────────────────────── */
+.pfg-form-top { display: flex; padding-top: 4px; }
+.pfg-form-badge { display: grid; place-items: center; }
+.pfg-form { width: 100%; margin: 0 auto 40px; padding: 22px clamp(16px, 4vw, 34px); }
+.pfg-grid2 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.pfg-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.pfg-switch { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+.pfg-sub { margin: 14px 0 2px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pfg-kept { font-size: 11.5px; font-weight: 500; }
+.pfg-form label { display: grid; gap: 5px; font-size: 12.5px; color: var(--muted); }
+.pfg-actions { margin-top: 18px; display: flex; justify-content: center; }
+.pfg-link-btn { padding: 12px 30px; font-size: 15px; border-radius: 999px; }
+.pfg-msg { border-radius: 16px; padding: 22px 18px; text-align: center; display: grid; justify-items: center; gap: 8px; margin-top: 18px; }
+.pfg-msg h3 { margin: 0; }
+.pfg-msg-icon {
+  width: 52px; height: 52px; border-radius: 999px; display: grid; place-items: center;
+  font-size: 26px; font-weight: 900; color: #fff;
+}
+.pfg-msg.ok { border: 1px solid rgba(34,197,94,.55); background: rgba(34,197,94,.08); }
+.pfg-msg.ok .pfg-msg-icon { background: #22c55e; }
+.pfg-msg.fail { border: 1px solid rgba(239,68,68,.5); background: rgba(239,68,68,.07); }
+.pfg-msg.fail .pfg-msg-icon { background: #ef4444; }
+.pfg-msg p { margin: 0; }
+.pfg-gate { text-align: center; margin: 60px auto 0; max-width: 460px; padding: 28px; }
+
+/* ── Panel > Settings: the tidy social table (one uniform row per network) ── */
+.pft-wrap { overflow-x: auto; }
+.pft-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.pft-table th {
+  text-align: start; font-size: 11px; color: var(--muted); font-weight: 700;
+  padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+.pft-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.pft-table tr:last-child td { border-bottom: 0; }
+.pft-table tr:hover td { background: rgba(1,180,228,.04); }
+.pft-plat { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.pft-status { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+.pft-status.on { color: #22c55e; border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.08); }
+.pft-status.off { color: var(--muted); }
+.pft-table input[type="url"] { min-width: 200px; width: 100%; }
+.pft-table select { min-width: 100px; }
+.pft-linkbtn { white-space: nowrap; text-decoration: none; }
+
+@media (max-width: 640px) {
+  .pfg-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pfg-card { padding: 16px 10px 12px; }
+}
+
+/* composer header row (Platforms section): title + the "Link a network" button */
+.pf-composer-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pf-composer-head h3 { flex: 1; }

@@ -1,0 +1,336 @@
+/* Questions & Answers page — standalone writing canvas inspired by Article Editor. */
+body.qa-editor-page {
+  min-height: 100%;
+  padding: 104px 16px 48px;
+  background: var(--orbs-base, linear-gradient(180deg, #08131e, #070f18 46%, #0a1826));
+  background-attachment: fixed;
+  color: var(--text, #f4fbff);
+  font-family: "Cairo", "Outfit", "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+body.qa-editor-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(520px 320px at 85% 8%, rgba(1, 180, 228, .16), transparent 70%),
+    radial-gradient(480px 300px at 10% 90%, rgba(144, 206, 161, .12), transparent 70%);
+}
+
+html[data-style]:not([data-style="default"]) body.qa-editor-page::before {
+  display: none;
+}
+
+body.qa-editor-page .bg-orbs,
+body.qa-editor-page .grain {
+  display: none;
+}
+
+.qa-page-main {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+.qa-page-main .ct-bar {
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom-color: var(--line);
+}
+
+.qa-page-main .ct-bar .follow-tab {
+  padding: 10px 14px;
+  border-bottom-width: 2px;
+  font-size: 14px;
+}
+
+.qa-page-root {
+  --qa-accent: var(--cyan, #01b4e4);
+  --qa-accent-2: var(--cyan-2, var(--cyan, #01b4e4));
+  --qa-text: var(--text, #f4fbff);
+  --qa-muted: var(--muted, #9bb0c2);
+  --qa-line: var(--line, rgba(145, 196, 220, .16));
+  --qa-surface: var(--surface, rgba(9, 22, 36, .62));
+  --qa-input: var(--input, var(--input-bg, rgba(4, 14, 24, .55)));
+  --qa-sub: var(--sub, var(--sub-bg, rgba(255, 255, 255, .05)));
+  --qa-shadow: var(--shadow, 0 24px 80px rgba(0, 0, 0, .42));
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  color: var(--qa-text);
+  font-family: "Cairo", "Outfit", "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.qa-page-root .qa-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+  padding: 0 0 17px;
+  border-bottom: 1px solid var(--qa-line);
+}
+
+.qa-page-head-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.qa-page-head-copy h1 {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 36px);
+  line-height: 1.25;
+}
+
+.qa-page-head-copy p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--qa-muted);
+}
+
+.qa-page-root .qa-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.qa-page-root .qa-page-actions .btn {
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 8px 15px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.qa-page-root .com-qa-form {
+  width: min(100%, 960px);
+  margin: 18px auto;
+  padding: clamp(22px, 4vw, 44px);
+  gap: 22px;
+  border: 1px solid var(--qa-line);
+  border-radius: 18px;
+  background: var(--qa-surface);
+  box-shadow: var(--qa-shadow), inset 0 1px 0 rgba(255, 255, 255, .08);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.qa-page-root .com-qa-head {
+  align-items: center;
+  gap: 16px;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--qa-line);
+}
+
+.qa-page-root .com-qa-head h2,
+.qa-page-root .com-qa-head h3 {
+  margin: 0 0 5px;
+  color: var(--qa-text);
+  font-size: clamp(21px, 2.8vw, 27px);
+  line-height: 1.3;
+}
+
+.qa-page-root .com-qa-head p {
+  color: var(--qa-muted);
+}
+
+.qa-page-root .com-qa-mark {
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
+  border: 1px solid color-mix(in srgb, var(--qa-accent) 38%, var(--qa-line));
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--qa-accent) 13%, transparent);
+  color: var(--qa-accent-2);
+  font-size: 23px;
+}
+
+.qa-page-root .com-qa-form .com-field {
+  gap: 8px;
+}
+
+.qa-page-root .com-qa-form .com-field-label,
+.qa-page-root .com-qa-form .com-attach-field > .com-field-label {
+  color: var(--qa-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.qa-page-root .com-qa-form input:not(.com-file-input),
+.qa-page-root .com-qa-form textarea {
+  min-height: 48px;
+  border: 1px solid var(--qa-line);
+  border-radius: 12px;
+  padding: 11px 13px;
+  background: var(--qa-input);
+  color: var(--qa-text);
+  font: inherit;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.qa-page-root .com-qa-form #com-question-title {
+  min-height: 56px;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.qa-page-root .com-qa-form #com-question-details,
+.qa-page-root .com-qa-form #com-answer-body {
+  min-height: 230px;
+  line-height: 1.9;
+}
+
+.qa-page-root .com-qa-form input:not(.com-file-input):focus,
+.qa-page-root .com-qa-form textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--qa-accent) 65%, var(--qa-line));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--qa-accent) 15%, transparent);
+}
+
+.qa-page-root .com-qa-form .com-attach-field {
+  gap: 9px;
+}
+
+.qa-page-root .com-dropzone {
+  min-height: 88px;
+  padding: 17px 18px;
+  border-color: color-mix(in srgb, var(--qa-accent) 48%, var(--qa-line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--qa-accent) 5%, var(--qa-sub));
+}
+
+.qa-page-root .com-dropzone:hover,
+.qa-page-root .com-dropzone.is-dragover {
+  border-color: var(--qa-accent);
+  background: color-mix(in srgb, var(--qa-accent) 10%, var(--qa-sub));
+}
+
+.qa-page-root .com-drop-icon {
+  border: 1px solid color-mix(in srgb, var(--qa-accent) 24%, var(--qa-line));
+  background: color-mix(in srgb, var(--qa-accent) 12%, var(--qa-sub));
+}
+
+.qa-page-root .com-selected-file,
+.qa-page-root .com-attach-file {
+  border-color: var(--qa-line);
+  border-radius: 12px;
+  background: var(--qa-sub);
+}
+
+.qa-page-root .com-form-status {
+  color: var(--qa-muted);
+}
+
+.qa-page-root .com-qa-form .com-form-actions {
+  justify-content: flex-start;
+  gap: 9px;
+  padding-top: 4px;
+}
+
+.qa-page-root .com-qa-form .com-form-actions .btn {
+  min-height: 42px;
+  border-radius: 12px;
+  padding: 8px 17px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.qa-page-root .com-row.glass,
+.qa-page-root .com-q.glass,
+.qa-page-root .com-answer.glass {
+  border: 1px solid var(--qa-line);
+  background: var(--qa-surface);
+  box-shadow: var(--qa-shadow), inset 0 1px 0 rgba(255, 255, 255, .06);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+
+.qa-page-root .com-row.glass {
+  min-height: 76px;
+  padding: 15px 17px;
+  border-radius: 15px;
+}
+
+.qa-page-root .com-row.glass:hover {
+  border-color: var(--qa-accent);
+}
+
+.qa-page-root .com-q,
+.qa-page-root .com-answer {
+  border-radius: 16px;
+}
+
+.qa-page-root .com-q h2 {
+  font-size: clamp(22px, 2.8vw, 30px);
+  line-height: 1.35;
+}
+
+.qa-page-root .com-back,
+.qa-page-root .com-attach-download {
+  color: var(--qa-accent-2);
+}
+
+.qa-page-root .com-answer.com-hl {
+  outline-color: var(--qa-accent);
+}
+
+@media (max-width: 700px) {
+  body.qa-editor-page {
+    padding: 94px 10px 32px;
+  }
+
+  .qa-page-main {
+    width: min(100%, calc(100% - 8px));
+  }
+
+  .qa-page-root .qa-page-head {
+    align-items: flex-start;
+    padding-bottom: 14px;
+  }
+
+  .qa-page-root .com-qa-form {
+    padding: 19px 16px;
+    gap: 18px;
+    border-radius: 16px;
+  }
+
+  .qa-page-root .com-qa-head {
+    align-items: flex-start;
+    gap: 11px;
+  }
+
+  .qa-page-root .com-qa-mark {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    border-radius: 13px;
+  }
+
+  .qa-page-root .com-dropzone {
+    padding: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qa-page-root *,
+  .qa-page-root *::before,
+  .qa-page-root *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
