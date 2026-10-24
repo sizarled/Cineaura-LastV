@@ -58,18 +58,9 @@
     try{ localStorage.setItem(STYLE_KEY, style); }catch{}
     // sync to profile if logged in (non-blocking, best-effort)
     try{
-      const sb = window.supabaseRequest;
-      const rs = window.restValue;
-      // we need member_id/profile sync — defer to existing session logic
-      // Try to get session from localStorage supabase? Instead call generic PATCH via common helpers if available
-      // Use profiles table if column exists; swallow errors (column may not exist yet)
-      const sessRaw = localStorage.getItem("cineaura_session");
-      let memberId = null;
-      if(sessRaw){ try{ const s=JSON.parse(sessRaw); memberId = s.member_id || s.memberId || null; }catch{} }
-      // also check sb session storage used elsewhere
-      if(!memberId){
-        // try reading from dashboard state? fallback: attempt PATCH without id will fail safely
-      }
+      const sb = window.CineAura?.supabaseRequest;
+      const rs = window.CineAura?.restValue;
+      const memberId = window.CineAura?.getSession?.()?.member_id;
       if(memberId && sb && rs){
         sb(`/rest/v1/profiles?member_id=eq.${rs(memberId)}`, { method:"PATCH", body: JSON.stringify({ style }) }).catch(()=>{});
       }

@@ -32,6 +32,8 @@
   const SUPABASE_URL = "https://samazxadqggoeilaqfdp.supabase.co";
   const SUPABASE_KEY = "sb_publishable_UZ74c-sHOywW9lOfErwXuA_GtMtvYYY";
 
+  const auth = window.CineAuraAuth.create({ url: SUPABASE_URL, key: SUPABASE_KEY });
+
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -44,12 +46,14 @@
     toast._t = setTimeout(() => el.classList.remove("show"), 2800);
   }
 
+  // This is display metadata, not an authentication/authorization source.
+  // Old localStorage-only sessions are deliberately invalid after the cutover.
   function getSession() {
     try {
-      return JSON.parse(localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY) || "null");
-    } catch {
-      return null;
-    }
+      const identity = auth.peekSession()?.user.id;
+      const cached = JSON.parse(localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY) || "null");
+      return identity && cached?.auth_user_id === identity ? cached : null;
+    } catch { return null; }
   }
 
   function validReferralMemberId(value) {
@@ -123,9 +127,12 @@
     return Boolean(getSession());
   }
 
-  function setSession(member, stay = true) {
+  function setSession(member, stay = auth.peekSession()?.stay ?? true) {
+    const identity = auth.peekSession()?.user.id;
+    if (!identity || member.auth_user_id !== identity) throw new Error("verified_member_session_required");
     const payload = JSON.stringify({
       member_id: member.member_id,
+      auth_user_id: identity,
       username: member.username,
       email: member.email,
       full_name: member.full_name,
@@ -497,6 +504,9 @@
 
   function logout() {
     touchPresence(true);
+    void auth.signOut();
+    localStorage.removeItem("cineaura_panel");
+    sessionStorage.removeItem("cineaura_panel");
     localStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY);
     renderAuth();
@@ -848,11 +858,10 @@
     }
     let res;
     try {
-      res = await fetch(`${SUPABASE_URL}/storage/v1/object/${AVATAR_BUCKET}/${avatarObjectPath(id)}`, {
+      res = await supabaseFetch(`${SUPABASE_URL}/storage/v1/object/${AVATAR_BUCKET}/${avatarObjectPath(id)}`, {
         method: "POST",
         headers: {
           apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
           "Content-Type": "image/jpeg",
           "x-upsert": "true",
           // browsers keep a picture for a day; every upload has a new ?v= link anyway
@@ -1052,11 +1061,10 @@
   async function storagePut(path, blob) {
     let res;
     try {
-      res = await fetch(`${SUPABASE_URL}/storage/v1/object/${PICTURE_BUCKET}/${String(path).split("/").map(encodeURIComponent).join("/")}`, {
+      res = await supabaseFetch(`${SUPABASE_URL}/storage/v1/object/${PICTURE_BUCKET}/${String(path).split("/").map(encodeURIComponent).join("/")}`, {
         method: "POST",
         headers: {
           apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
           "Content-Type": "image/jpeg",
           "x-upsert": "true",
           "cache-control": "max-age=86400",
@@ -1330,7 +1338,7 @@
   // Staff (Super Admin / Admin / Moderator) rows, safe when sql/panel.sql is not installed yet.
   async function fetchStaff(columns = "id,role,member_id,username") {
     const pick = String(columns).split(",").map((c) => c.trim()).filter(Boolean);
-    const res = await supabaseRequest(`/rest/v1/staff?select=${pick.join(",")}&order=created_at.asc`);
+    const res = await supabaseRequest(`/rest/v1/staff_directory?select=${pick.join(",")}&order=id.asc`);
     return res.ok && Array.isArray(res.data) ? res.data : [];
   }
 
@@ -1869,10 +1877,9 @@
     const url = `${SUPABASE_URL}/rest/v1/codes?code=eq.${encodeURIComponent(clean)}&select=*`;
     let res;
     try {
-      res = await fetch(url, {
+      res = await supabaseFetch(url, {
         headers: {
           apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
           Accept: "application/json",
         },
       });
@@ -3458,12 +3465,24 @@
     return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
+  // The directory views redact private columns for other visitors. Base tables
+  // remain protected even if a caller bypasses this convenience routing.
+  function databasePath(path, options) {
+    if (!options.method || String(options.method).toUpperCase() === "GET") {
+      return path.replace(/^\/rest\/v1\/members(?=[?]|$)/, "/rest/v1/member_directory")
+        .replace(/^\/rest\/v1\/profiles(?=[?]|$)/, "/rest/v1/profile_directory");
+    }
+    return path;
+  }
+
+  async function supabaseFetch(path, options = {}) {
+    return auth.fetch(path, options);
+  }
+
   async function supabaseRequest(path, options = {}) {
-    const res = await fetch(`${SUPABASE_URL}${path}`, {
+    const res = await supabaseFetch(databasePath(path, options), {
       ...options,
       headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
         Accept: "application/json",
         "Content-Type": "application/json",
         Prefer: "return=representation",
@@ -3472,14 +3491,45 @@
     });
     let data = null;
     const raw = await res.text();
-    try {
-      data = raw ? JSON.parse(raw) : null;
-    } catch {
-      data = raw;
-    }
-    // Headers carry the total row count when a request asks for count=exact.
+    try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
     return { ok: res.ok, status: res.status, data, headers: res.headers };
   }
+
+  function authErrorText(error) {
+    const code = String(error?.code || error?.message || "");
+    if (code === "weak_password") return t("auth.secure.newPassword");
+    if (["invalid_auth_callback", "unsupported_auth_callback"].includes(code)) return t("auth.secure.callbackInvalid");
+    if (["legacy_claim_review_required", "legacy_account_already_claimed"].includes(code)) return t("auth.secure.pending");
+    if (["invalid_credentials", "email_not_confirmed", "invalid_email"].includes(code)) return t("auth.secure.invalid");
+    if (code === "email_ownership_refresh_required") return t("auth.secure.freshEmail");
+    if (["authentication_required", "authentication_identity_changed", "auth_request_cancelled"].includes(code)) return t("wd.err.member");
+    if (["member_binding_failed", "account_details_required", "banned", "email_confirmation_required"].includes(code)) return t("auth.secure.bindingFailed");
+    return t("auth.secure.error");
+  }
+
+  async function loadAuthMember() {
+    const result = await rpc("member_auth_bind");
+    if (!result.ok || !result.data?.ok || !result.data.member) {
+      throw new window.CineAuraAuth.AuthError(result.data?.reason || result.data?.message || "member_binding_failed", result.status);
+    }
+    setSession(result.data.member);
+    clearReferralAttribution();
+    return result.data.member;
+  }
+
+  auth.onChange((session) => {
+    // Never carry another Auth identity's display cache into a new session.
+    if (!session || !getSession()) {
+      localStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem("cineaura_panel");
+      sessionStorage.removeItem("cineaura_panel");
+    }
+    if (document.body) {
+      renderAuth();
+      syncAuthGate();
+    }
+  });
 
   // Tell the author's accepted followers that a new post is out. One bulk insert
   // keeps it cheap; failures stay silent (the post itself is already saved).
@@ -5677,6 +5727,10 @@
     wireSessionNav,
     posterCard,
     sha256,
+    auth,
+    loadAuthMember,
+    authErrorText,
+    supabaseFetch,
     supabaseRequest,
     POINT_RATES,
     STORED_POINT_COLUMNS,

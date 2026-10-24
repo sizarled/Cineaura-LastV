@@ -117,14 +117,13 @@
   const qaPublicUrl = (path) => `${String(C().SUPABASE_URL || "").replace(/\/+$/, "")}/storage/v1/object/public/${QA_BUCKET}/${qaEncodePath(path)}`;
   const qaAuthHeaders = (extra) => ({
     apikey: C().SUPABASE_KEY,
-    Authorization: `Bearer ${C().SUPABASE_KEY}`,
     ...(extra || {}),
   });
 
   async function removeQAFiles(paths) {
     await Promise.all((paths || []).map(async (path) => {
       try {
-        await fetch(qaStorageUrl(path), { method: "DELETE", headers: qaAuthHeaders() });
+        await C().supabaseFetch(qaStorageUrl(path), { method: "DELETE", headers: qaAuthHeaders() });
       } catch {
         /* cleanup must not hide the original save error */
       }
@@ -142,7 +141,7 @@
       if (statusNode) statusNode.textContent = t("com.uploadingFile", { current: i + 1, total: files.length });
       let res;
       try {
-        res = await fetch(qaStorageUrl(path), {
+        res = await C().supabaseFetch(qaStorageUrl(path), {
           method: "POST",
           headers: qaAuthHeaders({
             "Content-Type": file.type || "application/octet-stream",

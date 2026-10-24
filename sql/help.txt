@@ -190,8 +190,17 @@ begin
   end if;
 end $$;
 -- v1 legacy columns must not block new inserts (both were NOT NULL without defaults)
-alter table public.help_article_votes alter column voter_key drop not null;
-alter table public.help_article_votes alter column is_useful drop not null;
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+              where table_schema = 'public' and table_name = 'help_article_votes' and column_name = 'voter_key') then
+    alter table public.help_article_votes alter column voter_key drop not null;
+  end if;
+  if exists (select 1 from information_schema.columns
+              where table_schema = 'public' and table_name = 'help_article_votes' and column_name = 'is_useful') then
+    alter table public.help_article_votes alter column is_useful drop not null;
+  end if;
+end $$;
 -- drop exact duplicate (article, member) rows before the unique index
 delete from public.help_article_votes a using public.help_article_votes b
  where a.article_id = b.article_id and a.member_id = b.member_id and a.id < b.id and a.member_id <> '';

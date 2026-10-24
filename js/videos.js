@@ -43,11 +43,10 @@
     if (ytMetaCache.has(id)) return ytMetaCache.get(id);
     let out = null;
     try {
-      const res = await fetch(`${C.SUPABASE_URL}/functions/v1/youtube-search`, {
+      const res = await C.supabaseFetch(`${C.SUPABASE_URL}/functions/v1/youtube-search`, {
         method: "POST",
         headers: {
           apikey: C.SUPABASE_KEY,
-          Authorization: `Bearer ${C.SUPABASE_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ video: id }),
@@ -326,12 +325,11 @@
   // A request that survives the page being left (a click on a card opens another page).
   function beacon(name, args) {
     try {
-      fetch(`${C.SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      C.supabaseFetch(`${C.SUPABASE_URL}/rest/v1/rpc/${name}`, {
         method: "POST",
         keepalive: true,
         headers: {
           apikey: C.SUPABASE_KEY,
-          Authorization: `Bearer ${C.SUPABASE_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(args),

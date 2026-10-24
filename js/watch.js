@@ -460,6 +460,7 @@
     const ctl = new AbortController();
     const timeout = setTimeout(() => ctl.abort(), 6000);
     try {
+      // Intentional credential-free reachability probe, not a database operation.
       // no-cors: any answer (even 401) proves the internet works; only a network failure throws
       await fetch(`${CineAura.SUPABASE_URL}/rest/v1/`, { mode: "no-cors", cache: "no-store", signal: ctl.signal });
       net.down = false;

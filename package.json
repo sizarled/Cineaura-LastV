@@ -1,0 +1,22 @@
+{
+  "name": "cineaura-static-site",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:security",
+    "test:auth": "node --test tests/auth-client.test.cjs",
+    "test:auth:source": "node --test tests/auth-source.test.cjs",
+    "test:auth:browser": "node tests/auth-browser.test.cjs",
+    "test:security:db": "node tests/security-db.test.cjs",
+    "test:security": "npm run test:auth && npm run test:auth:source && npm run test:security:db && npm run test:auth:browser"
+  },
+  "devDependencies": {
+    "@sparticuz/chromium": "153.0.0",
+    "embedded-postgres": "17.6.0-beta.15",
+    "pg": "8.23.1",
+    "playwright-core": "1.64.1",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

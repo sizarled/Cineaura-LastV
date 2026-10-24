@@ -2,7 +2,6 @@
   const API_KEY = "dec98ec9b59a5938a5ee3ae4eda1e090";
   const API = "https://api.themoviedb.org/3";
   const IMG = "https://image.tmdb.org/t/p";
-  const SESSION_KEY = "cineaura_session";
   const HERO_MS = 7000;
 
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -17,11 +16,7 @@
   }
 
   function isLoggedIn() {
-    try {
-      return Boolean(JSON.parse(localStorage.getItem(SESSION_KEY) || "null"));
-    } catch {
-      return false;
-    }
+    return Boolean(window.CineAura?.getSession?.());
   }
 
   function renderAuth() {
@@ -31,9 +26,7 @@
   }
 
   function logout() {
-    localStorage.removeItem(SESSION_KEY);
-    renderAuth();
-    toast((window.CineAura?.t && window.CineAura.t("home.signedOut")) || "You have been signed out.");
+    window.CineAura?.logout?.();
   }
 
   function imgUrl(path, size = "w780") {
@@ -311,9 +304,7 @@
       e.preventDefault();
       const form = e.currentTarget;
       const fd = new FormData(form);
-      const session = (() => {
-        try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch { return null; }
-      })();
+      const session = window.CineAura?.getSession?.() || null;
       if (window.CineAura?.supabaseRequest) {
         await window.CineAura.supabaseRequest("/rest/v1/panel_messages", {
           method: "POST",
@@ -373,9 +364,7 @@
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
-        const session = (() => {
-          try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch { return null; }
-        })();
+        const session = window.CineAura?.getSession?.() || null;
         if (window.CineAura?.supabaseRequest) {
           await window.CineAura.supabaseRequest("/rest/v1/panel_messages", {
             method: "POST",

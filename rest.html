@@ -84,36 +84,36 @@
         <aside class="glass auth-visual" id="auth-visual">
           <span class="media-badge" data-i18n="rest.badge">Account recovery</span>
           <h2 data-i18n="rest.h2">Lost the key. Keep the seat.</h2>
-          <p data-i18n="rest.p">Enter the 16-character recovery code from your signup file to set a new password.</p>
+          <p data-i18n="auth.secure.resetLead">Request a reset link using your verified email. Open it in this browser to set a new password.</p>
         </aside>
 
         <form class="glass auth-card" id="code-form" novalidate>
           <span class="eyebrow" data-i18n="rest.eyebrow">Rest</span>
           <h1 data-i18n="rest.title">Recover your account</h1>
-          <p class="lead" data-i18n="rest.lead">Paste the recovery code you saved when you created the account.</p>
-          <div class="form-alert" id="code-alert"></div>
+          <p class="lead" data-i18n="auth.secure.resetLead">Request a reset link using your verified email. Open it in this browser to set a new password.</p>
+          <div class="form-alert" id="code-alert" role="status" aria-live="polite"></div>
           <div class="auth-grid auth-single">
             <label class="auth-full">
-              <span data-i18n="rest.code">Recovery code</span>
-              <input class="recovery-input" id="recovery-input" name="recovery" maxlength="16" autocomplete="one-time-code" data-i18n-placeholder="rest.codePh" placeholder="16 characters, no spaces" />
+              <span data-i18n="auth.secure.email">Email (verified account)</span>
+              <input type="email" id="recovery-email" name="email" autocomplete="email" required maxlength="254" placeholder="you@email.com" />
             </label>
             <div class="auth-full">
-              <button class="btn btn-lg btn-primary auth-submit" type="submit" id="code-btn" data-i18n="rest.continue">Continue</button>
+              <button class="btn btn-lg btn-primary auth-submit" type="submit" id="code-btn" data-i18n="auth.secure.sendReset">Send reset link</button>
             </div>
           </div>
-          <p class="auth-switch"><a href="./login.html" data-i18n="rest.backLogin">Back to login</a> · <a href="./register.html" data-i18n="rest.create">Create an account</a></p>
+          <p class="auth-switch"><a href="./login.html" data-i18n="rest.backLogin">Back to login</a> · <a href="./register.html?migrate=1" data-i18n="auth.secure.legacy">Securely link an existing account</a></p>
         </form>
 
         <form class="glass auth-card" id="password-form" hidden novalidate>
           <span class="eyebrow" data-i18n="rest.newPass">New password</span>
           <h1 data-i18n="rest.setPass">Set a new password</h1>
-          <p class="lead" data-i18n="rest.passLead">Enter the same password twice. It must be at least 8 characters.</p>
-          <div class="form-alert" id="password-alert"></div>
+          <p class="lead" data-i18n="auth.secure.newPassword">Use a password of 12 to 256 characters.</p>
+          <div class="form-alert" id="password-alert" role="status" aria-live="polite"></div>
           <div class="auth-grid auth-single">
             <label class="auth-full">
               <span data-i18n="rest.newPass">New password</span>
               <span class="password-wrap">
-                <input type="password" name="password" id="new-password" autocomplete="new-password" required minlength="8" />
+                <input type="password" name="password" id="new-password" autocomplete="new-password" required minlength="12" maxlength="256" />
                 <button type="button" id="toggle-password" data-i18n-aria="auth.showPass" aria-label="Show password">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
                 </button>
@@ -121,7 +121,7 @@
             </label>
             <label class="auth-full">
               <span data-i18n="rest.confirm">Confirm password</span>
-              <input type="password" name="confirm" id="confirm-password" autocomplete="new-password" required minlength="8" />
+              <input type="password" name="confirm" id="confirm-password" autocomplete="new-password" required minlength="12" maxlength="256" />
             </label>
             <div class="auth-full">
               <button class="btn btn-lg btn-primary auth-submit" type="submit" id="save-btn" data-i18n="rest.savePass">Save password</button>
@@ -133,11 +133,8 @@
           <span class="eyebrow" data-i18n="rest.recovered">Recovered</span>
           <h1 data-i18n="rest.ok">Password restored successfully</h1>
           <p class="lead" data-i18n="rest.okLead">Your new password is saved. Download your account details and continue to the dashboard.</p>
-          <div class="success-meta" id="success-meta"></div>
-          <div class="success-actions">
-            <button class="btn btn-lg btn-primary" id="download-txt" type="button" data-i18n="rest.download">Download details</button>
-            <a class="btn btn-lg btn-ghost" href="./dashboard.html" data-i18n="auth.goDash">Go to Dashboard</a>
-          </div>
+          <p data-i18n="auth.secure.credentials">Passwords and recovery are managed securely through verified email, not downloadable recovery codes.</p>
+          <a class="btn btn-lg btn-primary" href="./login.html" data-i18n="nav.signin">Sign In</a>
         </section>
       </section>
     </main>
@@ -146,6 +143,7 @@
   <div class="toast" id="toast" role="status"></div>
   <script src="js/i18n.js"></script>
   <script src="js/lang.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/common.js"></script>
   <script src="js/rest.js"></script>
 </body>

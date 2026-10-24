@@ -193,13 +193,12 @@
       blob = (await new Promise((r) => canvas.toBlob(r, "image/jpeg", 0.86))) || file;
     }
     const path = `${folder}/${Date.now()}${Math.floor(Math.random() * 999)}.jpg`;
-    const res = await fetch(
+    const res = await C().supabaseFetch(
       `${C().SUPABASE_URL}/storage/v1/object/source/${path.split("/").map(encodeURIComponent).join("/")}`,
       {
         method: "POST",
         headers: {
           apikey: C().SUPABASE_KEY,
-          Authorization: `Bearer ${C().SUPABASE_KEY}`,
           "Content-Type": "image/jpeg",
           "x-upsert": "true",
           "cache-control": "max-age=86400",

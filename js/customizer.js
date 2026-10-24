@@ -597,20 +597,21 @@
 
   function memberId(){
     try{ const C=window.CineAura; const s=C&&C.getSession&&C.getSession(); if(s&&s.member_id) return s.member_id; }catch{}
-    try{ const raw=localStorage.getItem("cineaura_session"); if(raw){ const j=JSON.parse(raw); return j.member_id||j.memberId||"anon"; } }catch{}
     return "anon";
   }
   async function uploadToBucket(path, data, contentType){
     try{
-      const url=`https://samazxadqggoeilaqfdp.supabase.co/storage/v1/object/${BUCKET}/${path}`;
-      const headers={ "apikey":"sb_publishable_UZ74c-sHOywW9lOfErwXuA_GtMtvYYY", "Authorization":"Bearer sb_publishable_UZ74c-sHOywW9lOfErwXuA_GtMtvYYY" };
+      const C=window.CineAura;
+      if(!C?.getSession()?.member_id) return false;
+      const url=`${C.SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;
+      const headers={};
       if(typeof data==="string") headers["Content-Type"]=contentType||"text/plain";
       else if(contentType) headers["Content-Type"]=contentType;
       const body = typeof data==="string" ? data : data;
-      const res=await fetch(url,{method:"POST", headers, body});
+      const res=await C.supabaseFetch(url,{method:"POST", headers, body});
       if(res.ok) return true;
       // try PUT if exists
-      const res2=await fetch(url,{method:"PUT", headers, body});
+      const res2=await C.supabaseFetch(url,{method:"PUT", headers, body});
       return res2.ok;
     }catch{ return false; }
   }

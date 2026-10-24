@@ -1813,6 +1813,9 @@ html[data-theme="day"] .vis-chip.vis-private { color: #c62f35; }
   outline-offset: 2px;
 }
 
+/* Auth migration/completion panels must remain hidden despite grid label styles. */
+.auth-shell [hidden] { display: none !important; }
+
 .auth-shell {
   width: min(1120px, calc(100% - 40px));
   margin: 0 auto 56px;

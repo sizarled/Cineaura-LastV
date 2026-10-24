@@ -326,11 +326,10 @@
     const path = `${FOLDER}/${id}-${token()}.${/\.m3u8$/i.test(file.name || "") ? "m3u8" : "m3u"}`;
     let res;
     try {
-      res = await fetch(`${C.SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
+      res = await C.supabaseFetch(`${C.SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
         method: "POST",
         headers: {
           apikey: C.SUPABASE_KEY,
-          Authorization: `Bearer ${C.SUPABASE_KEY}`,
           "Content-Type": "audio/x-mpegurl",
           // the name changes with every upload, so the file never needs to be fetched again
           "cache-control": "max-age=86400",

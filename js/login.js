@@ -2,18 +2,13 @@
   const {
     $,
     setupChrome,
-    isLoggedIn,
-    setSession,
     toast,
     t,
     hydratePrefsFromProfile,
-    sha256,
     supabaseRequest,
-    normalizeAccountStatus,
     tmdb,
     imgUrl,
     restValue,
-    getSession,
     initialsAvatar,
     primeAvatars,
     avatarUrlFor,
@@ -21,7 +16,7 @@
     escapeHtml,
   } = window.CineAura;
 
-  const TABLES = ["members", "Members"];
+  const { auth, loadAuthMember, authErrorText } = window.CineAura;
 
   function showAlert(type, html) {
     const el = $("#form-alert");
@@ -85,108 +80,31 @@
     $("#success-card").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  async function findMember(login) {
-    const value = String(login || "").trim();
-    const email = value.toLowerCase();
-    let tableMissing = false;
-    for (const table of TABLES) {
-      const path = `/rest/v1/${table}?or=(username.ilike.${restValue(value)},email.eq.${restValue(email)})&select=member_id,full_name,username,email,status,password,country,birth_date,recovery_code,created_at`;
-      const res = await supabaseRequest(path);
-      if (res.status === 404 && res.data?.code === "PGRST205") {
-        tableMissing = true;
-        continue;
-      }
-      if (res.ok && Array.isArray(res.data)) {
-        return { row: res.data[0] || null, tableMissing: false };
-      }
-    }
-    return { row: null, tableMissing };
-  }
-
-  async function loginViaRpc(login, hashed) {
-    const res = await supabaseRequest("/rest/v1/rpc/login_member", {
-      method: "POST",
-      body: JSON.stringify({ p_login: login, p_password: hashed }),
-    });
-    if (res.ok && res.data && typeof res.data === "object") return res.data;
-    return null;
-  }
-
   async function onSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
-    const login = String(data.login || "").trim();
-    const password = String(data.password || "");
-    const stay = Boolean(data.stay);
-
-    if (!login || !password) {
-      showAlert("error", t("auth.needFields"));
-      return;
-    }
-
-    const btn = $("#submit-btn");
-    btn.disabled = true;
-    btn.textContent = t("auth.signing");
-
+    const button = $("#submit-btn");
+    button.disabled = true;
+    button.textContent = t("auth.signing");
     try {
-      const hashed = await sha256(password);
-      const rpc = await loginViaRpc(login, hashed);
-      let result = rpc;
-
-      if (!result) {
-        const found = await findMember(login);
-        if (found.tableMissing) {
-          showAlert("warn", "The Members table is not ready yet. Run sql/members.sql in Supabase, then try again.");
-          return;
-        }
-        if (!found.row) {
-          showAlert("error", 'This account is not registered. <a class="btn btn-sm btn-primary" href="./register.html" style="margin-left:8px">Sign up</a>');
-          return;
-        }
-        const status = normalizeAccountStatus(found.row.status);
-        if (status === "banned") {
-          showAlert("error", "This account has been banned and cannot sign in.");
-          return;
-        }
-        if (found.row.password !== hashed && found.row.password !== password) {
-          showAlert("error", 'The password is incorrect. <a class="btn btn-sm btn-primary" href="./rest.html" style="margin-left:8px">Recovery</a>');
-          return;
-        }
-        result = { ok: true, reason: "ok", member: found.row };
-      }
-
-      // the precise refusals first: every refusal has ok: false
-      if (result.reason === "bad_password") {
-        showAlert("error", `${t("login.badPass")} <a class="btn btn-sm btn-primary" href="./rest.html" style="margin-left:8px">${t("auth.recovery")}</a>`);
-        return;
-      }
-      if (result.reason === "banned") {
-        // banned for not being activated / re-activated within 30 days (sql/account_deadline.sql)
-        const why = window.CineAura.accountBanText?.(result.ban_reason);
-        showAlert("error", why ? escapeHtml(why) : t("login.banned"));
-        return;
-      }
-      if (result.reason === "setup") {
-        showAlert("warn", t("login.setup"));
-        return;
-      }
-      if (result.ok === false || result.reason === "not_found") {
-        showAlert("error", `${t("login.notReg")} <a class="btn btn-sm btn-primary" href="./register.html" style="margin-left:8px">${t("nav.signup")}</a>`);
-        return;
-      }
-
-      const member = result.member || result;
-      setSession(member, stay);
+      await auth.signIn(String(data.login || "").trim(), String(data.password || ""), Boolean(data.stay));
+      const member = await loadAuthMember();
       await hydratePrefsFromProfile();
+      form.reset();
       toast(t("auth.signedOk"));
       showSuccess(member);
     } catch (error) {
-      console.error(error);
-      showAlert("error", t("login.fail"));
+      if (["username_unavailable", "account_details_required", "invalid_age"].includes(error.code) && auth.peekSession()) {
+        location.replace("./register.html?complete=1");
+        return;
+      }
+      await auth.signOut();
+      // No account enumeration and no credential/table fallback.
+      showAlert("error", escapeHtml(authErrorText(error)));
     } finally {
-      btn.disabled = false;
-      btn.textContent = t("auth.signin");
+      button.disabled = false;
+      button.textContent = t("auth.signin");
     }
   }
 
@@ -202,14 +120,32 @@
     }
   }
 
-  function init() {
+  async function init() {
     setupChrome();
     $("#toggle-password").addEventListener("click", () => {
       const input = document.querySelector('input[name="password"]');
       input.type = input.type === "password" ? "text" : "password";
     });
     $("#login-form").addEventListener("submit", onSubmit);
-    if (isLoggedIn()) showSuccess(getSession() || {});
+    try {
+      const callback = await auth.completeRedirect();
+      if (callback) {
+        if (!["signup", "email_change"].includes(callback.flow)) throw new window.CineAuraAuth.AuthError("invalid_auth_callback");
+        const member = await loadAuthMember();
+        await hydratePrefsFromProfile();
+        showSuccess(member);
+      } else if (auth.peekSession()) {
+        // Revalidate the server binding/status; never welcome a cached identity alone.
+        showSuccess(await loadAuthMember());
+      }
+    } catch (error) {
+      if (["username_unavailable", "account_details_required", "invalid_age"].includes(error.code) && auth.peekSession()) {
+        location.replace("./register.html?complete=1");
+        return;
+      }
+      await auth.signOut();
+      showAlert("error", escapeHtml(authErrorText(error)));
+    }
     setVisual();
   }
 

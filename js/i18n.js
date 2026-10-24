@@ -6,6 +6,32 @@
 (() => {
   const LANGS = ["en","ar","fr","de","es","nl","it"];
   const KEYS = {
+    "auth.secure.freshEmail": "Use an email recovery link to prove ownership again before linking this legacy account.",
+    "auth.secure.existingEmail": "If you already verified this email previously, use password recovery to securely link your account.",
+    "auth.secure.complete": "Complete your verified account profile",
+
+    // Verified account migration (October 2026).
+    "auth.secure.email": "Email (verified account)",
+    "auth.secure.signInHelp": "Sign in with your verified email. Existing accounts must be securely linked once.",
+    "auth.secure.legacy": "Securely link an existing account",
+    "auth.secure.legacyTitle": "Securely link your account",
+    "auth.secure.legacyHelp": "Use your original account email and choose a new password. Confirm the email link to keep your member ID, content and points.",
+    "auth.secure.verify": "Check your email to confirm your account. No member session is created before verification.",
+    "auth.secure.recoverySent": "If an eligible account exists, a reset link has been sent. Old recovery codes are no longer accepted.",
+    "auth.secure.newPassword": "Use a password of 12 to 256 characters.",
+    "auth.secure.invalid": "Unable to sign in. Check your email and password, confirm your email, or securely link your existing account.",
+    "auth.secure.callbackInvalid": "This link is invalid, expired, or was opened in another browser. Request a new link and use the browser that requested it.",
+    "auth.secure.pending": "Your legacy account needs an ownership review. Contact support; no account data has been changed.",
+    "auth.secure.bindingFailed": "Your email is verified, but your member account could not be loaded. Please try again or contact support.",
+    "auth.secure.resetLead": "Request a reset link using your verified email. Open it in this browser to set a new password.",
+    "auth.secure.sendReset": "Send reset link",
+    "auth.secure.needRecovery": "Open the verified reset link from your email before choosing a new password.",
+    "auth.secure.emailPending": "Confirm the email change from your inbox. Your current verified address stays in use until confirmation.",
+    "auth.secure.confirm": "Confirm your email",
+    "auth.secure.credentials": "Passwords and recovery are managed securely through verified email, not downloadable recovery codes.",
+    "auth.secure.countryManual": "Automatic country detection is unavailable. Enter your country to continue.",
+    "auth.secure.error": "The secure account service is unavailable. Please try again; no legacy credential fallback will be used.",
+
 
     // ── Navigation ──────────────────────────────────────────────────
     "nav.search": "Search",

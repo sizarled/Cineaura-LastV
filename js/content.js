@@ -1123,11 +1123,10 @@
     grid.innerHTML = `<li class="vh-wait"><div class="loader" style="display:grid"><div class="spinner"></div></div></li>`;
     let out = null;
     try {
-      const res = await fetch(`${C.SUPABASE_URL}/functions/v1/youtube-search`, {
+      const res = await C.supabaseFetch(`${C.SUPABASE_URL}/functions/v1/youtube-search`, {
         method: "POST",
         headers: {
           apikey: C.SUPABASE_KEY,
-          Authorization: `Bearer ${C.SUPABASE_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ q, limit: 18 }),
@@ -1268,11 +1267,10 @@
     let out = null;
     if (q) {
       try {
-        const res = await fetch(`${C.SUPABASE_URL}/functions/v1/youtube-search`, {
+        const res = await C.supabaseFetch(`${C.SUPABASE_URL}/functions/v1/youtube-search`, {
           method: "POST",
           headers: {
             apikey: C.SUPABASE_KEY,
-            Authorization: `Bearer ${C.SUPABASE_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ q, limit: 12 }),

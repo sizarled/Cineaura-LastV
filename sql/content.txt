@@ -89,6 +89,10 @@ create table if not exists public.content (
   downloads boolean not null default false
 );
 
+-- _content_card below already includes orientation; fresh databases need the
+-- column before PostgreSQL validates that SQL function (not only in the later patch).
+alter table public.content add column if not exists portrait boolean not null default false;
+
 do $$
 begin
   alter table public.content add constraint content_age_check check (age_rating in (3, 6, 13, 16, 18));

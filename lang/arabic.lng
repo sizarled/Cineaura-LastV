@@ -5169,3 +5169,29 @@ Could not upload attachments. Check the connection, storage setup, and file size
 Each file must be 50 MB or less. = يجب ألا يتجاوز حجم كل ملف 50 ميغابايت.
 Attach up to {max} files. = يمكن إرفاق ما يصل إلى {max} ملفات.
 Attachments must total {max} or less. = يجب ألا يتجاوز الحجم الإجمالي للمرفقات {max}.
+
+# Verified account migration.
+Email (verified account) = البريد الإلكتروني للحساب المُوثّق
+Sign in with your verified email. Existing accounts must be securely linked once. = سجّل الدخول ببريدك الإلكتروني المُوثّق. يجب ربط الحسابات القديمة بأمان مرة واحدة.
+Securely link an existing account = ربط حساب قديم بأمان
+Securely link your account = اربط حسابك بأمان
+Use your original account email and choose a new password. Confirm the email link to keep your member ID, content and points. = استخدم البريد الأصلي لحسابك واختر كلمة مرور جديدة. أكّد رابط البريد للاحتفاظ برقم العضوية والمحتوى والنقاط.
+Check your email to confirm your account. No member session is created before verification. = تحقّق من بريدك الإلكتروني لتأكيد الحساب. لن تُنشأ جلسة عضو قبل التحقّق.
+If an eligible account exists, a reset link has been sent. Old recovery codes are no longer accepted. = إذا كان هناك حساب مؤهّل، فسيُرسل رابط إعادة التعيين. لم تعد رموز الاسترداد القديمة مقبولة.
+Use a password of 12 to 256 characters. = استخدم كلمة مرور من 12 إلى 256 حرفًا.
+Unable to sign in. Check your email and password, confirm your email, or securely link your existing account. = تعذّر تسجيل الدخول. تحقّق من البريد وكلمة المرور، وأكّد بريدك، أو اربط حسابك القديم بأمان.
+This link is invalid, expired, or was opened in another browser. Request a new link and use the browser that requested it. = الرابط غير صالح أو انتهت صلاحيته أو فُتح في متصفح آخر. اطلب رابطًا جديدًا وافتحه في المتصفح الذي طلبته منه.
+Your legacy account needs an ownership review. Contact support; no account data has been changed. = يحتاج حسابك القديم إلى مراجعة الملكية. تواصل مع الدعم؛ لم تتغير بيانات الحساب.
+Your email is verified, but your member account could not be loaded. Please try again or contact support. = تم توثيق بريدك، لكن تعذّر تحميل حساب العضوية. أعد المحاولة أو تواصل مع الدعم.
+Request a reset link using your verified email. Open it in this browser to set a new password. = اطلب رابط إعادة التعيين باستخدام بريدك المُوثّق. افتحه في هذا المتصفح لتعيين كلمة مرور جديدة.
+Send reset link = إرسال رابط إعادة التعيين
+Open the verified reset link from your email before choosing a new password. = افتح رابط إعادة التعيين المُوثّق من بريدك قبل اختيار كلمة مرور جديدة.
+Confirm the email change from your inbox. Your current verified address stays in use until confirmation. = أكّد تغيير البريد من صندوق الوارد. سيظل بريدك المُوثّق الحالي مستخدمًا حتى التأكيد.
+Confirm your email = أكّد بريدك الإلكتروني
+Passwords and recovery are managed securely through verified email, not downloadable recovery codes. = تُدار كلمة المرور والاسترداد بأمان عبر البريد المُوثّق، وليس عبر رموز استرداد قابلة للتنزيل.
+Automatic country detection is unavailable. Enter your country to continue. = تعذّر تحديد البلد تلقائيًا. أدخل بلدك للمتابعة.
+The secure account service is unavailable. Please try again; no legacy credential fallback will be used. = خدمة الحسابات الآمنة غير متاحة. أعد المحاولة؛ لن نستخدم بيانات الدخول القديمة كبديل.
+
+Use an email recovery link to prove ownership again before linking this legacy account. = استخدم رابط استرداد عبر البريد لإثبات الملكية مجددًا قبل ربط هذا الحساب القديم.
+If you already verified this email previously, use password recovery to securely link your account. = إذا سبق أن أكّدت هذا البريد، فاستخدم استرداد كلمة المرور لربط حسابك بأمان.
+Complete your verified account profile = أكمل ملف حسابك المُوثّق

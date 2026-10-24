@@ -168,7 +168,6 @@
     const patch = {
       bio: state.bio,
       avatar_url: state.avatar,
-      membership_type: state.plan,
     };
     const existing = await supabaseRequest(
       `/rest/v1/profiles?member_id=eq.${restValue(state.member.member_id)}&select=member_id`
@@ -189,24 +188,6 @@
         ...patch,
       }),
     });
-  }
-
-  async function applyMembership({ months, duration }) {
-    const start = new Date();
-    const end = expiresFrom(months);
-    const body = {
-      status: "active",
-      membership_type: state.plan,
-      membership_duration: duration || durationLabel(months),
-      membership_expires_at: end.toISOString(),
-    };
-    const mem = await supabaseRequest(
-      `/rest/v1/members?member_id=eq.${restValue(state.member.member_id)}`,
-      { method: "PATCH", body: JSON.stringify(body) }
-    );
-    if (!mem.ok) return { ok: false, message: t("act.memberFail") };
-    Object.assign(state.member, body);
-    return { ok: true, start, end };
   }
 
   // Why the server refused a code (sql/packages.sql account_code_redeem).
@@ -240,69 +221,16 @@
       });
       return { ok: true, start: new Date(), end: new Date(r.expires_at), extended: Boolean(r.extended), months: Number(r.months) || 0 };
     }
-    // without sql/packages.sql: the code of activation.sql, read and used from the page as before
-    const res = await supabaseRequest(
-      `/rest/v1/activation?activation_code=eq.${restValue(clean)}&select=*`
-    );
-    if (tableMissing(res)) {
-      return { ok: false, message: t("act.missing") };
-    }
-    const row = res.ok && res.data?.[0];
-    if (!row) return { ok: false, message: t("act.invalid") };
-    if (row.used) return { ok: false, message: t("act.used") };
-    if (row.member_id && row.member_id !== state.member.member_id) {
-      return { ok: false, message: t("act.other") };
-    }
-    if (row.membership_type && row.membership_type !== state.plan) {
-      return { ok: false, message: `This code is for ${row.membership_type}, not ${state.plan}.` };
-    }
-    const months = monthsFromDuration(row.duration, state.plan);
-    const duration = row.duration || durationLabel(months);
-    const start = new Date();
-    const end = expiresFrom(months);
-    const patch = await supabaseRequest(
-      `/rest/v1/activation?activation_code=eq.${restValue(clean)}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          member_id: state.member.member_id,
-          membership_type: state.plan,
-          duration,
-          started_at: start.toISOString(),
-          expires_at: end.toISOString(),
-          ip: state.ip,
-          country: state.member.country || "",
-          used: true,
-          used_at: start.toISOString(),
-          kind: state.mode,
-        }),
-      }
-    );
-    if (!patch.ok) return { ok: false, message: t("act.consumeFail") };
-    return applyMembership({ months, duration });
+    return { ok: false, message: t("act.missing") };
   }
 
   async function activateFreeFirst() {
-    const plan = PLANS.Free;
-    const start = new Date();
-    const end = expiresFrom(plan.months);
-    await supabaseRequest("/rest/v1/activation", {
-      method: "POST",
-      body: JSON.stringify({
-        activation_code: `FREE${state.member.member_id.replace(/\D/g, "")}${Date.now()}`.slice(0, 24),
-        member_id: state.member.member_id,
-        membership_type: "Free",
-        duration: plan.duration,
-        started_at: start.toISOString(),
-        expires_at: end.toISOString(),
-        ip: state.ip,
-        country: state.member.country || "",
-        used: true,
-        used_at: start.toISOString(),
-        kind: "activate",
-      }),
-    });
-    return applyMembership({ months: plan.months, duration: plan.duration });
+    const response = await window.CineAura.rpc("member_activate_free").catch(() => null);
+    const result = response?.data;
+    if (!response?.ok || !result?.ok) return { ok: false, message: t("act.memberFail") };
+    state.plan = "Free";
+    Object.assign(state.member, { status: "active", membership_type: "Free", membership_expires_at: result.expires_at });
+    return { ok: true, start: new Date(), end: new Date(result.expires_at), months: 1, extended: false };
   }
 
   // "Get the code": the member picks one of the three locker providers —

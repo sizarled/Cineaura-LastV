@@ -181,7 +181,7 @@
       </div>`;
     let out = null;
     try {
-      const resp = await fetch(CONFIG.edgeUrl, {
+      const resp = await C.supabaseFetch(CONFIG.edgeUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-client-info": "cineaura-web" },
         body: JSON.stringify({

@@ -148,26 +148,10 @@
       state.profile = get.data[0];
       return;
     }
-    const row = {
-      member_id: member.member_id,
-      username: member.username,
-      bio: "",
-      membership_type: member.membership_type || "Free",
-      private_minutes: Number(member.watch_minutes || 0),
-      public_minutes: 0,
-      avatar_url: "",
-      followers: 0,
-      following: 0,
-      language: getLang(),
-      theme: getTheme(),
-      region: "",
-      country: member.country || "",
-    };
-    await supabaseRequest("/rest/v1/profiles", {
-      method: "POST",
-      body: JSON.stringify(row),
-    });
-    state.profile = row;
+    await C.loadAuthMember();
+    const refreshed = await supabaseRequest(`/rest/v1/profiles?member_id=eq.${restValue(member.member_id)}&select=*`);
+    if (!refreshed.ok || !refreshed.data?.[0]) throw new Error("profile_unavailable");
+    state.profile = refreshed.data[0];
   }
 
   function playlistId() {
@@ -206,53 +190,10 @@
   }
 
   async function syncWatchMinutes() {
-    const views = await supabaseRequest(
-      `/rest/v1/views?viewer_id=eq.${restValue(state.member.member_id)}&select=minutes,playlist_id`
-    );
-    const rows = views.ok && Array.isArray(views.data) ? views.data : [];
-    const vis = {};
-    state.playlists.forEach((p) => {
-      vis[p.playlist_id] = String(p.visibility || "").toLowerCase();
-    });
-    const extraIds = [...new Set(rows.map((r) => r.playlist_id).filter((id) => id && !vis[id]))];
-    if (extraIds.length) {
-      const extra = await supabaseRequest(
-        `/rest/v1/playlists?playlist_id=in.(${extraIds.join(",")})&select=playlist_id,visibility`
-      );
-      (extra.data || []).forEach((p) => {
-        vis[p.playlist_id] = String(p.visibility || "").toLowerCase();
-      });
-    }
-    let priv = 0;
-    let pub = 0;
-    rows.forEach((r) => {
-      const mins = Number(r.minutes || 0);
-      if (vis[r.playlist_id] === "public") pub += mins;
-      else priv += mins;
-    });
-    const owned = await supabaseRequest(
-      `/rest/v1/views?link_owner_id=eq.${restValue(state.member.member_id)}&select=minutes,viewer_id`
-    );
-    (owned.ok && Array.isArray(owned.data) ? owned.data : []).forEach((r) => {
-      if (r.viewer_id !== state.member.member_id) pub += Number(r.minutes || 0);
-    });
-    // Prizes are no longer paid by shrinking the watch minutes: what a member
-    // spent lives in profiles.points_spent, and winners.minutes_paid is kept
-    // only as a record of what each prize cost. Subtracting it here as well
-    // would charge every claim twice.
-    await supabaseRequest(`/rest/v1/profiles?member_id=eq.${restValue(state.member.member_id)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ private_minutes: priv, public_minutes: pub }),
-    });
-    await supabaseRequest(`/rest/v1/members?member_id=eq.${restValue(state.member.member_id)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ watch_minutes: priv + pub }),
-    });
-    if (state.profile) {
-      state.profile.private_minutes = priv;
-      state.profile.public_minutes = pub;
-    }
-    if (state.member) state.member.watch_minutes = priv + pub;
+    // Counters/points are maintained by server-side activity functions. The
+    // browser must never overwrite them with a locally recomputed total.
+    const result = await supabaseRequest(`/rest/v1/profiles?member_id=eq.${restValue(state.member.member_id)}&select=private_minutes,public_minutes,watch_points`);
+    if (result.ok && result.data?.[0]) Object.assign(state.profile, result.data[0]);
   }
 
   function avatar() {
@@ -4275,9 +4216,9 @@
         <div class="follow-pane stack" data-dpane="set2">
           ${planBoxHtml(m, left)}
           <input id="s-email" value="${escapeHtml(m.email||"")}" placeholder="${t("common.email")}" />
-          <input id="s-pass" type="password" placeholder="${t("common.newPassword")}" />
-          <p class="muted">${t("common.recoveryCode")}: <strong id="s-rec">${escapeHtml(m.recovery_code||t("common.notStored"))}</strong>
-            <button class="btn btn-sm btn-ghost" id="copy-rec" type="button">${t("common.copy")}</button></p>
+          <input id="s-pass" type="password" minlength="12" maxlength="256" autocomplete="new-password" placeholder="${t("common.newPassword")}" />
+          <p class="muted">${t("auth.secure.credentials")}</p>
+          <a href="./rest.html">${t("auth.recovery")}</a>
         </div>
         <button class="btn btn-lg btn-primary" id="s-save" type="button">${t("dash.settings.save")}</button>
       </div>`;
@@ -4331,11 +4272,6 @@
       }
     }catch{}
     wireSiteSettings(main);
-    $("#copy-rec").onclick = async () => {
-      if (!m.recovery_code) return toast(t("dash.noRec"));
-      await navigator.clipboard.writeText(m.recovery_code);
-      toast(t("dash.recCopied"));
-    };
     $("#s-save").onclick = async () => {
       const body = {
         bio: $("#s-bio").value,
@@ -4345,24 +4281,29 @@
         region: $("#s-region").value.trim(),
         style: ($("#s-style")?.value || (C.getStyle?C.getStyle():"default")),
       };
-      const profileSave = writeProfileSettings(body);
-      const mem = { full_name: $("#s-name").value.trim(), email: $("#s-email").value.trim().toLowerCase() };
-      const pass = $("#s-pass").value;
-      if (pass.length >= 8) mem.password = await sha256(pass);
-      const [profileResult, memberResult] = await Promise.all([
-        profileSave,
-        supabaseRequest(`/rest/v1/members?member_id=eq.${restValue(m.member_id)}`, {
-          method: "PATCH",
-          body: JSON.stringify(mem),
-        }).catch(() => ({ ok: false, status: 0 })),
-      ]);
-      if (profileResult.ok) {
+      const button = $("#s-save");
+      button.disabled = true;
+      try {
+        const email = $("#s-email").value.trim().toLowerCase();
+        const password = $("#s-pass").value;
+        const credentials = {};
+        if (email !== String(state.member.email || "").toLowerCase()) credentials.email = email;
+        if (password) credentials.password = password;
+        if (Object.keys(credentials).length) await C.auth.updateUser(credentials);
+        const [profileResult, memberResult] = await Promise.all([
+          writeProfileSettings(body),
+          C.rpc("member_account_update", { p_full_name: $("#s-name").value.trim() }),
+        ]);
+        if (!profileResult.ok || !memberResult.ok || !memberResult.data?.ok) throw new Error("settings_save_failed");
         Object.assign(state.profile, body);
         C.refreshAvatar(m.member_id, body.avatar_url);
-      }
-      if (memberResult.ok) Object.assign(state.member, mem);
-      applyPrefs({ language: body.language, theme: body.theme, persist: true });
-      toast(profileResult.ok && memberResult.ok ? t("dash.settings.saved") : t("dash.settings.saveFailed"));
+        Object.assign(state.member, await C.loadAuthMember());
+        $("#s-pass").value = "";
+        applyPrefs({ language: body.language, theme: body.theme, persist: true });
+        toast(t(credentials.email ? "auth.secure.emailPending" : "dash.settings.saved"));
+      } catch (error) {
+        toast(error?.name === "AuthError" ? C.authErrorText(error) : t("dash.settings.saveFailed"));
+      } finally { button.disabled = false; }
     };
   }
 

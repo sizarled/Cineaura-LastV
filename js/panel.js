@@ -194,11 +194,11 @@
 
   async function loadDirectory() {
     let [mem, prof, san] = await Promise.all([
-      supabaseRequest("/rest/v1/members?select=member_id,full_name,username,status,email,country,gender,birth_date,membership_type,membership_duration,membership_expires_at,watch_minutes,created_at,recovery_code,banned_at&order=created_at.desc&limit=400"),
+      supabaseRequest("/rest/v1/members?select=member_id,full_name,username,status,email,country,gender,birth_date,membership_type,membership_duration,membership_expires_at,watch_minutes,created_at,banned_at&order=created_at.desc&limit=400"),
       supabaseRequest("/rest/v1/profiles?select=member_id,username,avatar_url,bio,followers,following,language,region,country,private_minutes,public_minutes"),
       supabaseRequest("/rest/v1/sanctions?select=*"),
     ]);
-    if (!mem.ok) mem = await supabaseRequest("/rest/v1/members?select=member_id,full_name,username,status,email,country,gender,birth_date,membership_type,membership_duration,membership_expires_at,watch_minutes,created_at,recovery_code&order=created_at.desc&limit=400");
+    if (!mem.ok) mem = await supabaseRequest("/rest/v1/members?select=member_id,full_name,username,status,email,country,gender,birth_date,membership_type,membership_duration,membership_expires_at,watch_minutes,created_at&order=created_at.desc&limit=400");
     if (!prof.ok) prof = await supabaseRequest("/rest/v1/profiles?select=member_id,username,avatar_url,bio,followers,following");
     state.members = mem.ok && Array.isArray(mem.data) ? mem.data : [];
     state.profiles = {};
@@ -263,21 +263,6 @@
       btn.disabled = true;
       try {
         const hash = await sha256(pass);
-        if (setup) {
-          if (pass !== $("#p-pass2").value) return alert("error", t("panel.mismatch"));
-          const session = getSession();
-          const ins = await window.CineAura.rpc("staff_setup_super", {
-            p_member: session?.member_id || "",
-            p_username: session?.username || "Super Admin",
-            p_hash: hash,
-            p_sections: ALL_SECTIONS.join(","),
-          });
-          if (!ins.ok || !ins.data?.ok) return alert("error", t("panel.setupFail"));
-          setPanel(ins.data.staff, $("#p-stay").checked, ins.data.token);
-          toast(t("panel.welcomeSuper"));
-          await enterPanel();
-          return;
-        }
         const role = roleFromLogin($("#p-user").value);
         if (!role) return alert("error", t("panel.badUser"));
         const res = await window.CineAura.rpc("staff_login", { p_role: role, p_hash: hash });
@@ -411,10 +396,8 @@
   };
 
   async function patchMemberStatus(id, status) {
-    const body = status === "banned" ? { status, banned_at: new Date().toISOString() } : status === "active" ? { status, banned_at: null } : { status };
-    let r = await supabaseRequest(`/rest/v1/members?member_id=eq.${restValue(id)}`, { method: "PATCH", body: JSON.stringify(body) });
-    if (!r.ok) r = await supabaseRequest(`/rest/v1/members?member_id=eq.${restValue(id)}`, { method: "PATCH", body: JSON.stringify({ status }) });
-    return r.ok;
+    const response = await window.CineAura.rpc("member_admin_set_status", { p_token: state.staff.token, p_member: id, p_status: status });
+    return Boolean(response.ok && response.data?.ok);
   }
 
   // which: "full" | "partial" | "all"
@@ -2603,10 +2586,9 @@
   async function boot() {
     setupChrome();
     const existing = getPanel();
-    const superRes = await supabaseRequest("/rest/v1/staff?role=eq.super&select=id,role,member_id,username,sections");
-    const hasSuper = superRes.ok && Array.isArray(superRes.data) && superRes.data.length;
-    if (!hasSuper) {
-      renderLogin("setup");
+    if (!getSession()?.member_id) {
+      clearPanel();
+      $("#panel-root").innerHTML = `<section class="glass auth-card"><p>${escapeHtml(t("auth.secure.signInHelp"))}</p><a class="btn btn-primary" href="./login.html">${t("nav.signin")}</a></section>`;
       return;
     }
     if (existing?.id && existing?.role) {

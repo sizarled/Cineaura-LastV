@@ -134,9 +134,9 @@
     const path = `${folder}/${Date.now()}-${safe}`;
     let res;
     try {
-      res = await fetch(`${C().SUPABASE_URL}/storage/v1/object/source/${path}`, {
+      res = await C().supabaseFetch(`${C().SUPABASE_URL}/storage/v1/object/source/${path}`, {
         method: "POST",
-        headers: { apikey: C().SUPABASE_KEY, Authorization: `Bearer ${C().SUPABASE_KEY}`, "Content-Type": file.type || "application/octet-stream", "cache-control": "max-age=31536000, immutable" },
+        headers: { apikey: C().SUPABASE_KEY, "Content-Type": file.type || "application/octet-stream", "cache-control": "max-age=31536000, immutable" },
         body: file,
       });
     } catch {

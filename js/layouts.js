@@ -260,7 +260,6 @@
       try{
         if(C&&C.getSession){
           const s=C.getSession(); if(s&&s.username) username=s.username;
-          if(!username){ const st=localStorage.getItem("cineaura_session"); if(st){ const j=JSON.parse(st); username=j.username||j.user||""; } }
         }
       }catch{}
       ids.forEach(sid=>{

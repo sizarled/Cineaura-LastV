@@ -96,7 +96,6 @@
   const signUrl = (bucket = PRIVATE_BUCKET) => `${C().SUPABASE_URL}/storage/v1/object/sign/${bucket}`;
   const authHeaders = (extra) => ({
     apikey: C().SUPABASE_KEY,
-    Authorization: `Bearer ${C().SUPABASE_KEY}`,
     ...(extra || {}),
   });
 
@@ -105,7 +104,7 @@
   async function signedLink(row) {
     const bucket = BUCKET(row);
     if (bucket === PUBLIC_BUCKET) return publicUrl(row.storage_path, bucket);
-    const res = await fetch(`${signUrl(bucket)}/${encPath(row.storage_path)}`, {
+    const res = await C().supabaseFetch(`${signUrl(bucket)}/${encPath(row.storage_path)}`, {
       method: "POST",
       headers: authHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({ expiresIn: SIGN_SECONDS }),
@@ -123,7 +122,7 @@
   }
 
   async function putFile(path, file, mime, bucket = PRIVATE_BUCKET) {
-    const res = await fetch(objectUrl(path, bucket), {
+    const res = await C().supabaseFetch(objectUrl(path, bucket), {
       method: "POST",
       headers: authHeaders({
         "Content-Type": mime || "application/octet-stream",
@@ -138,7 +137,7 @@
 
   async function removeFile(path, bucket = PRIVATE_BUCKET) {
     try {
-      await fetch(objectUrl(path, bucket), { method: "DELETE", headers: authHeaders() });
+      await C().supabaseFetch(objectUrl(path, bucket), { method: "DELETE", headers: authHeaders() });
     } catch {
       /* the row is gone either way */
     }
@@ -167,9 +166,9 @@
     if (sha256) form.append("sha256", sha256);
     let res;
     try {
-      res = await fetch(`${C().SUPABASE_URL}/functions/v1/${SCAN_FN}`, {
+      res = await C().supabaseFetch(`${C().SUPABASE_URL}/functions/v1/${SCAN_FN}`, {
         method: "POST",
-        headers: { apikey: C().SUPABASE_KEY, Authorization: `Bearer ${C().SUPABASE_KEY}` },
+        headers: { apikey: C().SUPABASE_KEY, },
         body: form,
       });
     } catch {

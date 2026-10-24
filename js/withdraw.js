@@ -519,11 +519,20 @@
       const btn = form.querySelector(".wd-submit");
       btn.disabled = true;
       btn.textContent = t("wd.sending");
-      const hash = await C.sha256(pass);
-      const r = await C.rpc("withdraw_request", {
-        p_member: ctx.member.member_id, p_password: hash, p_points: pts, p_method: m, p_details: details,
-        p_save: Boolean(form.save?.checked),
-      }).catch(() => null);
+      let r;
+      try {
+        await C.auth.reauthenticate(pass);
+        r = await C.rpc("withdraw_request", {
+          p_member: ctx.member.member_id, p_password: "", p_points: pts, p_method: m, p_details: details,
+          p_save: Boolean(form.save?.checked),
+        });
+      } catch (error) {
+        btn.disabled = false;
+        btn.textContent = t("wd.send");
+        form.password.value = "";
+        return showError(error?.name === "AuthError" ? C.authErrorText(error) : t("wd.err.network"), "password");
+      }
+      form.password.value = "";
       btn.disabled = false;
       btn.textContent = t("wd.send");
       if (!r || !r.ok) {

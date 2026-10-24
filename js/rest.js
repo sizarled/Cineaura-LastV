@@ -1,192 +1,75 @@
 (() => {
-  const {
-    $,
-    setupChrome,
-    setSession,
-    toast,
-    sha256,
-    supabaseRequest,
-    tmdb,
-    imgUrl,
-    escapeHtml,
-    downloadAccountTxt,
-    restValue,
-    t,
-  } = window.CineAura;
+  const C = window.CineAura;
+  const { $, setupChrome, t } = C;
+  let verifiedRecovery = false;
 
-  const TABLES = ["members", "Members"];
-  let recovered = null;
-
-  function cleanCode(value) {
-    return String(value || "").replace(/[\s\-]/g, "").replace(/[^A-Za-z0-9]/g, "").slice(0, 16);
+  function alertAt(selector, type, message) {
+    const alert = $(selector);
+    alert.className = `form-alert show ${type}`;
+    alert.textContent = message;
   }
 
-  function showAlert(id, type, html) {
-    const el = $(id);
-    el.className = `form-alert show ${type}`;
-    el.innerHTML = html;
-  }
-
-  async function findByRecovery(code) {
-    const compact = cleanCode(code);
-    const variants = [...new Set([compact, compact.toUpperCase(), compact.toLowerCase()])];
-    let tableMissing = false;
-
-    for (const table of TABLES) {
-      for (const variant of variants) {
-        const queries = [
-          `/rest/v1/${table}?recovery_code=eq.${restValue(variant)}&select=member_id,full_name,username,email,status,country,birth_date,recovery_code,created_at`,
-          `/rest/v1/${table}?recovery_code=ilike.${restValue(variant)}&select=member_id,full_name,username,email,status,country,birth_date,recovery_code,created_at`,
-        ];
-        for (const path of queries) {
-          const res = await supabaseRequest(path);
-          if (res.status === 404 && res.data?.code === "PGRST205") {
-            tableMissing = true;
-            break;
-          }
-          if (res.ok && Array.isArray(res.data) && res.data.length) {
-            return { row: res.data[0], table, tableMissing: false };
-          }
-        }
-      }
-    }
-    return { row: null, table: "members", tableMissing };
-  }
-
-  async function savePassword(table, code, hashed) {
-    const rpc = await supabaseRequest("/rest/v1/rpc/reset_password_with_recovery", {
-      method: "POST",
-      body: JSON.stringify({ p_recovery_code: code, p_password: hashed }),
-    });
-    if (rpc.ok && rpc.data && rpc.data.ok) return rpc.data;
-
-    const patch = await supabaseRequest(
-      `/rest/v1/${table}?recovery_code=eq.${restValue(cleanCode(code))}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ password: hashed }),
-      }
-    );
-    if (patch.ok) return { ok: true };
-    if (patch.data?.code === "PGRST205") return { ok: false, reason: "setup" };
-    return { ok: false, reason: "error" };
-  }
-
-  async function onCode(event) {
+  async function onEmail(event) {
     event.preventDefault();
-    const code = cleanCode($("#recovery-input").value);
-    if (code.length !== 16) {
-      showAlert("#code-alert", "error", t("rest.need16"));
-      return;
-    }
-    const btn = $("#code-btn");
-    btn.disabled = true;
-    btn.textContent = t("rest.checking");
+    const button = $("#code-btn");
+    button.disabled = true;
     try {
-      const found = await findByRecovery(code);
-      if (found.tableMissing) {
-        showAlert("#code-alert", "warn", t("rest.table"));
-        return;
-      }
-      if (!found.row) {
-        showAlert("#code-alert", "error", t("rest.badCode"));
-        return;
-      }
-      recovered = { ...found.row, table: found.table, recovery_code: found.row.recovery_code || code };
-      $("#code-form").hidden = true;
-      $("#password-form").hidden = false;
-      toast(t("rest.codeOk"));
+      await C.auth.requestRecovery($("#recovery-email").value);
+      alertAt("#code-alert", "ok", t("auth.secure.recoverySent"));
     } catch (error) {
-      console.error(error);
-      showAlert("#code-alert", "error", t("rest.verifyFail"));
-    } finally {
-      btn.disabled = false;
-      btn.textContent = t("rest.continue");
-    }
+      alertAt("#code-alert", "error", C.authErrorText(error));
+    } finally { button.disabled = false; }
   }
 
   async function onPassword(event) {
     event.preventDefault();
+    if (!verifiedRecovery) return alertAt("#password-alert", "error", t("auth.secure.needRecovery"));
     const password = $("#new-password").value;
-    const confirm = $("#confirm-password").value;
-    if (password.length < 8) {
-      showAlert("#password-alert", "error", t("rest.pass8"));
-      return;
-    }
-    if (password !== confirm) {
-      showAlert("#password-alert", "error", t("rest.mismatch"));
-      return;
-    }
-    const btn = $("#save-btn");
-    btn.disabled = true;
-    btn.textContent = t("rest.saving");
+    if (password !== $("#confirm-password").value) return alertAt("#password-alert", "error", t("rest.mismatch"));
+    const button = $("#save-btn");
+    button.disabled = true;
     try {
-      const hashed = await sha256(password);
-      const result = await savePassword(recovered.table, recovered.recovery_code, hashed);
-      if (!result.ok) {
-        showAlert("#password-alert", "error", result.reason === "setup"
-          ? t("rest.table")
-          : t("rest.saveFail"));
-        return;
+      await C.auth.updateUser({ password });
+      // A recovery-link session also provides fresh, signed email ownership
+      // for an existing Auth user securely claiming a legacy member record.
+      let memberWarning = "";
+      try { await C.loadAuthMember(); } catch (error) {
+        if (["legacy_claim_review_required", "legacy_account_already_claimed"].includes(error.code)) memberWarning = C.authErrorText(error);
       }
-      setSession(recovered, true);
+      verifiedRecovery = false;
+      await C.auth.signOut();
+      $("#password-form").reset();
       $("#password-form").hidden = true;
       $("#success-card").hidden = false;
-      $("#success-meta").innerHTML = `
-        <div>${t("common.memberId")} <strong>${escapeHtml(recovered.member_id)}</strong></div>
-        <div>${t("reg.username")} <strong>${escapeHtml(recovered.username)}</strong></div>
-        <div>${t("common.email")} <strong>${escapeHtml(recovered.email)}</strong></div>
-      `;
-      toast(t("rest.ok"));
+      if (memberWarning) {
+        const note = document.createElement("p");
+        note.textContent = memberWarning;
+        $("#success-card").append(note);
+      }
     } catch (error) {
-      console.error(error);
-      showAlert("#password-alert", "error", t("rest.saveFail"));
-    } finally {
-      btn.disabled = false;
-      btn.textContent = t("rest.savePass");
-    }
+      alertAt("#password-alert", "error", C.authErrorText(error));
+    } finally { button.disabled = false; }
   }
 
-  async function setVisual() {
-    try {
-      const data = await tmdb("/trending/movie/week");
-      const hit = (data.results || []).find((x) => x.backdrop_path);
-      if (!hit) return;
-      $("#auth-visual").style.backgroundImage =
-        `linear-gradient(180deg, rgba(7,15,24,.18), rgba(7,15,24,.78)), url('${imgUrl(hit.backdrop_path, "w1280")}')`;
-    } catch {
-      /* keep fallback */
-    }
-  }
-
-  function init() {
+  async function init() {
     setupChrome();
-    const codeForm = $("#code-form");
-    const passwordForm = $("#password-form");
-    const recoveryInput = $("#recovery-input");
-    if (!codeForm || !recoveryInput) return;
-    recoveryInput.addEventListener("input", (e) => {
-      e.target.value = cleanCode(e.target.value);
-    });
-    $("#toggle-password")?.addEventListener("click", () => {
+    $("#code-form").addEventListener("submit", onEmail);
+    $("#password-form").addEventListener("submit", onPassword);
+    $("#toggle-password").addEventListener("click", () => {
       const input = $("#new-password");
-      if (input) input.type = input.type === "password" ? "text" : "password";
+      input.type = input.type === "password" ? "text" : "password";
     });
-    codeForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      onCode(event);
-    });
-    passwordForm?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      onPassword(event);
-    });
-    $("#download-txt").addEventListener("click", () => {
-      if (recovered) downloadAccountTxt(recovered);
-    });
-    setVisual();
+    try {
+      const callback = await C.auth.completeRedirect();
+      if (!callback) return;
+      if (callback.flow !== "recovery") throw new window.CineAuraAuth.AuthError("invalid_auth_callback");
+      verifiedRecovery = true;
+      $("#code-form").hidden = true;
+      $("#password-form").hidden = false;
+    } catch (error) {
+      await C.auth.signOut();
+      alertAt("#code-alert", "error", C.authErrorText(error));
+    }
   }
-
   document.addEventListener("DOMContentLoaded", init);
 })();

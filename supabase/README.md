@@ -1,3 +1,11 @@
+> **Security migration / release hold:** The verified-Auth P0 repair is not
+> deployed. Read [the rollout guide](../docs/security-auth-rollout-ar.md) before
+> following legacy setup/deployment instructions below. Run reviewed schema
+> installers before `auth_contain.sql` → `auth_prepare.sql` → `auth_cutover.sql`,
+> never after containment or sealing
+> access. Provider workflows below still need isolated end-to-end validation;
+> source/setup instructions are not evidence of a successful production flow.
+
 # Patreon code delivery — setup
 
 The page `codeactivation.html` asks a buyer for his Patreon account, walks him
